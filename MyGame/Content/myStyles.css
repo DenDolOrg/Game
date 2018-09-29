@@ -1,0 +1,27 @@
+body {
+    background-color: #081D26;
+}
+
+#wrapper{
+    width:90%;
+    margin: auto;
+    outline-style: solid;
+
+}
+
+#header{
+    position: relative;
+    padding-left: 5%;
+    height: 90px;
+    outline-style: solid;
+}
+
+#header h1{
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    margin: 0;
+    color: white;
+    letter-spacing: 10px;
+    word-spacing: 20px;
+}
