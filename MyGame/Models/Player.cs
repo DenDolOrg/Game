@@ -11,11 +11,19 @@ namespace MyGame.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class Player
     {
         public int Id { get; set; }
+        [Required]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Name should be less then 50 symbols length.")]
+        [RegularExpression("^[a-zA-Z]*$", ErrorMessage = "Name should consist of letters only.")]
         public string Name { get; set; }
+
+        [Required]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Surname should less then 50 symbols length.")]
+        [RegularExpression("^[a-zA-Z]*$", ErrorMessage = "Surname should consist of letters only.")]
         public string Surname { get; set; }
     
         public virtual Login Login { get; set; }

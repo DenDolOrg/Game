@@ -16,7 +16,7 @@ namespace MyGame
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "Autorisation", action = "Registration", id = UrlParameter.Optional }
             );
         }
     }

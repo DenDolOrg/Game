@@ -14,12 +14,18 @@ namespace MyGame.Controllers
     /// <seealso cref="Controller"/>
     public class HomeController : Controller
     {
+        /// <summary>
+        /// Players storage
+        /// </summary>
         private IPlayerRepository _playerRepository;
-        //private ILoginRepository _loginRepository;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HomeController" /> class.
+        /// </summary>
+        /// <param name="playerRepository">Players repository from Data Base</param>
         public HomeController(IPlayerRepository playerRepository)
         {
             _playerRepository = playerRepository;
-            //_loginRepository = loginRepository;
         }
         /// <summary>
         /// Default action  of <see cref="HomeController"/>
@@ -45,8 +51,6 @@ namespace MyGame.Controllers
             //_playerRepository.AddPlayer(newPlayer);
 
               //_playerRepository.RemovePlayer(1);
-
-
             return View();
         }
     }

@@ -11,13 +11,25 @@ namespace MyGame.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class Login
     {
         public int Id { get; set; }
+
+        [Required]
+        [StringLength(30, MinimumLength = 3, ErrorMessage = "Nickname should be at least 3 symbols and less then 30 symbols length.")]
+        [RegularExpression(@"^[a-zA-Z]", ErrorMessage = "Nickname has to begin from a letter.")]
         public string Nickname { get; set; }
         public string PasswordSalt { get; set; }
+
+        [Required]
+        [StringLength(50, MinimumLength = 5, ErrorMessage = "Password should be at least 5 symbols and less then 100 symbols length.")]
         public string PasswordHash { get; set; }
+
+        [Required]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Email should be less then 50 symbols length")]
+        [RegularExpression(@"^[a-zA-Z]\w*@[a-zA-Z]*\.[a-zA-Z]{2,4}$", ErrorMessage = "Enter valid Email.")]
         public string Email { get; set; }
     
         public virtual Player Player { get; set; }
