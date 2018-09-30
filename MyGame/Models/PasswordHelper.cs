@@ -8,17 +8,28 @@ namespace MyGame.Models
 {
     public class PasswordHelper
     {
+        public static string Salt { get; set; }
+
         public static string HashPassword(string password)
         {
             byte[] salt;
             byte[] buffer2;
-            if (password == null)
-            {
-                throw new ArgumentNullException("Password");
-            }
             using (Rfc2898DeriveBytes bytes = new Rfc2898DeriveBytes(password, 16, 1000))
             {
                 salt = bytes.Salt;
+                buffer2 = bytes.GetBytes(32);
+            }
+            Salt = Convert.ToBase64String(salt);
+            byte[] dst = new byte[49];
+            Buffer.BlockCopy(salt, 0, dst, 1, 16);
+            Buffer.BlockCopy(buffer2, 0, dst, 17, 32);
+            return Convert.ToBase64String(dst);
+        }
+        public static string HashPassword(string password, byte[] salt)
+        {
+            byte[] buffer2;
+            using (Rfc2898DeriveBytes bytes = new Rfc2898DeriveBytes(password, salt, 1000))
+            {
                 buffer2 = bytes.GetBytes(32);
             }
             byte[] dst = new byte[49];
@@ -33,10 +44,6 @@ namespace MyGame.Models
             if (hashedPassword == null)
             {
                 return false;
-            }
-            if (password == null)
-            {
-                throw new ArgumentNullException("Password");
             }
             byte[] src = Convert.FromBase64String(hashedPassword);
             if ((src.Length != 49) || (src[0] != 0))

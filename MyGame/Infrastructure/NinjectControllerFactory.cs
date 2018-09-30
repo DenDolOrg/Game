@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using MyGame.Models.Abstract;
+using MyGame.Models.Concrete;
 
 namespace MyGame.Infrastructure
 {
@@ -43,7 +45,8 @@ namespace MyGame.Infrastructure
         /// </summary>
         private void AddBindings()
         {
-
+            ninjectKernel.Bind<IPlayerRepository>().To<EFPlayerRepository>();
+            ninjectKernel.Bind<ILoginRepository>().To<EFLoginRepository>();
         }
 
     }

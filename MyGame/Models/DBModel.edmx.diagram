@@ -4,10 +4,10 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="6af00499cb1c42bf923196d3d2425d87" Name="Diagram1">
+      <Diagram DiagramId="64e3eb17f3f643a7ae994d5768baf07f" Name="Diagram1">
         <EntityTypeShape EntityType="GameDBModel.Login" Width="1.5" PointX="3" PointY="0.875" IsExpanded="true" />
         <EntityTypeShape EntityType="GameDBModel.Player" Width="1.5" PointX="0.75" PointY="1.125" IsExpanded="true" />
-        <AssociationConnector Association="GameDBModel.FK__Login__RelatedPl__4222D4EF" ManuallyRouted="false" />
+        <AssociationConnector Association="GameDBModel.Login_fk" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

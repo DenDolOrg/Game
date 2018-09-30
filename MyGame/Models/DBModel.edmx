@@ -4,17 +4,16 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="GameDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="GameDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Login">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id" Type="int" Nullable="false" />
           <Property Name="Nickname" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PasswordSalt" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="PasswordHash" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="PasswordSalt" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="PasswordHash" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="Email" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="RelatedPlayerId" Type="int" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -24,28 +23,27 @@
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Surname" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
-        <Association Name="FK__Login__RelatedPl__4222D4EF">
-          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
-          <End Role="Login" Type="Self.Login" Multiplicity="*" />
+        <Association Name="Login_fk">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="Login" Type="Self.Login" Multiplicity="0..1" />
           <ReferentialConstraint>
             <Principal Role="Player">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Login">
-              <PropertyRef Name="RelatedPlayerId" />
+              <PropertyRef Name="Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="GameDBModelStoreContainer">
           <EntitySet Name="Login" EntityType="Self.Login" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Player" EntityType="Self.Player" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Login__RelatedPl__4222D4EF" Association="Self.FK__Login__RelatedPl__4222D4EF">
+          <AssociationSet Name="Login_fk" Association="Self.Login_fk">
             <End Role="Player" EntitySet="Player" />
             <End Role="Login" EntitySet="Login" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="GameDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -53,12 +51,12 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Type="Int32" Nullable="false" />
           <Property Name="Nickname" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="PasswordSalt" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="PasswordHash" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PasswordSalt" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Player" Relationship="Self.FK__Login__RelatedPl__4222D4EF" FromRole="Login" ToRole="Player" />
+          <NavigationProperty Name="Player" Relationship="Self.Login_fk" FromRole="Login" ToRole="Player" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -67,16 +65,24 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Surname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Logins" Relationship="Self.FK__Login__RelatedPl__4222D4EF" FromRole="Player" ToRole="Login" />
+          <NavigationProperty Name="Login" Relationship="Self.Login_fk" FromRole="Player" ToRole="Login" />
         </EntityType>
-        <Association Name="FK__Login__RelatedPl__4222D4EF">
-          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
-          <End Role="Login" Type="Self.Login" Multiplicity="*" />
+        <Association Name="Login_fk">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="Login" Type="Self.Login" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Login">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
         <EntityContainer Name="GameDBContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Logins" EntityType="Self.Login" />
           <EntitySet Name="Players" EntityType="Self.Player" />
-          <AssociationSet Name="FK__Login__RelatedPl__4222D4EF" Association="Self.FK__Login__RelatedPl__4222D4EF">
+          <AssociationSet Name="Login_fk" Association="Self.Login_fk">
             <End Role="Player" EntitySet="Players" />
             <End Role="Login" EntitySet="Logins" />
           </AssociationSet>
@@ -107,15 +113,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="FK__Login__RelatedPl__4222D4EF" TypeName="GameDBModel.FK__Login__RelatedPl__4222D4EF" StoreEntitySet="Login">
-            <EndProperty Name="Player">
-              <ScalarProperty Name="Id" ColumnName="RelatedPlayerId" />
-            </EndProperty>
-            <EndProperty Name="Login">
-              <ScalarProperty Name="Id" ColumnName="Id" />
-            </EndProperty>
-            <Condition IsNull="false" ColumnName="RelatedPlayerId" />
-          </AssociationSetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -131,7 +128,7 @@
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="true" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
         <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>
