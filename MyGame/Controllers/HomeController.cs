@@ -31,27 +31,31 @@ namespace MyGame.Controllers
         /// Default action  of <see cref="HomeController"/>
         /// </summary>
         /// <returns>Returns a view whith the name of "<c>Views/Home/Index.cshtml</c>"</returns>
-        public ActionResult Index()
+        public ActionResult GuestIndex()
         {
-            //Login login = new Login()
-            //{
-            //    Nickname = "Sined",
-            //    Email = "email@hmail.com",
-            //    PasswordHash = PasswordHelper.HashPassword("myPassword"),
-            //    PasswordSalt = PasswordHelper.Salt
-            //};
-
-            //Player newPlayer = new Player()
-            //{
-            //    Name = "Denis",
-            //    Surname = "Dolich",
-            //    Login = login
-            //};
-            //newPlayer.Login.Player = newPlayer;
-            //_playerRepository.AddPlayer(newPlayer);
-
-              //_playerRepository.RemovePlayer(1);
+            if(Session["VisitorName"] == null)
+            {
+                ViewBag.VisitorName = "Guest";
+            }
+            else
+            {
+                ViewBag.VisitorName = Session["VisitorName"];
+            }
+            
             return View();
+        }
+        public ActionResult PlayersIndex(Player loggedPalyer)
+        {
+            Session["VisitorName"] = loggedPalyer.Name + " " + loggedPalyer.Surname;
+            Session["VisitorId"] = loggedPalyer.Id;
+            ViewBag.VisitorName = Session["VisitorName"];
+            return View();
+        }
+
+        [Authorize]
+        public string Some()
+        {
+            return "Autorisation Works";
         }
     }
 }

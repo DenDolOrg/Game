@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MyGame;
+using MyGame.Models.Abstract;
 using MyGame.Controllers;
 
 namespace MyGame.Tests.Controllers
@@ -16,7 +16,7 @@ namespace MyGame.Tests.Controllers
         public void Index()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            HomeController controller = new HomeController(null);
 
             // Act
             ViewResult result = controller.Index() as ViewResult;

@@ -1,12 +1,14 @@
 body {
     background-color: #081D26;
+
 }
 
 #wrapper{
     width:90%;
+    padding-bottom: 50px;
     margin: auto;
     outline-style: solid;
-
+    background-color: #DEB887;
 }
 
 #header{

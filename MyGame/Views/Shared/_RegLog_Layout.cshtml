@@ -4,15 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/mainStyles")
+    @Styles.Render("~/Content/RegLog")
     @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/myScripts")
 </head>
 <body>
     <div id="wrapper">
         <div id="header">
             <h1>MY STRANGE GAME</h1>
-            <p>Hello @ViewBag.VisitorName!</p>
         </div>
         @RenderBody()
     </div>

@@ -1,0 +1,83 @@
+form{
+  margin-top: 50px;
+}
+
+#form-wrapper{
+  background-color: #FFE2B1;
+  margin:auto;
+  width: 40%;
+}
+
+.reg_label{
+  font-size: 13pt;
+  text-align: center;
+  width: 80px;
+}
+
+.reg_field_wrapper{
+  margin-top: 15px;
+
+}
+
+.reg_input{
+  border-radius: 7px;
+  width: 300px;
+  font-size: 15pt;
+  letter-spacing: 2px;
+}
+
+.input-validation-error{
+  background-color: #FFD7D7;
+  border-style: solid;
+  border-width: 2px;
+  border-color: red;
+}
+
+span[id$="error"]{
+  display: block;
+  font-size: 13pt;
+  color: red;
+}
+
+#reg_summit_btn{
+  background-color: #DEB887;
+  border-radius: 7px;
+  width: 120px;
+  height: 40px;
+  font-size: 15pt;
+  margin-right: 20px;
+  float: right;
+}
+
+body {
+  background-color: #081D26;
+}
+
+#wrapper {
+  width: 60%;
+  padding-bottom: 50px;
+  margin: auto;
+  outline-style: solid;
+  background-color: #DEB887;
+}
+
+#header {
+  position: relative;
+  height: 90px;
+  border-bottom: 2px solid white;
+}
+
+#header h1 {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  color: white;
+  letter-spacing: 10px;
+  word-spacing: 20px;
+}
+
+legend{
+  font-size: 15pt;
+}

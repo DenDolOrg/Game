@@ -8,8 +8,6 @@ namespace MyGame.Models
 {
     public class PasswordHelper
     {
-        public static string Salt { get; set; }
-
         public static string HashPassword(string password)
         {
             byte[] salt;
@@ -19,25 +17,11 @@ namespace MyGame.Models
                 salt = bytes.Salt;
                 buffer2 = bytes.GetBytes(32);
             }
-            Salt = Convert.ToBase64String(salt);
             byte[] dst = new byte[49];
             Buffer.BlockCopy(salt, 0, dst, 1, 16);
             Buffer.BlockCopy(buffer2, 0, dst, 17, 32);
             return Convert.ToBase64String(dst);
         }
-        public static string HashPassword(string password, byte[] salt)
-        {
-            byte[] buffer2;
-            using (Rfc2898DeriveBytes bytes = new Rfc2898DeriveBytes(password, salt, 1000))
-            {
-                buffer2 = bytes.GetBytes(32);
-            }
-            byte[] dst = new byte[49];
-            Buffer.BlockCopy(salt, 0, dst, 1, 16);
-            Buffer.BlockCopy(buffer2, 0, dst, 17, 32);
-            return Convert.ToBase64String(dst);
-        }
-
         public static bool VerifyHashedPassword(string hashedPassword, string password)
         {
             byte[] buffer4;

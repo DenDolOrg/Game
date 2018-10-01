@@ -28,8 +28,14 @@ namespace MyGame
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.js"));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/myStyles.css"));
+            bundles.Add(new ScriptBundle("~/bundles/myScripts").Include(
+                    "~/Scripts/RegistrationAndLogin.js"));
+
+            bundles.Add(new StyleBundle("~/Content/RegLog").Include(
+                      "~/Content/RegistrationAndLogin.css"));
+
+            bundles.Add(new StyleBundle("~/Content/mainStyles").Include(
+                        "~/Content/SiteStyles.css"));
         }
     }
 }

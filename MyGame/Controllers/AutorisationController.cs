@@ -4,81 +4,57 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MyGame.Models.Abstract;
 
 namespace MyGame.Controllers
 {
     public class AutorisationController : Controller
     {
-        // GET: Autorisation
-        public ActionResult Index()
+        private IPlayerRepository _playerRepository;
+        private ILoginRepository _loginRepository;
+        public AutorisationController(IPlayerRepository playerRepository, ILoginRepository loginRepository)
         {
-            return View();
+            _playerRepository = playerRepository;
+            _loginRepository = loginRepository;
         }
 
-        // GET: Autorisation/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: Autorisation/Create
         [HttpGet]
         public ActionResult Registration()
         {
             return View();
         }
 
-        // POST: Autorisation/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Registration(Player newPlayer)
         {
+            newPlayer.Login.PasswordHash = PasswordHelper.HashPassword(newPlayer.Login.PasswordHash);
+            newPlayer.Login.Player = newPlayer;
 
-                return View();
+            _playerRepository.AddPlayer(newPlayer);
+            return RedirectToAction("GuestIndex", "Home");
         }
 
-        // GET: Autorisation/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public ActionResult Login()
         {
             return View();
         }
 
-        // POST: Autorisation/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
 
-                return RedirectToAction("Index");
-            }
-            catch
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Login(Login login)
+        {
+            Login loginFromDB = _loginRepository.LoginList.FirstOrDefault(l => l.Email == login.Email);
+            if(loginFromDB == null || !PasswordHelper.VerifyHashedPassword(loginFromDB.PasswordHash, login.PasswordHash))
             {
+                ViewBag.ErrorMessage = "Check your email or password";
                 return View();
             }
-        }
-
-        // GET: Autorisation/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Autorisation/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            Player loggedPlayer = _playerRepository.PlayerList.First(p => p.Id == loginFromDB.Id);
+            return RedirectToAction("PlayersIndex", "Home", loggedPlayer);
         }
     }
 }
