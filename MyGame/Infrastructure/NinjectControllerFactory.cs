@@ -5,8 +5,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using MyGame.Models.Abstract;
-using MyGame.Models.Concrete;
+using MyGame.BLL.Interfaces;
+using MyGame.DAL.Interfaces;
+using MyGame.BLL.Services;
+using MyGame.DAL.Repositories;
 
 namespace MyGame.Infrastructure
 {
@@ -45,8 +47,16 @@ namespace MyGame.Infrastructure
         /// </summary>
         private void AddBindings()
         {
-            ninjectKernel.Bind<IPlayerRepository>().To<EFPlayerRepository>();
-            ninjectKernel.Bind<ILoginRepository>().To<EFLoginRepository>();
+            ninjectKernel.Bind<IUnitOfWork>().To<IdentityUnitOfWork>();
+            ninjectKernel.Bind<IUserService>().To<UserService>();
+
+            //ninjectKernel.Bind<IPlayerRepository>().To<EFPlayerRepository>();
+            //ninjectKernel.Bind<ILoginRepository>().To<EFLoginRepository>();
+        }
+
+        public IKernel GetCurrentKernel()
+        {
+            return ninjectKernel;
         }
 
     }

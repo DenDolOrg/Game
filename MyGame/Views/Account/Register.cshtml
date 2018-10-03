@@ -1,0 +1,68 @@
+﻿@model MyGame.Models.RegisterModel
+
+@{
+    ViewBag.Title = "Registration";
+    Layout = "~/Views/Shared/_RegLog_Layout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<fieldset id="form-wrapper">
+    <legend>Registration</legend>
+    @Html.ValidationSummary(true, "", new { @class = "validation-error" })
+
+    <div class="reg_field_wrapper">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "reg_label" })
+        <div class="reg_input_wrapper">
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "reg_input" } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "validation-error" })
+        </div>
+    </div>
+
+    <div class="reg_field_wrapper">
+        @Html.LabelFor(model => model.Surname, htmlAttributes: new { @class = "reg_label" })
+        <div class="reg_input_wrapper">
+            @Html.EditorFor(model => model.Surname, new { htmlAttributes = new { @class = "reg_input" } })
+            @Html.ValidationMessageFor(model => model.Surname, "", new { @class = "validation-error" })
+        </div>
+    </div>
+
+    <div class="reg_field_wrapper">
+        @Html.LabelFor(model => model.Nickname, htmlAttributes: new { @class = "reg_label" })
+        <div class="reg_input_wrapper">
+            @Html.EditorFor(model => model.Nickname, new { htmlAttributes = new { @class = "reg_input" } })
+            @Html.ValidationMessageFor(model => model.Nickname, "", new { @class = "validation-error" })
+        </div>
+    </div>
+
+    <div class="reg_field_wrapper">
+        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "reg_label" })
+        <div class="reg_input_wrapper">
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "reg_input" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "validation-error" })
+        </div>
+    </div>
+
+    <div class="reg_field_wrapper">
+        @Html.LabelFor(model => model.Password, "Password", htmlAttributes: new { @class = "reg_label" })
+        <div class="reg_input_wrapper">
+            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "reg_input", @type = "password" } })
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "validation-error" })
+        </div>
+    </div>
+
+    <div class="reg_field_wrapper">
+        @Html.LabelFor(model => model.ConfirmPassword, "Confirm password", htmlAttributes: new { @class = "reg_label" })
+        <div class="reg_input_wrapper">
+            @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "reg_input", @type = "password" } })
+            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "validation-error" })
+        </div>
+    </div>
+
+    <div class="reg_field_wrapper">
+        <input type="submit" value="Register" id="reg_summit_btn" />
+    </div>
+</fieldset>
+}
