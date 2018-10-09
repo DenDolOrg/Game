@@ -62,8 +62,6 @@ namespace MyGame.Controllers
         /// <returns>Returns a view whith the name of "<c>Views/Home/Index.cshtml</c>"</returns>
         public async Task<ActionResult> Index()
         {
-
-            HttpContext.GetOwinContext().Set("US", UserService);
             UserDTO receivedUserDTO;
             if (Session["FullName"] == null)
             {
@@ -72,14 +70,8 @@ namespace MyGame.Controllers
                 {
                     string fullName = receivedUserDTO.Name + " " + receivedUserDTO.Surname;
                     Session["FullName"] = fullName;
-                    return RedirectToAction("UserHome");
                 }
             }
-            else
-            {
-                return RedirectToAction("UserHome");
-            }
-                
             return View();
         }
 

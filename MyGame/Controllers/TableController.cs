@@ -45,16 +45,17 @@ namespace MyGame.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpGet]
-        public JsonResult TableList()
+        public JsonResult GetAllTables()
         {
             IEnumerable<object> tables = TableService.GetAllTables();
 
             JsonResult json = Json(tables, JsonRequestBehavior.AllowGet);
             return json;
         }
-        public ActionResult Index()
+        public ActionResult AllTablesList()
         {
-            return View("TableList");
+            ActionModel actionModel = new ActionModel { ActionAddress = "/Table/GetAllTables" };
+            return View("TableList", actionModel);
         }
 
         public ActionResult CreateNewtable()

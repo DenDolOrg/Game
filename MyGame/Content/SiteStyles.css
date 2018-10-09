@@ -60,3 +60,16 @@
     background:none;
     background-image: url("../Images/invalid.png");
 }
+
+.user-menu{
+    position: relative;
+    float: right;
+    height: 90px;
+    width: 30%;
+    margin-right: 50px;   
+}
+.user-menu button{
+    position: absolute;
+    bottom: 0;
+    
+}

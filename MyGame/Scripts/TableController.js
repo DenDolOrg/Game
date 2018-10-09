@@ -2,13 +2,13 @@
 var app = angular.module("app", []);
 
 app.controller("TableListController", function TableListController($scope, $http) {
-
+    
     $scope.tableList = null;
     $scope.message = '';
     $scope.result = "color-default";
     $scope.isViewLoading = false;
 
-    $http.get("/Table/TableList").then(function (data) {
+    $http.get(actionAddress).then(function (data) {
         $scope.tableList = data;
     }, function (data) { });
        

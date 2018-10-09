@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<MyGame.BLL.DTO.FigureDTO>
 
 @{
-    ViewBag.Title = "UserHome";
+    ViewBag.Title = "SIngleTable";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -16,13 +16,10 @@
 
             FillTable(model);
         });
-
     </script>
 }
-<h2>My table:</h2>
 
 <div id="checkersTable">
-
     @for (int i = 1; i <= 10; i++)
     {
         string color = "#C9956E";
@@ -53,4 +50,3 @@
         </div>
     }
 </div>
-

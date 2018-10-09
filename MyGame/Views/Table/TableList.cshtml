@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MyGame.Models.ActionModel
+
+@{
     ViewBag.Title = "Table";
 }
 
@@ -23,12 +25,11 @@
 
                 <td>
                     Some Date
-                    <button type="button" ng-click="DeteleTable(tableModel)" class="deleteTable"></button>
                 </td>
                 <td>
                     <div class="btn-group">
+                        <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-warning btn-sm">Join</a>
                         <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
-                        <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-warning btn-sm">Edit</a>
                     </div>
 
                 </td>
@@ -39,11 +40,11 @@
 
 @section Addons
 {
+    <script type="text/javascript">
+        var actionAddress = @Html.Raw(Json.Encode(Model.ActionAddress));
+    </script>
     <script src="~/Scripts/TableController.js"></script>
 }
-
-
-
 
 @Html.ActionLink("Create table", "CreateNewTable")
 

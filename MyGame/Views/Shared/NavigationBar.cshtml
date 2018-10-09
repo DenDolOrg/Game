@@ -1,0 +1,18 @@
+﻿<div class="dropdown user-menu">
+    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Tables
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+        <li><a class="dropdown-item" href="#">My tables</a></li>
+        <li><a class="dropdown-item" href="#">Available tables</a></li>
+        @if (HttpContext.Current.User.IsInRole("admin"))
+        {
+            <li>
+                @Html.ActionLink("All tables", "AllTablesList", "Table", null, new { @class = "dropdown-item" })
+                @*<a class="dropdown-item" href="#">All tables</a>*@
+            </li>
+        }
+    </ul>
+
+
+</div>

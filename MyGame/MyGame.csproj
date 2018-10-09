@@ -207,6 +207,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\NinjectControllerFactory.cs" />
+    <Compile Include="Models\ActionModel.cs" />
     <Compile Include="Models\FieldModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PlayerModel.cs" />
@@ -234,8 +235,6 @@
     <Content Include="Scripts\Bibles\angular-mocks.js" />
     <Content Include="Scripts\Bibles\angular.js" />
     <Content Include="Scripts\Bibles\angular.min.js" />
-    <Content Include="Scripts\Bibles\bootstrap.js" />
-    <Content Include="Scripts\Bibles\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -249,7 +248,16 @@
     <Content Include="Content\Bootstrap\bootstrap.min.css.map" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Scripts\Bibles\bootstrap.bundle.js.map" />
+    <Content Include="Scripts\Bibles\bootstrap.bundle.min.js.map" />
+    <Content Include="Scripts\Bibles\bootstrap.js.map" />
+    <Content Include="Scripts\Bibles\bootstrap.min.js.map" />
     <None Include="Scripts\Bibles\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\Bibles\bootstrap.bundle.js" />
+    <Content Include="Scripts\Bibles\bootstrap.bundle.min.js" />
+    <Content Include="Scripts\Bibles\bootstrap.js" />
+    <Content Include="Scripts\Bibles\bootstrap.min.js" />
+    <Content Include="Scripts\Bibles\popper.min.js" />
     <Content Include="Scripts\FillTableFithFigures.js" />
     <Content Include="Scripts\TableController.js" />
     <Content Include="Scripts\Bibles\jquery-3.3.1.js" />
@@ -280,8 +288,9 @@
     <Content Include="Views\Shared\WelcomeGuest.cshtml" />
     <Content Include="Views\Shared\WelcomeUser.cshtml" />
     <Content Include="Views\Table\TableList.cshtml" />
-    <Content Include="Views\Home\square.cshtml" />
-    <Content Include="Views\Home\UserHome.cshtml" />
+    <Content Include="Views\Table\square.cshtml" />
+    <Content Include="Views\Table\SIngleTable.cshtml" />
+    <Content Include="Views\Shared\NavigationBar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

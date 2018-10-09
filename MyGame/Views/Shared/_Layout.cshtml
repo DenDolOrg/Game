@@ -7,8 +7,7 @@
     @Styles.Render("~/bundles/mainStyles")
     @Styles.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/bibles")
-    @Scripts.Render("~/bundles/myScripts")
-    
+
 </head>
 <body>
     <div id="header">
@@ -17,12 +16,18 @@
         { Html.RenderPartial("WelcomeGuest"); }
 
         else
-        { Html.RenderPartial("WelcomeUser"); }
+        {
+            Html.RenderPartial("WelcomeUser");
+            {
+                Html.RenderPartial("NavigationBar");
+            }
+        }
     </div>
 
     <div id="contentDiv">
 
         @RenderBody()
+
     </div>
 
     @RenderSection("Addons", false)

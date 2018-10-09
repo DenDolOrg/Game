@@ -16,15 +16,13 @@ namespace MyGame
         {
             bundles.Add(new ScriptBundle("~/bundles/bibles").Include(
                         "~/Scripts/Bibles/jquery-{version}.js",
-                        "~/Scripts/Bibles/bootstrap.js",
+                        "~/Scripts/Bibles/popper.min.js",
+                        "~/Scripts/Bibles/bootstrap.min.js",
                          "~/Scripts/Bibles/angular.min.js"
                         ));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/Bibles/jquery.validate*"));
-
-            bundles.Add(new ScriptBundle("~/bundles/myScripts").Include(
-                    "~/Scripts/deleteTable.js"));
 
             bundles.Add(new StyleBundle("~/bundles/RegLog").Include(
                       "~/Content/RegistrationAndLogin.css"));
