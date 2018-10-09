@@ -32,5 +32,12 @@ namespace MyGame.DAL.Entities
         /// Contains link on appropriate player profile.
         /// </summary>
         public virtual PlayerProfile PlayerProfile { get; set; }
+
+        public virtual ICollection<Table> Tables { get; set; }
+
+        public ApplicationUser()
+        {
+            Tables = new HashSet<Table>();
+        }
     }
 }

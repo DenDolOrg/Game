@@ -21,6 +21,7 @@ namespace MyGame.Models
         ///User's password.
         /// </summary>
         [Required(ErrorMessage = "Password required.")]
+        [MinLength(6, ErrorMessage = "Passwords must be at least 6 characters.")]
         [DataType(DataType.Password, ErrorMessage = "Enter password.")]
         public string Password { get; set; }
     }

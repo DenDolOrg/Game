@@ -14,28 +14,31 @@ namespace MyGame
         /// <param name="bundles">Bundle object</param>
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/Scripts/jquery-{version}.js"));
+            bundles.Add(new ScriptBundle("~/bundles/bibles").Include(
+                        "~/Scripts/Bibles/jquery-{version}.js",
+                        "~/Scripts/Bibles/bootstrap.js",
+                         "~/Scripts/Bibles/angular.min.js"
+                        ));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/Scripts/jquery.validate*"));
-
-            // Use the development version of Modernizr to develop with and learn from. Then, when you're
-            // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.
-            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                        "~/Scripts/modernizr-*"));
-
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js"));
+                        "~/Scripts/Bibles/jquery.validate*"));
 
             bundles.Add(new ScriptBundle("~/bundles/myScripts").Include(
-                    "~/Scripts/RegistrationAndLogin.js"));
+                    "~/Scripts/deleteTable.js"));
 
-            bundles.Add(new StyleBundle("~/Content/RegLog").Include(
+            bundles.Add(new StyleBundle("~/bundles/RegLog").Include(
                       "~/Content/RegistrationAndLogin.css"));
 
-            bundles.Add(new StyleBundle("~/Content/mainStyles").Include(
-                        "~/Content/SiteStyles.css"));
+            bundles.Add(new StyleBundle("~/bundles/bootstrap").Include(
+                    "~/Content/Bootstrap/bootstrap-grid.min.css",
+                    "~/Content/Bootstrap/bootstrap-reboot.min.css",
+                    "~/Content/Bootstrap/bootstrap.min.css"
+                ));
+
+            bundles.Add(new StyleBundle("~/bundles/mainStyles").Include(
+                        "~/Content/SiteStyles.css",
+                        "~/Content/Checkers.css"
+                        ));
         }
     }
 }

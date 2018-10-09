@@ -1,0 +1,14 @@
+.tableSquare{
+    padding: 0;
+    margin:  0;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+
+
+}
+#checkersTable{
+    font-size: 0;
+    width: 600px;
+    margin: auto;
+}

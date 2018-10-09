@@ -76,23 +76,46 @@
   <ItemGroup>
     <Compile Include="Entities\ApplicationRole.cs" />
     <Compile Include="Entities\ApplicationUser.cs" />
+    <Compile Include="Entities\ColorEnum.cs" />
+    <Compile Include="Entities\Figure.cs" />
     <Compile Include="Entities\PlayerProfile.cs" />
+    <Compile Include="Entities\Table.cs" />
     <Compile Include="EntityFramework\ApplicationContext.cs" />
     <Compile Include="EntityFramework\ContextFactory.cs" />
     <Compile Include="Identity\ApplicationRoleManager.cs" />
     <Compile Include="Identity\ApplicationUserManager.cs" />
     <Compile Include="Identity\IdentityModels.cs" />
+    <Compile Include="Interfaces\IFigureManager.cs" />
+    <Compile Include="Interfaces\IManager.cs" />
     <Compile Include="Interfaces\IPlayerManager.cs" />
+    <Compile Include="Interfaces\ITableManager.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
+    <Compile Include="Migrations\201810081904109_newDb.cs" />
+    <Compile Include="Migrations\201810081904109_newDb.Designer.cs">
+      <DependentUpon>201810081904109_newDb.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810081957566_final1.cs" />
+    <Compile Include="Migrations\201810081957566_final1.Designer.cs">
+      <DependentUpon>201810081957566_final1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\FigureManager.cs" />
     <Compile Include="Repositories\IdentityUnitOfWork.cs" />
     <Compile Include="Repositories\PlayerManager.cs" />
+    <Compile Include="Repositories\TableManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201810081904109_newDb.resx">
+      <DependentUpon>201810081904109_newDb.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810081957566_final1.resx">
+      <DependentUpon>201810081957566_final1.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

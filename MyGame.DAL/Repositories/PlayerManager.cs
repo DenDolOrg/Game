@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace MyGame.DAL.Repositories
 {
     /// <summary>
-    /// Realisation of interface <see cref="IPlayerManager"/>. Class for profile control.
+    /// Realisation of interface <see cref="IManager"/>. Class for profile control.
     /// </summary>
     public class PlayerManager : IPlayerManager
     {
@@ -14,7 +14,7 @@ namespace MyGame.DAL.Repositories
         /// <summary>
         /// Database context.
         /// </summary>
-        public ApplicationContext Database { get; set; }
+        public ApplicationContext Database { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="PlayerManager"/>.
@@ -25,30 +25,19 @@ namespace MyGame.DAL.Repositories
             Database = db;
         }
 
-        /// <summary>
-        /// Creates new player profile and adds it to DB.
-        /// </summary>
-        /// <param name="profile">Player profile to add.</param>
-        public async Task CreateAsync(PlayerProfile profile)
+        public void Create(PlayerProfile profile)
         {
             Database.PlayerProfile.Add(profile);
-            await Database.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Dispose Database managed resorces.
-        /// </summary>
         public void Dispose()
         {
             Database.Dispose();
         }
-        /// <summary>
-        /// Delete users profile.
-        /// </summary>
-        /// <param name="profile">Profile to delete.</param>
-        public async Task DeleteAsync(PlayerProfile profile)
+
+        public async void Delete(PlayerProfile item)
         {
-            Database.PlayerProfile.Remove(profile);
+            Database.PlayerProfile.Remove(item);
             await Database.SaveChangesAsync();
         }
     }

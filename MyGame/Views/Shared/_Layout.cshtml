@@ -1,20 +1,30 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html >
+<html ng-app="app">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/mainStyles")
-    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/bundles/mainStyles")
+    @Styles.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/bibles")
     @Scripts.Render("~/bundles/myScripts")
+    
 </head>
 <body>
-    <div id="wrapper">
-        <div id="header">
-            <h1>MY STRANGE GAME</h1>
-            <p>Hello @ViewBag.VisitorName!</p>
-        </div>
+    <div id="header">
+        @Html.ActionLink("MY STRANGE GAME", "Index", "Home", null, new { @id = "homeLink" })
+        @if (Session["FullName"] == null)
+        { Html.RenderPartial("WelcomeGuest"); }
+
+        else
+        { Html.RenderPartial("WelcomeUser"); }
+    </div>
+
+    <div id="contentDiv">
+
         @RenderBody()
     </div>
+
+    @RenderSection("Addons", false)
 </body>
 </html>

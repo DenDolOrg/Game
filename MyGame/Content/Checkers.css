@@ -1,0 +1,18 @@
+.tableSquare{
+    padding: 0;
+    margin:  0;
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+}
+
+.tableSquare img{
+    position: absolute;
+    display: ;
+}
+#checkersTable{
+    transform: rotate(0deg);
+    font-size: 0;
+    width: 500px;
+    margin: auto;
+}

@@ -32,13 +32,6 @@ namespace MyGame.BLL.Services
         }
 
         #region AUTHENTICATION
-        /// <summary>
-        /// User authentication method.
-        /// </summary>
-        /// <param name="userDTO">Universal user data model. Contains user email and password.
-        /// <seealso cref="UserDTO"/>
-        /// </param>
-        /// <returns>Returns claim of authenticated user.</returns>
         public async Task<ClaimsIdentity> Authenticate(UserDTO userDTO)
         {
             ClaimsIdentity claim = null;
@@ -62,13 +55,6 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region DELETE
-        /// <summary>
-        /// Delete user method.
-        /// </summary>
-        /// <param name="userDTO">Universal user data model. Contains user email.
-        /// <seealso cref="UserDTO"/>
-        /// </param>
-        /// <returns>Returns detetion operation status like <see cref="OperatingSystem"/> instance.</returns>
         public async Task<OperationDetails> Delete(UserDTO userDTO)
         {
             var user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
@@ -89,7 +75,7 @@ namespace MyGame.BLL.Services
                         var result = await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
                     }
                 }
-                await Database.PlayerManager.DeleteAsync(user.PlayerProfile);
+                Database.PlayerManager.Delete(user.PlayerProfile);
                 await Database.UserManager.DeleteAsync(user);
                 return new OperationDetails(true, "Account" + userDTO.Email + "succesfuly deleted", "");
             }
@@ -101,44 +87,35 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region CREATE
-        /// <summary>
-        /// User creation method.
-        /// </summary>
-        /// <param name="userDTO">Universal user data model. Contains user name, surname, nickname, email and password. 
-        /// <seealso cref="UserDTO"/>
-        /// </param>
-        /// <returns>Returns user creation operation status like <see cref="OperatingSystem"/> instance.</returns>
         public async Task<OperationDetails> Create(UserDTO userDTO)
         {
             ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
             if (user == null)
             {
+                user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
+                if(user != null)
+                {
+                    return new OperationDetails(false, "Account with such Nickname already exist.", "Nickname");
+                }
                 user = new ApplicationUser { Email = userDTO.Email, UserName = userDTO.UserName };
-                await Database.UserManager.CreateAsync(user, userDTO.Password);
+                var result = await Database.UserManager.CreateAsync(user, userDTO.Password);
 
                 await Database.UserManager.AddToRoleAsync(user.Id, userDTO.Role);
 
                 PlayerProfile playerProfile = new PlayerProfile { Id = user.Id, Surname = userDTO.Surname, Name = userDTO.Name };
-                await Database.PlayerManager.CreateAsync(playerProfile);
+                Database.PlayerManager.Create(playerProfile);
                 await Database.SaveAsync();
                 return new OperationDetails(true, "Registration completed successfully.", "");
 
             }
             else
             {
-                return new OperationDetails(false, "Account with such login already exist.", "Email");
+                return new OperationDetails(false, "Account with such email already exist.", "Email");
             }
         }
         #endregion
 
         #region SET_INITIAL_DATA
-        /// <summary>
-        /// Sets default roles and admin account.
-        /// </summary>
-        /// <param name="adminDTO">Universal user data model. Contains admins email.
-        /// <seealso cref="UserDTO"/>
-        /// </param>
-        /// <param name="roles">List of roles to add.</param>
         public async Task SetInitialData(UserDTO adminDTO, List<string> roles)
         {
             foreach (string roleName in roles)
@@ -162,9 +139,54 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
+        #region GET_USER
+        public async Task<UserDTO> GetUser(UserDTO userDTO)
+        {
+            UserDTO userDtoToSend = null;
+            ApplicationUser user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
+
+            if (user != null)
+            {
+                userDtoToSend = new UserDTO
+                {
+                    Id = user.Id.ToString(),
+                    Email = user.Email,
+                    Name = user.PlayerProfile.Name,
+                    Surname = user.PlayerProfile.Surname,
+                    UserName = user.UserName
+                };
+            }
+            return userDtoToSend;
+        }
+        #endregion
+
+        #region GET_ALL_USERS
+        public async Task<IEnumerable<UserDTO>> GetAllUsers()
+        {
+            IEnumerable<ApplicationUser> users = await Task<IEnumerable<ApplicationUser>>.Factory.StartNew(() => Database.UserManager.Users);
+
+            List<UserDTO> userDTOs = new List<UserDTO>();
+            foreach(ApplicationUser u in users)
+            {
+                userDTOs.Add(new UserDTO
+                {
+                    Id = u.Id.ToString(),
+                    Name = u.PlayerProfile.Name,
+                    Surname = u.PlayerProfile.Surname,
+                    Email = u.Email,
+                    UserName = u.UserName
+                });
+            }
+
+            return userDTOs.AsEnumerable();
+        }
+        #endregion
+
         public void Dispose()
         {
             Database.Dispose();
         }
+
+
     }
 }

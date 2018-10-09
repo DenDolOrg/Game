@@ -47,11 +47,10 @@ namespace MyGame.Infrastructure
         /// </summary>
         private void AddBindings()
         {
+
             ninjectKernel.Bind<IUnitOfWork>().To<IdentityUnitOfWork>();
             ninjectKernel.Bind<IUserService>().To<UserService>();
-
-            //ninjectKernel.Bind<IPlayerRepository>().To<EFPlayerRepository>();
-            //ninjectKernel.Bind<ILoginRepository>().To<EFLoginRepository>();
+            ninjectKernel.Bind<ITableService>().To<TableService>();
         }
 
         public IKernel GetCurrentKernel()

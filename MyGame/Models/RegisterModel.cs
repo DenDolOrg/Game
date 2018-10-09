@@ -11,6 +11,7 @@ namespace MyGame.Models
     /// </summary>
     public class RegisterModel
     {
+
         /// <summary>
         /// User's name.
         /// </summary>
@@ -22,7 +23,7 @@ namespace MyGame.Models
         /// </summary>
         [Required(ErrorMessage = "Surname required.")]
         public string Surname { get; set; }
-
+            
         /// <summary>
         /// User's nickname.
         /// </summary>
@@ -35,13 +36,14 @@ namespace MyGame.Models
         /// User's email.
         /// </summary>
         [Required(ErrorMessage = "Email required.")]
-        [DataType(DataType.EmailAddress, ErrorMessage = "Enter valid Email.")]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         /// <summary>
         /// User's password.
         /// </summary>
         [Required(ErrorMessage = "Password required.")]
+        [MinLength(6, ErrorMessage = "Passwords must be at least 6 characters.")]
         [DataType(DataType.Password, ErrorMessage = "Enter password.")]
         public string Password { get; set; }
 

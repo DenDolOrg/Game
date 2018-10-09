@@ -76,6 +76,7 @@ namespace MyGame.Controllers
                 else
                 {
                     AuthenticationManager.SignOut();
+                    
                     AuthenticationManager.SignIn(new AuthenticationProperties
                     {
                         IsPersistent = true
@@ -93,7 +94,8 @@ namespace MyGame.Controllers
         /// </summary>
         /// <returns>Returns view <c>Views/Account/Register.cshtml</c></returns>
         public ActionResult Register()
-        {
+        {           
+            var name = HttpContext.User.Identity.Name;
             return View();
         }
         #endregion
@@ -129,7 +131,11 @@ namespace MyGame.Controllers
                 };
                 OperationDetails operationDetails = await UserService.Create(userDto);
                 if (operationDetails.Succedeed)
-                    return View("SuccessRegister");
+                {
+                    ClaimsIdentity claim = await UserService.Authenticate(userDto);
+                    AuthenticationManager.SignIn();
+                    return RedirectToAction("Index", "Home");
+                }
                 else
                     ModelState.AddModelError(operationDetails.PropErrorName, operationDetails.ErrorMessage);
             }
@@ -144,6 +150,7 @@ namespace MyGame.Controllers
         /// <returns>Returns view <c>Views/Home/Index</c></returns>
         public ActionResult Logout()
         {
+            Session.RemoveAll();
             AuthenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
         }

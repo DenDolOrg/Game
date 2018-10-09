@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MyGame.BLL.DTO
 {
     /// <summary>
-    /// Universal user data model to transter.
+    /// Main user data model to transter.
     /// </summary>
     public class UserDTO
     {

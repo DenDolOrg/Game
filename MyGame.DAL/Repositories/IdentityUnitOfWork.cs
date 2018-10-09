@@ -29,6 +29,8 @@ namespace MyGame.DAL.Repositories
             UserManager = new ApplicationUserManager(new UserStore<ApplicationUser, ApplicationRole, int, UserLogin, UserRole, UserClaim>(db));
             RoleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole, int, UserRole>(db));
             PlayerManager = new PlayerManager(db);
+            TableManager = new TableManager(db);
+            FigureManager = new FigureManager(db);
         }
 
         /// <summary>
@@ -48,6 +50,13 @@ namespace MyGame.DAL.Repositories
         /// </summary>
         /// <seealso cref="ApplicationRoleManager"/>
         public IPlayerManager PlayerManager { get; }
+
+        /// <summary>
+        /// Table manager.
+        /// </summary>
+        public ITableManager TableManager { get; }
+
+        public IFigureManager FigureManager { get; }
 
         public void Dispose()
         {

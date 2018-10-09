@@ -1,0 +1,56 @@
+﻿@model IEnumerable<MyGame.BLL.DTO.FigureDTO>
+
+@{
+    ViewBag.Title = "UserHome";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Addons
+{
+    <link href="~/Content/Checkers.css" />
+    <script src="~/Scripts/FillTableFithFigures.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var model = @Html.Raw(Json.Encode(Model));
+
+            FillTable(model);
+        });
+
+    </script>
+}
+<h2>My table:</h2>
+
+<div id="checkersTable">
+
+    @for (int i = 1; i <= 10; i++)
+    {
+        string color = "#C9956E";
+        if ((i % 2) == 0)
+        {
+            color = "#3B363A";
+        }
+        <div id="row_@i">
+            @for (int j = 1; j <= 10; j++)
+            {
+                MyGame.Models.FieldModel field = new MyGame.Models.FieldModel
+                {
+                    X = j,
+                    Y = i,
+                    Color = color
+                };
+
+                Html.RenderPartial("square", field);
+                if (color == "#3B363A")
+                {
+                    color = "#C9956E";
+                }
+                else
+                {
+                    color = "#3B363A";
+                }
+            }
+        </div>
+    }
+</div>
+

@@ -362,7 +362,8 @@ $.extend( $.validator, {
 	messages: {
 		required: "This field is required.",
 		remote: "Please fix this field.",
-		email: "Please enter a valid email address.",
+        email: "Please enter a valid email address.",
+        emailunique: "That email already exist",
 		url: "Please enter a valid URL.",
 		date: "Please enter a valid date.",
 		dateISO: "Please enter a valid date (ISO).",
@@ -1149,7 +1150,8 @@ $.extend( $.validator, {
 
 	classRuleSettings: {
 		required: { required: true },
-		email: { email: true },
+        email: { email: true },
+        emailunique: { emailunique: true},
 		url: { url: true },
 		date: { date: true },
 		dateISO: { dateISO: true },
@@ -1382,7 +1384,11 @@ $.extend( $.validator, {
 			// If you have a problem with this implementation, report a bug against the above spec
 			// Or use custom methods to implement your own email validation
 			return this.optional( element ) || /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test( value );
-		},
+        },
+
+        emailunique: function (value, element) {
+            return false;
+        },
 
 		// https://jqueryvalidation.org/url-method/
 		url: function( value, element ) {

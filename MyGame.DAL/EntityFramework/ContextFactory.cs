@@ -12,7 +12,7 @@ namespace MyGame.DAL.EntityFramework
         public string ConnectionString { get; set; }
         public ContextFactory()
         {
-            ConnectionString = "Data Source=DESKTOP-F2L76L7;Initial Catalog=GameDB;Integrated Security=True";
+            ConnectionString = "Data Source=SQL6006.site4now.net;Initial Catalog=DB_A4199F_GameDB;User ID=DB_A4199F_GameDB_admin;Password=10dfhtybrsd";
         }
         public ApplicationContext Create()
         {

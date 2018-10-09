@@ -1,16 +1,13 @@
-﻿using System;
+﻿using MyGame.DAL.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MyGame.DAL.Entities;
 
 namespace MyGame.DAL.Interfaces
 {
-    public interface IPlayerManager :IDisposable
+    public interface IPlayerManager : IManager<PlayerProfile>
     {
-        Task CreateAsync(PlayerProfile profile);
-
-        Task DeleteAsync(PlayerProfile profile);
     }
 }

@@ -12,6 +12,8 @@ namespace MyGame.DAL.Interfaces
         ApplicationUserManager UserManager { get; }
         ApplicationRoleManager RoleManager { get; }
         IPlayerManager PlayerManager { get; }
+        ITableManager TableManager { get; }
+        IFigureManager FigureManager { get; }
         Task SaveAsync();
 
     }

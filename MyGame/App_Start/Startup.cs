@@ -24,13 +24,17 @@ namespace MyGame.App_Start
     /// </summary>
     public class Startup
     {
+
+        NinjectControllerFactory currentFactory;
         /// <summary>
         /// Configuration method for setup authentication settings and connect UI with BLL.
         /// </summary>
         /// <param name="app">Default appication builder instance of <see cref="IAppBuilder"/></param>
         public void Configuration(IAppBuilder app)
         {
-            app.CreatePerOwinContext<IUserService>(CreateUserService);
+            currentFactory = (NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory();
+            app.CreatePerOwinContext(CreateUserService);
+            app.CreatePerOwinContext(CreateTableService);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
@@ -48,16 +52,28 @@ namespace MyGame.App_Start
 
             CreateDefaultRoles(CreateUserService()).Wait();
         }
+
+        #region CREATORS
         /// <summary>
         /// Method for creating ne instance of <see cref="IUserService"/>
         /// </summary>
         /// <returns>Returns new instance of <see cref="IUserService"/></returns>
         private IUserService CreateUserService()
         {
-            NinjectControllerFactory currentFactory = (NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory();
             IUserService service = currentFactory.GetCurrentKernel().Get<IUserService>();
             return service;
         }
+
+        /// <summary>
+        /// Method for creating ne instance of <see cref="ITableService"/>
+        /// </summary>
+        /// <returns>Returns new instance of <see cref="ITableService"/></returns>
+        private ITableService CreateTableService()
+        {
+            ITableService service = currentFactory.GetCurrentKernel().Get<ITableService>();
+            return service;
+        }
+
         /// <summary>
         /// Method for adding standard roles to DB and setting up user with email "dolichdenis@gmail.com" as administator.
         /// </summary>
@@ -69,5 +85,6 @@ namespace MyGame.App_Start
                 Email = "dolichdenis@gmail.com"
             }, new List<string> { "admin", "user"});
         }
+        #endregion
     }
 }
