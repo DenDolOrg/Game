@@ -15,7 +15,7 @@ namespace MyGame.Controllers
     [Authorize]
     public class TableController : Controller
     {
-
+        #region SERVICES
         private IUserService UserService
         {
             get
@@ -23,7 +23,7 @@ namespace MyGame.Controllers
                 return HttpContext.GetOwinContext().GetUserManager<IUserService>();
             }
         }
-        
+
         private ITableService TableService
         {
             get
@@ -42,6 +42,7 @@ namespace MyGame.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
+        #endregion
 
         #region TABLE_LIST
         /// <summary>
@@ -68,6 +69,23 @@ namespace MyGame.Controllers
         }
         #endregion
 
+        #region USER_TABLES
+        /// <summary>
+        /// Returns tables where current user is one of the opponents.
+        /// </summary>
+        /// <returns>Json object for table list.</returns>
+        [HttpGet]
+        [Authorize]
+        public async Task<JsonResult> GetUserTables()
+        {
+            UserDTO userDTO = new UserDTO { UserName = HttpContext.User.Identity.Name };
+
+            IEnumerable<TableDTO> tables = await TableService.GetUserTables(userDTO);
+
+            return Json(tables, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
         #region ALL_TABLES
 
         /// <summary>
@@ -80,23 +98,6 @@ namespace MyGame.Controllers
         public async Task<JsonResult> GetAllTables()
         {
             IEnumerable<TableDTO> tables = await TableService.GetAllTables();
-
-            return Json(tables, JsonRequestBehavior.AllowGet);
-        }
-        #endregion
-
-        #region USER_TABLES
-        /// <summary>
-        /// Returns tables where current user is one of the opponents.
-        /// </summary>
-        /// <returns>Json object for table list.</returns>
-        [HttpGet]
-        [Authorize]
-        public async Task<JsonResult> GetUserTables()
-        {
-            UserDTO userDTO = new UserDTO {UserName = HttpContext.User.Identity.Name };
-
-            IEnumerable<TableDTO> tables = await TableService.GetUserTables(userDTO);
 
             return Json(tables, JsonRequestBehavior.AllowGet);
         }
@@ -120,6 +121,7 @@ namespace MyGame.Controllers
         }
         #endregion
 
+        #region CREATE_TABLE
         /// <summary>
         /// Creates new table for user.
         /// </summary
@@ -129,8 +131,9 @@ namespace MyGame.Controllers
             await TableService.CreateNewTable(user);
             return RedirectToAction("TableList", "TAble", new { tableType = "myTables" });
         }
+        #endregion
 
-
+        #region DELETE_TABLE
         /// <summary>
         /// Deletes table with some id.
         /// </summary>
@@ -143,5 +146,6 @@ namespace MyGame.Controllers
             await TableService.DeteteTable(id);
 
         }
+        #endregion
     }
 }

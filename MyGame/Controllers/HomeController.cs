@@ -22,14 +22,7 @@ namespace MyGame.Controllers
     /// <seealso cref="Controller"/>
     public class HomeController : Controller
     {
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HomeController" /> class.
-        /// </summary>
-        public HomeController()
-        {
-
-        }
+        #region SERVICES
         private IUserService UserService
         {
             get
@@ -37,24 +30,7 @@ namespace MyGame.Controllers
                 return HttpContext.GetOwinContext().GetUserManager<IUserService>();
             }
         }
-        /// <summary>
-        /// Returns new instance of <see cref="IAuthenticationManager"/> for managing authentication process.
-        /// </summary>
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
-
-        private ITableService TableService
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().GetUserManager<ITableService>();
-            }
-        }
+        #endregion
 
         /// <summary>
         /// Default action  of <see cref="HomeController"/>

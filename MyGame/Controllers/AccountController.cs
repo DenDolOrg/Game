@@ -17,9 +17,7 @@ namespace MyGame.Controllers
     /// </summary>
     public class AccountController : Controller
     {
-        /// <summary>
-        /// Returns new instance of <see cref="IUserService"/>
-        /// </summary>
+        #region SERVICES
         private IUserService UserService
         {
             get
@@ -46,6 +44,7 @@ namespace MyGame.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
+        #endregion
 
         #region LOGIN(GET)
         /// <summary>
