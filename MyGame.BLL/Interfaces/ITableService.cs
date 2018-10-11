@@ -26,6 +26,12 @@ namespace MyGame.BLL.Interfaces
         Task DeteteTable(int tableId);
 
         /// <summary>
+        /// Deletes all user tables.
+        /// </summary>
+        /// <param name="user">User for which tables have to be deleted</param>
+        Task DeteteUserTables(UserDTO user);
+
+        /// <summary>
         /// Method to get figures information .
         /// </summary>
         /// <param name="tableId">Id of table where figures are.</param>

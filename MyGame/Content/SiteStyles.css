@@ -51,6 +51,7 @@
     width: 600px;
     margin-left: 50px; 
 }
+
 .deleteTable{
     float: right;
     height: 20px;
@@ -61,15 +62,13 @@
     background-image: url("../Images/invalid.png");
 }
 
-.user-menu{
-    position: relative;
-    float: right;
-    height: 90px;
-    width: 30%;
-    margin-right: 50px;   
-}
-.user-menu button{
+#nav-wrapper{
+    right: 30%;
     position: absolute;
     bottom: 0;
-    
+    width: 200px;
+   
+}
+.btn-light{
+    width: 100px;
 }

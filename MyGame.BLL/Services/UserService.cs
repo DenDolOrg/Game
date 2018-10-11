@@ -36,10 +36,14 @@ namespace MyGame.BLL.Services
         public async Task<ClaimsIdentity> Authenticate(UserDTO userDTO)
         {
             ClaimsIdentity claim = null;
-            ApplicationUser user = await Database.UserManager.FindAsync(userDTO.Email, userDTO.Password);
+            ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
             if(user != null)
-                claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);           
-
+            {
+                if(await Database.UserManager.CheckPasswordAsync(user, userDTO.Password))
+                {
+                    claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+                }
+            }        
             return claim;
         }
         #endregion
@@ -48,24 +52,24 @@ namespace MyGame.BLL.Services
         public async Task Delete(UserDTO userDTO)
         {
             ApplicationUser user = await Database.UserManager.FindByIdAsync(Int32.Parse(userDTO.Id));
-                var logins = user.Logins;
-                var rolesForUser = await Database.UserManager.GetRolesAsync(user.Id);
+            var logins = user.Logins;
+            var rolesForUser = await Database.UserManager.GetRolesAsync(user.Id);
                 
-                foreach(var login in logins.ToList())
-                {
-                    await Database.UserManager.RemoveLoginAsync(login.UserId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
-                }
+            foreach(var login in logins.ToList())
+            {
+                await Database.UserManager.RemoveLoginAsync(login.UserId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
+            }
 
-                if(rolesForUser.Count() > 0)
+            if(rolesForUser.Count() > 0)
+            {
+                foreach(string roleName in rolesForUser)
                 {
-                    foreach(string roleName in rolesForUser.ToList())
-                    {
-                        await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
-                    }
+                    await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
                 }
-                //ADD DELETION USER TABLES
-                await Database.PlayerManager.DeleteAsync(user.PlayerProfile);
-                await Database.UserManager.DeleteAsync(user);
+            }
+
+            await Database.PlayerManager.DeleteAsync(user.PlayerProfile);
+            await Database.UserManager.DeleteAsync(user);
         }
         #endregion
 

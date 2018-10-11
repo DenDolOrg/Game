@@ -65,6 +65,20 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
+        #region DELETE_USER_TABLES
+        public async Task DeteteUserTables(UserDTO userDTO)
+        {
+            ApplicationUser user = await Database.UserManager.FindByIdAsync(Int32.Parse(userDTO.Id));
+
+            IEnumerable<int> tables = new List<int>(user.Tables.Select(t => t.Id));
+
+            foreach(int id in tables)
+            {
+                await DeteteTable(id);
+            }
+        }
+        #endregion
+
         #region GET_FIGURES
         public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(int tableId)
         {

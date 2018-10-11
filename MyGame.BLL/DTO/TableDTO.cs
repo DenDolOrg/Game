@@ -17,6 +17,11 @@ namespace MyGame.BLL.DTO
         public string Id { get; set; }
 
         /// <summary>
+        /// Creation time of table.
+        /// </summary>
+        public DateTime CreationTime { get; set; }
+
+        /// <summary>
         /// Table figures data.
         /// </summary>
         public IEnumerable<UserDTO> Opponents { get; set; }

@@ -1,24 +1,38 @@
-﻿<div class="btn-group" role="group">
-    <div class="dropdown user-menu">
+﻿<div id="nav-wrapper">
 
-        <button class="btn dropdown-toggle btn-secondary btn-light" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Tables
+    
+
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+
+            <button class="btn dropdown-toggle btn-light" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Tables
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+                <li>@Html.ActionLink("Available tables", "TableList", "Table", new { tableType = "available" }, new { @class = "dropdown-item" })</li>
+
+                <li>@Html.ActionLink("My tables", "TableList", "Table", new { tableType = "myTables" }, new { @class = "dropdown-item" })</li>
+                @if (HttpContext.Current.User.IsInRole("admin"))
+                {
+                    <li>
+                        @Html.ActionLink("All tables", "TableList", "Table", new { tableType = "all" }, new { @class = "dropdown-item" })
+                    </li>
+                }
+
+                <li>@Html.ActionLink("Create new table", "CreateNewtable", "Table", null, new { @class = "dropdown-item" })</li>
+            </ul>
+
+        </div>
+
+        <button class="btn btn-light" onclick="UserBtnClick()">
+            Users
         </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
-            <li>@Html.ActionLink("Available tables", "TableList", "Table", new { tableType = "available" }, new { @class = "dropdown-item" })</li>
-
-            <li>@Html.ActionLink("My tables", "TableList", "Table", new { tableType = "myTables" }, new { @class = "dropdown-item" })</li>
-            @if (HttpContext.Current.User.IsInRole("admin"))
-            {
-                <li>
-                    @Html.ActionLink("All tables", "TableList", "Table", new { tableType = "all" }, new { @class = "dropdown-item" })
-                </li>
-            }
-        </ul>
 
     </div>
-
-        @Html.ActionLink("Users", "UserList", "Account")
-
-
 </div>
+
+<script type="text/javascript">
+    function UserBtnClick() {
+        window.location.href = '/Account/UserList';
+    }
+</script>

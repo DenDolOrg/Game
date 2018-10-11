@@ -127,7 +127,7 @@ namespace MyGame.Controllers
         {
             UserDTO user = new UserDTO { UserName = HttpContext.User.Identity.Name };
             await TableService.CreateNewTable(user);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("TableList", "TAble", new { tableType = "myTables" });
         }
 
 

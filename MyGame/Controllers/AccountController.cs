@@ -28,6 +28,14 @@ namespace MyGame.Controllers
             }
         }
 
+        private ITableService TableService
+        {
+            get
+            {
+                return HttpContext.GetOwinContext().GetUserManager<ITableService>();
+            }
+        }
+
         /// <summary>
         /// Returns new instance of <see cref="IAuthenticationManager"/> for managing authentication process.
         /// </summary>
@@ -169,7 +177,7 @@ namespace MyGame.Controllers
             {
                 Id = id.ToString()
             };
-
+            await TableService.DeteteUserTables(userDTO);
             await UserService.Delete(userDTO);
 
 
