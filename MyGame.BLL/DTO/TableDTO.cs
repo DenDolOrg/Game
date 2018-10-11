@@ -14,7 +14,7 @@ namespace MyGame.BLL.DTO
         /// <summary>
         /// Table Id.
         /// </summary>
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Creation time of table.

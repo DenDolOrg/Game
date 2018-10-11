@@ -23,7 +23,7 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="tableId">Id of table to detele.</param>
         /// <returns>Returns table deletion operation status like <see cref="OperatingSystem"/> instance.</returns>
-        Task DeteteTable(int tableId);
+        Task DeteteTable(TableDTO tableDTO);
 
         /// <summary>
         /// Deletes all user tables.
@@ -36,14 +36,14 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="tableId">Id of table where figures are.</param>
         /// <returns>List of universal figure data model. Each of it contains Id, X coordinate, Y coordinate of figure.</returns>
-        Task<IEnumerable<FigureDTO>> GetFiguresOnTable(int tableId);
+        Task<IEnumerable<FigureDTO>> GetFiguresOnTable(TableDTO tableDTO);
 
         /// <summary>
         /// Get table inforamtion with id = <c>tableId</c>.
         /// </summary>
         /// <param name="tableId">Id of table.</param>
         /// <returns>Universal table data model. Contains Id of table and list of opponents.</returns>
-        TableDTO GetTable(int tableId);
+        TableDTO GetTable(TableDTO tableDTO);
 
         /// <summary>
         /// Returns all tables information from DB.

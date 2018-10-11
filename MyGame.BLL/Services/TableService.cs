@@ -54,9 +54,9 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region DELETE
-        public async Task DeteteTable(int tableId)
+        public async Task DeteteTable(TableDTO tableDTO)
         {
-            Table table = Database.TableManager.FindById(tableId);
+            Table table = Database.TableManager.FindById(tableDTO.Id);
             if (table != null)
             {
                 await Database.FigureManager.DeleteAsync(table.Id);
@@ -68,21 +68,21 @@ namespace MyGame.BLL.Services
         #region DELETE_USER_TABLES
         public async Task DeteteUserTables(UserDTO userDTO)
         {
-            ApplicationUser user = await Database.UserManager.FindByIdAsync(Int32.Parse(userDTO.Id));
+            ApplicationUser user = await Database.UserManager.FindByIdAsync(userDTO.Id);
 
             IEnumerable<int> tables = new List<int>(user.Tables.Select(t => t.Id));
 
             foreach(int id in tables)
             {
-                await DeteteTable(id);
+                await DeteteTable(new TableDTO { Id = id});
             }
         }
         #endregion
 
         #region GET_FIGURES
-        public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(int tableId)
+        public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(TableDTO tableDTO)
         {
-            IEnumerable<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(tableId).ToListAsync();
+            IEnumerable<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(tableDTO.Id).ToListAsync();
             if (tableFigures != null)
             {
                 return CreateFiguresDTO(tableFigures);
@@ -92,15 +92,16 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region GET_TABLE
-        public TableDTO GetTable(int tableId)
+        public TableDTO GetTable(TableDTO tableDTO)
         {
-            Table table = Database.TableManager.FindById(tableId);
+            Table table = Database.TableManager.FindById(tableDTO.Id);
             if(table != null)
             {
-                TableDTO tableDTO = new TableDTO
+                TableDTO tableDTO_out = new TableDTO
                 {
-                    Id = table.Id.ToString(),
-                    Opponents = GetOpponents(table)
+                    Id = table.Id,
+                    Opponents = GetOpponents(table),
+                    CreationTime = table.CreationTime
             };
 
                 return tableDTO;
@@ -144,6 +145,14 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
+        //#region JOIN_TO_TABLE
+       
+        //public async Task<OperationDetails> JoinToTable(UserDTO userDTO, TableDTO tableDTO)
+        //{
+        //    ApplicationUser user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
+        //}
+        //#endregion
+
         #region HELPERS
 
         /// <summary>
@@ -163,7 +172,7 @@ namespace MyGame.BLL.Services
             {
                 opponents[i++] = new UserDTO
                 {
-                    Id = u.Id.ToString(),
+                    Id = u.Id,
                     Name = u.PlayerProfile.Name,
                     Surname = u.PlayerProfile.Surname,
                     Email = u.Email,
@@ -190,8 +199,9 @@ namespace MyGame.BLL.Services
                 opponents = GetOpponents(t);
                 tableDTOs.Add(new TableDTO
                 {
-                    Id = t.Id.ToString(),
-                    Opponents = opponents
+                    Id = t.Id,
+                    Opponents = opponents,
+                    CreationTime = t.CreationTime
                 });
             }
             return tableDTOs;

@@ -174,7 +174,7 @@ namespace MyGame.Controllers
         {
             UserDTO userDTO = new UserDTO
             {
-                Id = id.ToString()
+                Id = id
             };
             await TableService.DeteteUserTables(userDTO);
             await UserService.Delete(userDTO);

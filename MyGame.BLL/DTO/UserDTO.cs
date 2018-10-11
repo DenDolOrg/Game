@@ -14,7 +14,7 @@ namespace MyGame.BLL.DTO
         /// <summary>
         /// Users id.
         /// </summary>
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Users name.

@@ -133,6 +133,14 @@ namespace MyGame.Controllers
         }
         #endregion
 
+        //#region JOIN_TABLE
+        //public async Task<ActionResult> JoinTable(int tableId)
+        //{
+
+        //}
+        
+        //#endregion
+
         #region DELETE_TABLE
         /// <summary>
         /// Deletes table with some id.
@@ -143,7 +151,7 @@ namespace MyGame.Controllers
         [HttpDelete]
         public async Task Delete(int id)
         {
-            await TableService.DeteteTable(id);
+            await TableService.DeteteTable(new TableDTO {Id = id });
 
         }
         #endregion
