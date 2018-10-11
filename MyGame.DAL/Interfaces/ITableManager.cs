@@ -20,10 +20,20 @@ namespace MyGame.DAL.Interfaces
         /// Returns all tables from DB.
         /// </summary>
         /// <returns>List of <see cref="Table"/>.</returns>
-        IEnumerable<Table> GetAllTabes();
+        IQueryable<Table> GetAllTabes();
 
-        IEnumerable<Table> GetTablesForUser(int userId);
+        /// <summary>
+        /// Returns user tables.
+        /// </summary>
+        /// <param name="userId">User Id.</param>
+        /// <returns> List of tables.</returns>
+        IQueryable<Table> GetTablesForUser(int userId);
 
-
+        /// <summary>
+        /// Returns tables user can join.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <returns>List of tables.</returns>
+        IQueryable<Table> GetAvailableTables(int userId);
     }
 }

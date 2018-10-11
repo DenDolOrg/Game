@@ -21,39 +21,38 @@ namespace MyGame.DAL.Repositories
         {
             Database = db;
         }
-        public void Create(int tableId)
-        {
-            Table table = Database.Tables.Find(tableId);
-            ICollection<Figure> figures = SetFigures(table);
-            Database.Figures.AddRange(figures.AsEnumerable());
-            Database.SaveChangesAsync().Wait();
-            figures.CopyTo(table.Figures.ToArray(), 0);
-            Database.SaveChangesAsync().Wait();
-        }
 
-        public void Delete(int tableId)
+        #region CREATE
+        public async Task CreateAsync(int tableId)
         {
-            if (tableId > 0)
+            Table table = await Database.Tables.FindAsync(tableId);
+
+            IEnumerable<Figure> figures = SetFigures(table);
+            Database.Figures.AddRange(figures);
+            await Database.SaveChangesAsync();
+
+            table.Figures = new List<Figure>(figures);
+            await Database.SaveChangesAsync();
+        }
+        #endregion
+
+        #region DELETE
+        public async Task DeleteAsync(int tableId)
+        {
+            IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
+            foreach (Figure f in tableFigures)
             {
-                IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
-                foreach(Figure f in tableFigures)
-                {
-                    Database.Figures.Remove(f);
-                }
-                
-            Database.SaveChanges();
-
+                Database.Figures.Remove(f);
             }
+            await Database.SaveChangesAsync();   
         }
-        public void Dispose()
-        {
-            Database.Dispose();
-        }
+        #endregion
 
+        #region HELPERS
         /// <summary>
         /// Set figures start position.
         /// </summary>
-        private ICollection<Figure> SetFigures(Table table)
+        private IEnumerable<Figure> SetFigures(Table table)
         {
             List<Figure> figures = new List<Figure>();
             Colors color = Colors.Black;
@@ -84,12 +83,19 @@ namespace MyGame.DAL.Repositories
 
             return figures;
         }
+        #endregion
 
-        public IEnumerable<Figure> GetFiguresForTable(int tableId)
+
+        public IQueryable<Figure> GetFiguresForTable(int tableId)
         {
-            IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
+            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
 
             return tableFigures;
+        }
+
+        public void Dispose()
+        {
+            Database.Dispose();
         }
     }
 }

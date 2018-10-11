@@ -14,10 +14,18 @@ namespace MyGame
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "Table",
+                url: "{controller}/{action}/{tableType}",
+                defaults: new { },
+                constraints: new { controller = "Table", action = "TableList" }
+                );
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+
         }
     }
 }

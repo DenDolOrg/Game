@@ -25,16 +25,17 @@ namespace MyGame.DAL.Repositories
             Database = db;
         }
 
-        public void Create(Table item)
+        public async Task CreateAsync(Table item)
         {
             Database.Tables.Add(item);
-            Database.SaveChanges();
+            await Database.SaveChangesAsync();
         }
 
-        public void Delete(Table item)
+        public async Task DeleteAsync(Table item)
         {
+
             Database.Tables.Remove(item);
-            Database.SaveChanges();
+            await Database.SaveChangesAsync();
         }
 
         public Table FindById(int id)
@@ -42,20 +43,29 @@ namespace MyGame.DAL.Repositories
             return Database.Tables.Find(id);
         }
 
-        public IEnumerable<Table> GetAllTabes()
+        public IQueryable<Table> GetAllTabes()
         {
-            return Database.Tables.AsEnumerable();
+            IQueryable<Table> tables  = Database.Tables;
+            return tables;
+        }
+
+        public IQueryable<Table> GetTablesForUser(int userId)
+        {
+            IQueryable<Table> tables = Database.Tables.Where(t => t.Opponents.Where(o => o.Id == userId).Count() > 0);
+
+            return tables;
+        }
+
+        public IQueryable<Table> GetAvailableTables(int userId)
+        {
+            IQueryable<Table> tables = Database.Tables.Where(t => (t.Opponents.Count == 1) && (t.Opponents.Where( o => o.Id == userId).Count() == 0));
+
+            return tables;
         }
 
         public void Dispose()
         {
             Database.Dispose();
-        }
-
-        public IEnumerable<Table> GetTablesForUser(int userId)
-        {
-            IEnumerable<Table> tables = Database.Tables.Where(t => t.Opponents.Where(o => o.Id == userId).Count() > 0);
-            return tables;
         }
     }
 }

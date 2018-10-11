@@ -14,8 +14,8 @@ namespace MyGame.Models
         /// <summary>
         /// User's Email or Nickname.
         /// </summary>
-        [Required(ErrorMessage = "Email or Nickname required.")]
-        public string EmailOrNickname { get; set; }
+        [Required(ErrorMessage = "Email required.")]
+        public string Email { get; set; }
         
         /// <summary>
         ///User's password.

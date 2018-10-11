@@ -25,9 +25,10 @@ namespace MyGame.DAL.Repositories
             Database = db;
         }
 
-        public void Create(PlayerProfile profile)
+        public async Task CreateAsync(PlayerProfile profile)
         {
             Database.PlayerProfile.Add(profile);
+            await Database.SaveChangesAsync();
         }
 
         public void Dispose()
@@ -35,10 +36,13 @@ namespace MyGame.DAL.Repositories
             Database.Dispose();
         }
 
-        public async void Delete(PlayerProfile item)
+        public async Task DeleteAsync(PlayerProfile item)
         {
+
             Database.PlayerProfile.Remove(item);
             await Database.SaveChangesAsync();
+
+ 
         }
     }
 }

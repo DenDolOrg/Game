@@ -5,8 +5,8 @@ using System.Web;
 
 namespace MyGame.Models
 {
-    public class ActionModel
+    public class TableActionModel
     {
-        public string ActionAddress { get; set; }
+        public string ActionName { get; set; }
     }
 }

@@ -207,11 +207,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\NinjectControllerFactory.cs" />
-    <Compile Include="Models\ActionModel.cs" />
     <Compile Include="Models\FieldModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PlayerModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
+    <Compile Include="Models\TableActionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +270,7 @@
     <Content Include="Scripts\Bibles\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\Bibles\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\Bibles\modernizr-2.8.3.js" />
+    <Content Include="Scripts\UserController.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -291,6 +292,7 @@
     <Content Include="Views\Table\square.cshtml" />
     <Content Include="Views\Table\SIngleTable.cshtml" />
     <Content Include="Views\Shared\NavigationBar.cshtml" />
+    <Content Include="Views\Account\UserList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

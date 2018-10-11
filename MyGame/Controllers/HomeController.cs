@@ -77,20 +77,6 @@ namespace MyGame.Controllers
 
         public ActionResult UserHome()
         {
-            UserDTO user = new UserDTO { UserName = HttpContext.User.Identity.Name };
-
-            ICollection<TableDTO> tables = TableService.GetTablesForUser(user);
-
-            if (tables != null && tables.Count > 0)
-            {
-                IEnumerable<FigureDTO> figures = TableService.GetFiguresOnTable(Int32.Parse(tables.First().Id));
-                if (figures != null && figures.Count() > 0)
-                {
-                    return View(figures);
-                }
-
-            }
-
             return View("Index");
         }
 

@@ -14,7 +14,7 @@ namespace MyGame.DAL.Interfaces
         IPlayerManager PlayerManager { get; }
         ITableManager TableManager { get; }
         IFigureManager FigureManager { get; }
-        Task SaveAsync();
+        Task SaveChangesAsync();
 
     }
 }

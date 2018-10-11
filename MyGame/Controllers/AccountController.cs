@@ -67,7 +67,7 @@ namespace MyGame.Controllers
         {
             if (ModelState.IsValid)
             {
-                UserDTO userDto = new UserDTO { Email = loginModel.EmailOrNickname, Password = loginModel.Password };
+                UserDTO userDto = new UserDTO { Email = loginModel.Email, Password = loginModel.Password };
                 ClaimsIdentity claim = await UserService.Authenticate(userDto);
                 if (claim == null)
                 {
@@ -163,17 +163,40 @@ namespace MyGame.Controllers
         /// <param name="email">Email of user to delete.</param>
         /// <returns></returns>
         [Authorize(Roles = "admin")]
-        public async Task<ActionResult> Delete(string email)
+        public async Task Delete(int id)
         {
             UserDTO userDTO = new UserDTO
             {
-                Email = email
+                Id = id.ToString()
             };
 
-            OperationDetails operationDetails = await UserService.Delete(userDTO);
+            await UserService.Delete(userDTO);
 
+
+        }
+        #endregion
+
+        #region USER_LIST
+        /// <summary>
+        /// Returns view with list of users.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult UserList()
+        {
             return View();
+        }
+        #endregion
 
+        #region GET_ALL_USERS
+        /// <summary>
+        /// Returns user list.
+        /// </summary>
+        /// <returns>Json object for user list.</returns>
+        public async Task<JsonResult> GetAllUsers()
+        {
+            IEnumerable<UserDTO> users = await UserService.GetAllUsers();
+
+            return Json(users, JsonRequestBehavior.AllowGet);
         }
         #endregion
     }

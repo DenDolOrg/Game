@@ -58,6 +58,11 @@ namespace MyGame.DAL.Repositories
 
         public IFigureManager FigureManager { get; }
 
+
+        public async Task SaveChangesAsync()
+        {
+            await db.SaveChangesAsync();
+        }
         public void Dispose()
         {
             Dispose(true);
@@ -81,12 +86,6 @@ namespace MyGame.DAL.Repositories
             }
         }
 
-        /// <summary>
-        /// Asynchronous Database saving.
-        /// </summary>
-        public async Task SaveAsync()
-        {
-            await db.SaveChangesAsync();
-        }
+
     }
 }

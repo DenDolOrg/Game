@@ -9,7 +9,7 @@ namespace MyGame.DAL.Interfaces
 {
     public interface IFigureManager : IManager<int>
     {
-        IEnumerable<Figure> GetFiguresForTable(int tableId);
+        IQueryable<Figure> GetFiguresForTable(int tableId);
 
     }
 }

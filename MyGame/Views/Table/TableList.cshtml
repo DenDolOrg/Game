@@ -1,7 +1,15 @@
-﻿@model MyGame.Models.ActionModel
+﻿@model MyGame.Models.TableActionModel
 
 @{
     ViewBag.Title = "Table";
+}
+
+@section Addons
+{
+    <script type="text/javascript">
+        var actionAddress = @Html.Raw(Json.Encode(Model.ActionName));
+    </script>
+    <script src="~/Scripts/TableController.js"></script>
 }
 
 <h1>List of tables:</h1>
@@ -29,7 +37,10 @@
                 <td>
                     <div class="btn-group">
                         <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-warning btn-sm">Join</a>
-                        <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
+                        @if (HttpContext.Current.User.IsInRole("admin"))
+                        {
+                            <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
+                        }
                     </div>
 
                 </td>
@@ -37,14 +48,3 @@
         </tbody>
     </table>
 </div>
-
-@section Addons
-{
-    <script type="text/javascript">
-        var actionAddress = @Html.Raw(Json.Encode(Model.ActionAddress));
-    </script>
-    <script src="~/Scripts/TableController.js"></script>
-}
-
-@Html.ActionLink("Create table", "CreateNewTable")
-

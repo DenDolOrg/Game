@@ -16,21 +16,21 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="firstPlayer">First players information.</param>
         /// <returns>Returns table creation operation status like <see cref="OperatingSystem"/> instance.</returns>
-        void CreateNewTable(UserDTO firstPlayer);
+        Task CreateNewTable(UserDTO firstPlayer);
 
         /// <summary>
         /// Deletes table with id = <c>tableId</c> from DB.
         /// </summary>
         /// <param name="tableId">Id of table to detele.</param>
         /// <returns>Returns table deletion operation status like <see cref="OperatingSystem"/> instance.</returns>
-        void DeteteTable(int tableId);
+        Task DeteteTable(int tableId);
 
         /// <summary>
         /// Method to get figures information .
         /// </summary>
         /// <param name="tableId">Id of table where figures are.</param>
         /// <returns>List of universal figure data model. Each of it contains Id, X coordinate, Y coordinate of figure.</returns>
-        IEnumerable<FigureDTO> GetFiguresOnTable(int tableId);
+        Task<IEnumerable<FigureDTO>> GetFiguresOnTable(int tableId);
 
         /// <summary>
         /// Get table inforamtion with id = <c>tableId</c>.
@@ -43,12 +43,18 @@ namespace MyGame.BLL.Interfaces
         /// Returns all tables information from DB.
         /// </summary>
         /// <returns>List of universal table data model. Each of it contains Id of table and list of opponents.</returns>
-        IEnumerable<TableDTO> GetAllTables();
+        Task<IEnumerable<TableDTO>> GetAllTables();
 
         /// <summary>
-        /// Get table for user.
+        /// Get tables of user.
+        /// </summary>
+        /// <returns>List of tables.</returns>
+        Task<IEnumerable<TableDTO>> GetUserTables(UserDTO user);
+
+        /// <summary>
+        /// Get available to join tables.
         /// </summary>
         /// <returns></returns>
-        ICollection<TableDTO> GetTablesForUser(UserDTO user);
+        Task<IEnumerable<TableDTO>> GetAvailableTables(UserDTO userDTO);
     }
 }

@@ -1,7 +1,4 @@
-﻿
-var app = angular.module("app", []);
-
-app.controller("TableListController", function TableListController($scope, $http) {
+﻿app.controller("TableListController", function TableListController($scope, $http) {
     
     $scope.tableList = null;
     $scope.message = '';
@@ -14,10 +11,15 @@ app.controller("TableListController", function TableListController($scope, $http
        
 
     $scope.DeteleTable = function (tableModel) {
-        $http.delete("/Table/Delete/" + tableModel.Id).then(function SuccessDeleteTable(data) {
-            var index = $scope.tableList.data.indexOf(tableModel);
-            $scope.tableList.data.splice(index, 1);
-        }, function FailedDeteTetable(data) { });      
+        if (confirm("Are you sure you want to detete this table?"))
+        {
+            $http.delete("/Table/Delete/" + tableModel.Id).then(function SuccessDeleteTable() {
+                var index = $scope.tableList.data.indexOf(tableModel);
+                $scope.tableList.data.splice(index, 1);
+            }, function FailedDeleteTetable() {
+                alert("Unexpected error occurred.");
+            });
+        }
     };
     
     

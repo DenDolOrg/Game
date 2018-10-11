@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -35,31 +36,18 @@ namespace MyGame.BLL.Services
         public async Task<ClaimsIdentity> Authenticate(UserDTO userDTO)
         {
             ClaimsIdentity claim = null;
-            ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
-            if(user == null)
-            {
-                user = await Database.UserManager.FindAsync(userDTO.Email, userDTO.Password);
-                if(user != null)
-                    claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-            }
-            else
-            {
-                if(await Database.UserManager.CheckPasswordAsync(user, userDTO.Password))
-                {
-                    claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-                }
-            }
-            return claim;
+            ApplicationUser user = await Database.UserManager.FindAsync(userDTO.Email, userDTO.Password);
+            if(user != null)
+                claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);           
 
+            return claim;
         }
         #endregion
 
         #region DELETE
-        public async Task<OperationDetails> Delete(UserDTO userDTO)
+        public async Task Delete(UserDTO userDTO)
         {
-            var user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
-            if (user != null)
-            {
+            ApplicationUser user = await Database.UserManager.FindByIdAsync(Int32.Parse(userDTO.Id));
                 var logins = user.Logins;
                 var rolesForUser = await Database.UserManager.GetRolesAsync(user.Id);
                 
@@ -72,17 +60,12 @@ namespace MyGame.BLL.Services
                 {
                     foreach(string roleName in rolesForUser.ToList())
                     {
-                        var result = await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
+                        await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
                     }
                 }
-                Database.PlayerManager.Delete(user.PlayerProfile);
+                //ADD DELETION USER TABLES
+                await Database.PlayerManager.DeleteAsync(user.PlayerProfile);
                 await Database.UserManager.DeleteAsync(user);
-                return new OperationDetails(true, "Account" + userDTO.Email + "succesfuly deleted", "");
-            }
-            else
-            {
-                return new OperationDetails(false, "No account wuth such Email", "Email");
-            }
         }
         #endregion
 
@@ -103,9 +86,8 @@ namespace MyGame.BLL.Services
                 await Database.UserManager.AddToRoleAsync(user.Id, userDTO.Role);
 
                 PlayerProfile playerProfile = new PlayerProfile { Id = user.Id, Surname = userDTO.Surname, Name = userDTO.Name };
-                Database.PlayerManager.Create(playerProfile);
-                await Database.SaveAsync();
-                return new OperationDetails(true, "Registration completed successfully.", "");
+                await Database.PlayerManager.CreateAsync(playerProfile);
+                return new OperationDetails(true);
 
             }
             else
@@ -163,10 +145,17 @@ namespace MyGame.BLL.Services
         #region GET_ALL_USERS
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
-            IEnumerable<ApplicationUser> users = await Task<IEnumerable<ApplicationUser>>.Factory.StartNew(() => Database.UserManager.Users);
+            IEnumerable<ApplicationUser> users = await Database.UserManager.Users.ToListAsync();
 
+            return CreateUserDTOs(users);
+        }
+        #endregion
+
+        #region HELPERS
+        private IEnumerable<UserDTO> CreateUserDTOs(IEnumerable<ApplicationUser> users)
+        {
             List<UserDTO> userDTOs = new List<UserDTO>();
-            foreach(ApplicationUser u in users)
+            foreach (ApplicationUser u in users)
             {
                 userDTOs.Add(new UserDTO
                 {

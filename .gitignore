@@ -6,7 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-SQL Server Scripts1/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -97,6 +97,7 @@ $tf/
 *.gpState
 
 # ReSharper is a .NET coding add-in
+SQL Server Scripts1/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user

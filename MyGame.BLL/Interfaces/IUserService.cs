@@ -27,7 +27,7 @@ namespace MyGame.BLL.Interfaces
         /// <seealso cref="UserDTO"/>
         /// </param>
         /// <returns>Returns detetion operation status like <see cref="OperatingSystem"/> instance.</returns>
-        Task<OperationDetails> Delete(UserDTO userDTO);
+        Task Delete(UserDTO userDTO);
 
         /// <summary>
         /// User authentication method.

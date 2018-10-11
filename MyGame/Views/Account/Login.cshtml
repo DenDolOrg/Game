@@ -19,9 +19,9 @@
         @Html.ValidationSummary(true, "", new { @class = "valid-message" })
 
         <div class="form-group">
-            @Html.LabelFor(model => model.EmailOrNickname, htmlAttributes: new { @class = "reg_label" })
-            @Html.EditorFor(model => model.EmailOrNickname, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.EmailOrNickname, "", new { @class = "valid-message" })
+            @Html.LabelFor(model => model.Email, "E-mail", htmlAttributes: new { @class = "reg_label" })
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "valid-message" })
         </div>
 
         <div class="form-group">
