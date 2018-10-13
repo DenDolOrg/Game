@@ -21,7 +21,6 @@ namespace MyGame.Controllers.Tests
         [TestMethod()]
         public void LoginTest()
         {
-            Guid.
             Assert.Fail();
         }
 

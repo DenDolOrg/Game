@@ -13,6 +13,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Ninject;
+using MyGame.Infrastructure;
 
 namespace MyGame.Controllers
 {
@@ -23,12 +25,49 @@ namespace MyGame.Controllers
     public class HomeController : Controller
     {
         #region SERVICES
+        /// <summary>
+        /// Factory for creating services.
+        /// </summary>
+        private ServiceFactory serviceFactory;
+
+        /// <summary>
+        /// Service which contains methods to work with users.
+        /// </summary>
         private IUserService UserService
         {
             get
             {
-                return HttpContext.GetOwinContext().GetUserManager<IUserService>();
+                return serviceFactory.CreateUserService();
             }
+        }
+
+        /// <summary>
+        /// Service which contains methods to work with tables.
+        /// </summary>
+        private ITableService TableService
+        {
+            get
+            {
+                return serviceFactory.CreateTableService();
+            }
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="HomeController"/> with default services.
+        /// </summary>
+        public HomeController()
+        {
+            serviceFactory = new HttpContextServicesFactory(
+                () => HttpContext.GetOwinContext().Get<IUserService>(),
+                () => HttpContext.GetOwinContext().Get<ITableService>());
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="HomeController"/> with custom services(for unit testing).
+        /// </summary>
+        public HomeController(IUserService userService, ITableService tableService)
+        {
+            serviceFactory = new CustomServicesFactory(userService, tableService);
         }
         #endregion
 

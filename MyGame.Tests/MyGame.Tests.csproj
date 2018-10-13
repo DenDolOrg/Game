@@ -103,6 +103,7 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\MockUserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
@@ -111,6 +112,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MyGame.BLL\MyGame.BLL.csproj">
+      <Project>{33A97559-ED43-4960-89F9-A0A47583BD48}</Project>
+      <Name>MyGame.BLL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyGame\MyGame.csproj">
       <Project>{49418069-BBC5-4A1D-B157-95DBBE142EB3}</Project>
       <Name>MyGame</Name>

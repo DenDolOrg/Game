@@ -9,6 +9,7 @@ using MyGame.BLL.DTO;
 using System.Security.Claims;
 using MyGame.BLL.Interfaces;
 using MyGame.BLL.Infrastructure;
+using MyGame.Infrastructure;
 
 namespace MyGame.Controllers
 {
@@ -18,24 +19,54 @@ namespace MyGame.Controllers
     public class AccountController : Controller
     {
         #region SERVICES
+        /// <summary>
+        /// Factory for creating services.
+        /// </summary>
+        private ServiceFactory serviceFactory;
+
+        /// <summary>
+        /// Service which contains methods to work with users.
+        /// </summary>
         private IUserService UserService
         {
             get
             {
-                return HttpContext.GetOwinContext().GetUserManager<IUserService>();
-            }
-        }
-
-        private ITableService TableService
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().GetUserManager<ITableService>();
+                return serviceFactory.CreateUserService();
             }
         }
 
         /// <summary>
-        /// Returns new instance of <see cref="IAuthenticationManager"/> for managing authentication process.
+        /// Service which contains methods to work with tables.
+        /// </summary>
+        private ITableService TableService
+        {
+            get
+            {
+                return serviceFactory.CreateTableService();
+            }
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="AccountController"/> with default services.
+        /// </summary>
+        public AccountController()
+        {
+            serviceFactory = new HttpContextServicesFactory(
+                () => HttpContext.GetOwinContext().Get<IUserService>(),
+                () => HttpContext.GetOwinContext().Get<ITableService>());
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="AccountController"/> with custom services(for unit testing).
+        /// </summary>
+        public AccountController(IUserService userService, ITableService tableService)
+        {
+            serviceFactory = new CustomServicesFactory(userService, tableService);
+        }
+        #endregion
+
+        /// <summary>
+        /// Initialises new instance of <see cref="IAuthenticationManager"/> for managing authentication process.
         /// </summary>
         private IAuthenticationManager AuthenticationManager
         {
@@ -44,7 +75,6 @@ namespace MyGame.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
-        #endregion
 
         #region LOGIN(GET)
         /// <summary>
@@ -206,5 +236,7 @@ namespace MyGame.Controllers
             return Json(users, JsonRequestBehavior.AllowGet);
         }
         #endregion
+
+
     }
 }

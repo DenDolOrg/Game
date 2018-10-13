@@ -16,6 +16,7 @@ using Microsoft.AspNet.Identity.Owin;
 using MyGame.DAL.Identity;
 using MyGame.DAL.Entities;
 
+
 [assembly: OwinStartup(typeof(MyGame.App_Start.Startup))]
 namespace MyGame.App_Start
 {
@@ -24,17 +25,23 @@ namespace MyGame.App_Start
     /// </summary>
     public class Startup
     {
+        private IKernel kernel;
 
-        NinjectControllerFactory currentFactory;
+        public Startup()
+        {
+            NinjectControllerFactory factory = (NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory();
+            kernel = factory.GetCurrentKernel();
+        }
+
         /// <summary>
         /// Configuration method for setup authentication settings and connect UI with BLL.
         /// </summary>
         /// <param name="app">Default appication builder instance of <see cref="IAppBuilder"/></param>
         public void Configuration(IAppBuilder app)
         {
-            currentFactory = (NinjectControllerFactory)ControllerBuilder.Current.GetControllerFactory();
-            app.CreatePerOwinContext(CreateUserService);
-            app.CreatePerOwinContext(CreateTableService);
+
+            app.CreatePerOwinContext(CreareUserService);
+            app.CreatePerOwinContext(CreareTableService);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
@@ -49,29 +56,18 @@ namespace MyGame.App_Start
                      )
                 }
             });
-
-            CreateDefaultRoles(CreateUserService()).Wait();
+            CreateDefaultRoles(CreareUserService()).Wait();
         }
 
         #region CREATORS
-        /// <summary>
-        /// Method for creating ne instance of <see cref="IUserService"/>
-        /// </summary>
-        /// <returns>Returns new instance of <see cref="IUserService"/></returns>
-        private IUserService CreateUserService()
+        private IUserService CreareUserService()
         {
-            IUserService service = currentFactory.GetCurrentKernel().Get<IUserService>();
-            return service;
+            return kernel.Get<IUserService>();
         }
 
-        /// <summary>
-        /// Method for creating ne instance of <see cref="ITableService"/>
-        /// </summary>
-        /// <returns>Returns new instance of <see cref="ITableService"/></returns>
-        private ITableService CreateTableService()
+        private ITableService CreareTableService()
         {
-            ITableService service = currentFactory.GetCurrentKernel().Get<ITableService>();
-            return service;
+            return kernel.Get<ITableService>();
         }
 
         /// <summary>

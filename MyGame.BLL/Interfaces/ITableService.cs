@@ -1,5 +1,6 @@
 ﻿using MyGame.BLL.DTO;
 using MyGame.BLL.Infrastructure;
+using MyGame.BLL.Services;
 using MyGame.DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -62,5 +63,6 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<TableDTO>> GetAvailableTables(UserDTO userDTO);
+
     }
 }

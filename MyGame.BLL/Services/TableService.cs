@@ -229,7 +229,5 @@ namespace MyGame.BLL.Services
         {
             Database.Dispose();
         }
-
-
     }
 }

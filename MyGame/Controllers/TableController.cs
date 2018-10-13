@@ -9,38 +9,58 @@ using System.Web.Mvc;
 using MyGame.BLL.DTO;
 using System.Threading.Tasks;
 using MyGame.Models;
+using MyGame.Infrastructure;
 
 namespace MyGame.Controllers
 {
     [Authorize]
     public class TableController : Controller
     {
+
         #region SERVICES
+        /// <summary>
+        /// Factory for creating services.
+        /// </summary>
+        private ServiceFactory serviceFactory;
+
+        /// <summary>
+        /// Service which contains methods to work with users.
+        /// </summary>
         private IUserService UserService
         {
             get
             {
-                return HttpContext.GetOwinContext().GetUserManager<IUserService>();
-            }
-        }
-
-        private ITableService TableService
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().GetUserManager<ITableService>();
+                return serviceFactory.CreateUserService();
             }
         }
 
         /// <summary>
-        /// Returns new instance of <see cref="IAuthenticationManager"/> for managing authentication process.
+        /// Service which contains methods to work with tables.
         /// </summary>
-        private IAuthenticationManager AuthenticationManager
+        private ITableService TableService
         {
             get
             {
-                return HttpContext.GetOwinContext().Authentication;
+                return serviceFactory.CreateTableService();
             }
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="TableController"/> with default services.
+        /// </summary>
+        public TableController()
+        {
+            serviceFactory = new HttpContextServicesFactory(
+                () => HttpContext.GetOwinContext().Get<IUserService>(),
+                () => HttpContext.GetOwinContext().Get<ITableService>());
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="TableController"/> with custom services(for unit testing).
+        /// </summary>
+        public TableController(IUserService userService, ITableService tableService)
+        {
+            serviceFactory = new CustomServicesFactory(userService, tableService);
         }
         #endregion
 

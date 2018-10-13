@@ -3,12 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Owin.Security;
+using Microsoft.AspNet.Identity.Owin;
 using System.Web.Mvc;
 using System.Web.Routing;
 using MyGame.BLL.Interfaces;
 using MyGame.DAL.Interfaces;
 using MyGame.BLL.Services;
 using MyGame.DAL.Repositories;
+using MyGame.App_Start;
 
 namespace MyGame.Infrastructure
 {
@@ -47,10 +50,13 @@ namespace MyGame.Infrastructure
         /// </summary>
         private void AddBindings()
         {
-
             ninjectKernel.Bind<IUnitOfWork>().To<IdentityUnitOfWork>();
-            ninjectKernel.Bind<IUserService>().To<UserService>();
-            ninjectKernel.Bind<ITableService>().To<TableService>();
+            ninjectKernel.Bind<IUserService>().To<UserService>()
+                .When(request => (request.Target == null) || (request.Target.Name.EndsWith("Controller"))); ;
+
+            ninjectKernel.Bind<ITableService>().To<TableService>()
+                .When(request => (request.Target == null) || (request.Target.Name.EndsWith("Controller"))); ;
+
         }
 
         public IKernel GetCurrentKernel()

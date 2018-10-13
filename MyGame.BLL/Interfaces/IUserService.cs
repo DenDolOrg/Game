@@ -59,5 +59,6 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <returns>List of universal user data model.</returns>
         Task<IEnumerable<UserDTO>> GetAllUsers();
+
     }
 }

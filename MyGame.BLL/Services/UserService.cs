@@ -51,7 +51,7 @@ namespace MyGame.BLL.Services
         #region DELETE
         public async Task Delete(UserDTO userDTO)
         {
-            ApplicationUser user = await Database.UserManager.FindByIdAsync(Int32.Parse(userDTO.Id));
+            ApplicationUser user = await Database.UserManager.FindByIdAsync(userDTO.Id);
             var logins = user.Logins;
             var rolesForUser = await Database.UserManager.GetRolesAsync(user.Id);
                 
@@ -135,7 +135,7 @@ namespace MyGame.BLL.Services
             {
                 userDtoToSend = new UserDTO
                 {
-                    Id = user.Id.ToString(),
+                    Id = user.Id,
                     Email = user.Email,
                     Name = user.PlayerProfile.Name,
                     Surname = user.PlayerProfile.Surname,
@@ -163,7 +163,7 @@ namespace MyGame.BLL.Services
             {
                 userDTOs.Add(new UserDTO
                 {
-                    Id = u.Id.ToString(),
+                    Id = u.Id,
                     Name = u.PlayerProfile.Name,
                     Surname = u.PlayerProfile.Surname,
                     Email = u.Email,
@@ -179,7 +179,6 @@ namespace MyGame.BLL.Services
         {
             Database.Dispose();
         }
-
 
     }
 }
