@@ -23,28 +23,52 @@ namespace MyGame.DAL.Repositories
         }
 
         #region CREATE
-        public async Task CreateAsync(int tableId)
+        public async Task<bool> CreateAsync(int tableId)
         {
             Table table = await Database.Tables.FindAsync(tableId);
+            if (table == null)
+                return false;
 
-            IEnumerable<Figure> figures = SetFigures(table);
-            Database.Figures.AddRange(figures);
-            await Database.SaveChangesAsync();
+            try
+            {
+                IEnumerable<Figure> figures = SetFigures(table);
+                Database.Figures.AddRange(figures);
+                await Database.SaveChangesAsync();
 
-            table.Figures = new List<Figure>(figures);
-            await Database.SaveChangesAsync();
+                table.Figures = new List<Figure>(figures);
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+
         }
         #endregion
 
         #region DELETE
-        public async Task DeleteAsync(int tableId)
+        public async Task<bool> DeleteAsync(int tableId)
         {
             IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
-            foreach (Figure f in tableFigures)
+            if (tableFigures == null)
+                return false;
+
+            try
             {
-                Database.Figures.Remove(f);
+                foreach (Figure f in tableFigures)
+                {
+                    Database.Figures.Remove(f);
+                }
+                await Database.SaveChangesAsync();
             }
-            await Database.SaveChangesAsync();   
+            catch
+            {
+                return false;
+            }
+            return true;
+ 
         }
         #endregion
 

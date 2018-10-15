@@ -52,15 +52,16 @@ namespace MyGame.Controllers
         {
             serviceFactory = new HttpContextServicesFactory(
                 () => HttpContext.GetOwinContext().Get<IUserService>(),
-                () => HttpContext.GetOwinContext().Get<ITableService>());
+                () => HttpContext.GetOwinContext().Get<ITableService>(),
+                () => null);
         }
 
         /// <summary>
         /// Initialises a new instance of <see cref="TableController"/> with custom services(for unit testing).
         /// </summary>
-        public TableController(IUserService userService, ITableService tableService)
+        public TableController(IUserService userService, ITableService tableService, IAuthenticationManager authenticationManager)
         {
-            serviceFactory = new CustomServicesFactory(userService, tableService);
+            serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
         }
         #endregion
 

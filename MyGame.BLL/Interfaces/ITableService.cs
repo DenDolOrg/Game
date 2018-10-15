@@ -24,13 +24,13 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="tableId">Id of table to detele.</param>
         /// <returns>Returns table deletion operation status like <see cref="OperatingSystem"/> instance.</returns>
-        Task DeteteTable(TableDTO tableDTO);
+        Task<OperationDetails> DeteteTable(TableDTO tableDTO);
 
         /// <summary>
         /// Deletes all user tables.
         /// </summary>
         /// <param name="user">User for which tables have to be deleted</param>
-        Task DeteteUserTables(UserDTO user);
+        Task<OperationDetails> DeteteUserTables(UserDTO user);
 
         /// <summary>
         /// Method to get figures information .

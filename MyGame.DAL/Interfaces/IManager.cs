@@ -13,12 +13,12 @@ namespace MyGame.DAL.Interfaces
         /// Creates new item of type <see cref="T"/> and adds it to DB.
         /// </summary>
         /// <param name="item">Item to add.</param>
-        Task CreateAsync(T item);
+        Task<bool> CreateAsync(T item);
 
         /// <summary>
         /// Delete item of type <see cref="T"/> from DB.
         /// </summary>
         /// <param name="item">Item to delete.</param>
-        Task DeleteAsync(T item);
+        Task<bool> DeleteAsync(T item);
     }
 }

@@ -1,4 +1,5 @@
-﻿using MyGame.BLL.Interfaces;
+﻿using Microsoft.Owin.Security;
+using MyGame.BLL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,7 @@ namespace MyGame.Infrastructure
         /// </summary>
         /// <returns>Realization of <see cref="ITableService"/>.</returns>
         public abstract ITableService CreateTableService();
+
+        public abstract IAuthenticationManager CreateAuthenticationManager();
     }
 }

@@ -49,27 +49,40 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region DELETE
-        public async Task Delete(UserDTO userDTO)
+        public async Task<OperationDetails> Delete(UserDTO userDTO)
         {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
+
             ApplicationUser user = await Database.UserManager.FindByIdAsync(userDTO.Id);
             var logins = user.Logins;
             var rolesForUser = await Database.UserManager.GetRolesAsync(user.Id);
                 
             foreach(var login in logins.ToList())
             {
-                await Database.UserManager.RemoveLoginAsync(login.UserId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
+                var LoginDelResult = await Database.UserManager.RemoveLoginAsync(login.UserId, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
+                if (!LoginDelResult.Succeeded)
+                    return failOD;
             }
 
             if(rolesForUser.Count() > 0)
             {
                 foreach(string roleName in rolesForUser)
                 {
-                    await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
+                    var RoleDelResult = await Database.UserManager.RemoveFromRoleAsync(user.Id, roleName);
+                    if (!RoleDelResult.Succeeded)
+                        return failOD;
                 }
             }
 
-            await Database.PlayerManager.DeleteAsync(user.PlayerProfile);
-            await Database.UserManager.DeleteAsync(user);
+            bool PlayerDelResult = await Database.PlayerManager.DeleteAsync(user.PlayerProfile);
+            var UserDelResult = await Database.UserManager.DeleteAsync(user);
+
+            if (!(PlayerDelResult && UserDelResult.Succeeded))
+                return failOD;
+
+            return successOD;
+
         }
         #endregion
 

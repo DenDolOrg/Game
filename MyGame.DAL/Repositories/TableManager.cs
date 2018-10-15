@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyGame.DAL.Repositories
 {
-    class TableManager : ITableManager
+    public class TableManager : ITableManager
     {
         /// <summary>
         /// Database context.
@@ -25,44 +25,71 @@ namespace MyGame.DAL.Repositories
             Database = db;
         }
 
-        public async Task CreateAsync(Table item)
+        #region CREATE
+        public async Task<bool> CreateAsync(Table item)
         {
-            Database.Tables.Add(item);
-            await Database.SaveChangesAsync();
-        }
+            try
+            {
+                Database.Tables.Add(item);
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
 
-        public async Task DeleteAsync(Table item)
+            return true;
+        }
+        #endregion
+
+        #region DELETE
+        public async Task<bool> DeleteAsync(Table item)
         {
-
-            Database.Tables.Remove(item);
-            await Database.SaveChangesAsync();
+            try
+            {
+                Database.Tables.Remove(item);
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
+        #endregion
 
+        #region FIND_BY_ID
         public Table FindById(int id)
         {
             return Database.Tables.Find(id);
         }
+        #endregion
 
+        #region GET_ALL_TABLES
         public IQueryable<Table> GetAllTabes()
         {
             IQueryable<Table> tables  = Database.Tables;
             return tables;
         }
+        #endregion
 
+        #region GET_USER_TABLES
         public IQueryable<Table> GetTablesForUser(int userId)
         {
             IQueryable<Table> tables = Database.Tables.Where(t => t.Opponents.Where(o => o.Id == userId).Count() > 0);
 
             return tables;
         }
+        #endregion
 
+        #region GET_AVAILABLE_TABLES
         public IQueryable<Table> GetAvailableTables(int userId)
         {
             IQueryable<Table> tables = Database.Tables.Where(t => (t.Opponents.Count == 1) && (t.Opponents.Where( o => o.Id == userId).Count() == 0));
 
             return tables;
         }
-
+        #endregion
         public void Dispose()
         {
             Database.Dispose();

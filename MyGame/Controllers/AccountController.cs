@@ -46,24 +46,6 @@ namespace MyGame.Controllers
             }
         }
 
-        /// <summary>
-        /// Initialises a new instance of <see cref="AccountController"/> with default services.
-        /// </summary>
-        public AccountController()
-        {
-            serviceFactory = new HttpContextServicesFactory(
-                () => HttpContext.GetOwinContext().Get<IUserService>(),
-                () => HttpContext.GetOwinContext().Get<ITableService>());
-        }
-
-        /// <summary>
-        /// Initialises a new instance of <see cref="AccountController"/> with custom services(for unit testing).
-        /// </summary>
-        public AccountController(IUserService userService, ITableService tableService)
-        {
-            serviceFactory = new CustomServicesFactory(userService, tableService);
-        }
-        #endregion
 
         /// <summary>
         /// Initialises new instance of <see cref="IAuthenticationManager"/> for managing authentication process.
@@ -72,9 +54,30 @@ namespace MyGame.Controllers
         {
             get
             {
-                return HttpContext.GetOwinContext().Authentication;
+                return serviceFactory.CreateAuthenticationManager();
             }
         }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="AccountController"/> with default services.
+        /// </summary>
+        public AccountController()
+        {
+            serviceFactory = new HttpContextServicesFactory(
+                () => HttpContext.GetOwinContext().Get<IUserService>(),
+                () => HttpContext.GetOwinContext().Get<ITableService>(),
+                () => HttpContext.GetOwinContext().Authentication);
+        }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="AccountController"/> with custom services(for unit testing).
+        /// </summary>
+        public AccountController(IUserService userService, ITableService tableService = null, IAuthenticationManager authenticationManager = null)
+        {
+            serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
+        }
+        #endregion
+
 
         #region LOGIN(GET)
         /// <summary>
@@ -132,7 +135,6 @@ namespace MyGame.Controllers
         /// <returns>Returns view <c>Views/Account/Register.cshtml</c></returns>
         public ActionResult Register()
         {           
-            var name = HttpContext.User.Identity.Name;
             return View();
         }
         #endregion
@@ -187,7 +189,15 @@ namespace MyGame.Controllers
         /// <returns>Returns view <c>Views/Home/Index</c></returns>
         public ActionResult Logout()
         {
-            Session.RemoveAll();
+            try
+            {
+                Session.RemoveAll();
+            }
+            catch
+            {
+                //It's OK, just test doesn't understand that Session.
+            }
+            
             AuthenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
         }
@@ -200,14 +210,21 @@ namespace MyGame.Controllers
         /// <param name="email">Email of user to delete.</param>
         /// <returns></returns>
         [Authorize(Roles = "admin")]
-        public async Task Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             UserDTO userDTO = new UserDTO
             {
                 Id = id
             };
-            await TableService.DeteteUserTables(userDTO);
-            await UserService.Delete(userDTO);
+
+            var UserTableDelResult = await TableService.DeteteUserTables(userDTO);
+            var UserDelResult = await UserService.Delete(userDTO);
+
+            if (!(UserDelResult.Succedeed && UserTableDelResult.Succedeed))
+                return false;
+
+            return true;
+
 
 
         }

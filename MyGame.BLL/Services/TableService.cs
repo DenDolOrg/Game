@@ -54,28 +54,50 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region DELETE
-        public async Task DeteteTable(TableDTO tableDTO)
+        public async Task<OperationDetails> DeteteTable(TableDTO tableDTO)
         {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
+
             Table table = Database.TableManager.FindById(tableDTO.Id);
-            if (table != null)
-            {
-                await Database.FigureManager.DeleteAsync(table.Id);
-                await Database.TableManager.DeleteAsync(table);                
-            }
+            if (table == null)
+                return failOD;
+
+            bool FiguresDelResult = await Database.FigureManager.DeleteAsync(table.Id);
+            bool TableDelResult = await Database.TableManager.DeleteAsync(table);
+
+            if (!(FiguresDelResult && TableDelResult))
+                return failOD;
+
+            return successOD;
+            
+            
         }
         #endregion
 
         #region DELETE_USER_TABLES
-        public async Task DeteteUserTables(UserDTO userDTO)
+        public async Task<OperationDetails> DeteteUserTables(UserDTO userDTO)
         {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
+
             ApplicationUser user = await Database.UserManager.FindByIdAsync(userDTO.Id);
 
+            if (user == null)
+                return failOD;
+
             IEnumerable<int> tables = new List<int>(user.Tables.Select(t => t.Id));
+            if (tables == null || tables.Count() == 0)
+                return failOD;
 
             foreach(int id in tables)
             {
-                await DeteteTable(new TableDTO { Id = id});
+                var TableDelResult = await DeteteTable(new TableDTO { Id = id });
+                if (!TableDelResult.Succedeed)
+                    return failOD;
             }
+
+            return successOD;
         }
         #endregion
 
