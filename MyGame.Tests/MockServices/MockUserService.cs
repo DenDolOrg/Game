@@ -36,29 +36,31 @@ namespace MyGame.Tests.Services
         internal MockUserService MockCreate()
         {
             List<UserDTO> testList = new List<UserDTO>(users);
+
+            Setup(m => m.Create(
+                It.IsAny<UserDTO>()
+                )).ReturnsAsync(new OperationDetails(false));
+
             Setup(m => m.Create(
                 It.Is<UserDTO>(u => (testList.FirstOrDefault(f => (f.Email == u.Email) || (f.UserName == u.UserName)) == null) &&
                                     (testList.Append(u).Last().Equals(u)))
                 )).ReturnsAsync(new OperationDetails(true));
 
-            Setup(m => m.Create(
-                It.Is<UserDTO>(u => (users.FirstOrDefault(f => (f.Email == u.Email) || (f.UserName == u.UserName))) != null)
-                )).ReturnsAsync(new OperationDetails(false));
             return this;
         }
 
         internal MockUserService MockDelete()
         {
             List<UserDTO> testList = new List<UserDTO>(users);
+
+            Setup(m => m.Delete(
+                It.IsAny<UserDTO>()
+                )).ReturnsAsync(new OperationDetails(false));
+
             Setup(m => m.Delete(
                 It.Is<UserDTO>(u => ((testList.FirstOrDefault(f => (f.Id == u.Id)) != null) &&
                                     (testList.Remove(testList.Find(f => f.Id == u.Id)))))
                 )).ReturnsAsync(new OperationDetails(true));
-
-            Setup(m => m.Delete(
-                It.Is<UserDTO>(u => testList.FirstOrDefault(f => (f.Id == u.Id)) == null )
-                )).ReturnsAsync(new OperationDetails(false));
-
             return this;
         }
 
@@ -67,5 +69,18 @@ namespace MyGame.Tests.Services
             Setup(m => m.GetAllUsers()).ReturnsAsync(users);
             return this;
         }
+
+        internal MockUserService GetUser()
+        {
+            Setup(m => m.GetUser(
+                It.IsAny<UserDTO>()
+                )).ReturnsAsync((UserDTO)null);
+
+            Setup(m => m.GetUser(
+                It.Is<UserDTO>(u => users.FirstOrDefault(f => (f.UserName == u.UserName)) != null)
+                )).ReturnsAsync((UserDTO ud) => users.Find(f => f.UserName == ud.UserName));
+            return this;
+        }
+
     }
 }

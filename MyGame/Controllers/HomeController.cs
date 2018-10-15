@@ -66,7 +66,7 @@ namespace MyGame.Controllers
         /// <summary>
         /// Initialises a new instance of <see cref="HomeController"/> with custom services(for unit testing).
         /// </summary>
-        public HomeController(IUserService userService, ITableService tableService, IAuthenticationManager authenticationManager)
+        public HomeController(IUserService userService, ITableService tableService = null, IAuthenticationManager authenticationManager = null)
         {
             serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
         }
@@ -78,16 +78,21 @@ namespace MyGame.Controllers
         /// <returns>Returns a view whith the name of "<c>Views/Home/Index.cshtml</c>"</returns>
         public async Task<ActionResult> Index()
         {
+            
             UserDTO receivedUserDTO;
-            if (Session["FullName"] == null)
+            string userName = HttpContextManager.Current.User.Identity.Name;
+            if(!string.IsNullOrEmpty(userName))
             {
-                receivedUserDTO =  await UserService.GetUser(new UserDTO { UserName = HttpContext.User.Identity.Name });
+                receivedUserDTO = await UserService.GetUser(new UserDTO { UserName = userName });
                 if (receivedUserDTO != null)
                 {
                     string fullName = receivedUserDTO.Name + " " + receivedUserDTO.Surname;
-                    Session["FullName"] = fullName;
+
+                    HttpContextManager.Current.Session["FullName"] = fullName;
+
                 }
             }
+           
             return View();
         }
 

@@ -30,8 +30,11 @@ namespace MyGame.BLL.Services
         }
 
         #region CREATE
-        public async Task CreateNewTable(UserDTO firstPlayer)
+        public async Task<OperationDetails> CreateNewTable(UserDTO firstPlayer)
         {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
+
             ApplicationUser user = await Database.UserManager.FindByNameAsync(firstPlayer.UserName);
             if (user != null)
             {
@@ -42,14 +45,26 @@ namespace MyGame.BLL.Services
                         user
                     }
                 };
-                await Database.TableManager.CreateAsync(newTable);
+                bool tableCreateRes = await Database.TableManager.CreateAsync(newTable);
+                bool figuresCreateRes = await Database.FigureManager.CreateAsync(newTable.Id);
 
-                await Database.FigureManager.CreateAsync(newTable.Id);
+                if (!(tableCreateRes && figuresCreateRes))
+                    return failOD;
 
                 user.Tables.Add(newTable);
+                try
+                {
+                    await Database.SaveChangesAsync();
+                }
+                catch
+                {
+                    return failOD;
+                }
 
-                await Database.SaveChangesAsync();
+                return successOD;
+                
             }
+            return failOD;
         }
         #endregion
 
@@ -182,7 +197,7 @@ namespace MyGame.BLL.Services
         /// </summary>
         /// <param name="table">Table to scan.</param>
         /// <returns>List of universal table data model. Each of it contains Id of table and list of opponents.</returns>
-        private IEnumerable<UserDTO> GetOpponents(Table table)
+        private ICollection<UserDTO> GetOpponents(Table table)
         {
             List<UserDTO> opponents = new List<UserDTO>
             {
@@ -214,7 +229,7 @@ namespace MyGame.BLL.Services
         {
             List<TableDTO> tableDTOs = new List<TableDTO>();
 
-            IEnumerable<UserDTO> opponents;
+            ICollection<UserDTO> opponents;
             for (int i = 0; i < tables.Count(); i++)
             {
                 Table t = tables.ElementAt(i);

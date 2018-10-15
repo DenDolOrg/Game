@@ -23,10 +23,10 @@ namespace MyGame.Controllers.Tests
 
         //List<UserDTO> users = new List<UserDTO>
         //    {
-        //        new UserDTO{ Email = "email_1@gmail.com", Password = "111111", UserName = "username_1"},
-        //        new UserDTO{ Email = "email_2@gmail.com", Password = "222222", UserName = "username_2"},
-        //        new UserDTO{ Email = "email_3@gmail.com", Password = "333333", UserName = "username_3"},
-        //        new UserDTO{ Email = "email_4@gmail.com", Password = "444444", UserName = "username_4"}
+        //        new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
+        //        new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
+        //        new UserDTO{ Id = 3, Email = "email_3@gmail.com", Password = "333333", UserName = "username_3", Name = "name_3", Surname = "Surname_3"},
+        //        new UserDTO{ Id = 4, Email = "email_4@gmail.com", Password = "444444", UserName = "username_4", Name = "name_4", Surname = "Surname_4"}
         //    };
 
         MockAuthenticationManager mockAuthenticationManager = new MockAuthenticationManager()

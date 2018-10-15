@@ -10,6 +10,7 @@ using MyGame.BLL.DTO;
 using System.Threading.Tasks;
 using MyGame.Models;
 using MyGame.Infrastructure;
+using MyGame.BLL.Infrastructure;
 
 namespace MyGame.Controllers
 {
@@ -59,7 +60,7 @@ namespace MyGame.Controllers
         /// <summary>
         /// Initialises a new instance of <see cref="TableController"/> with custom services(for unit testing).
         /// </summary>
-        public TableController(IUserService userService, ITableService tableService, IAuthenticationManager authenticationManager)
+        public TableController(IUserService userService, ITableService tableService = null, IAuthenticationManager authenticationManager = null)
         {
             serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
         }
@@ -72,7 +73,7 @@ namespace MyGame.Controllers
         /// <param name="tableType">Table type to show.</param>
         /// <returns>View with needed list.</returns>
         [Authorize]
-        public ActionResult TableList(string tableType)
+        public ViewResult TableList(string tableType)
         {
             TableActionModel tableAction = new TableActionModel();
             if (tableType == "all")
@@ -99,11 +100,14 @@ namespace MyGame.Controllers
         [Authorize]
         public async Task<JsonResult> GetUserTables()
         {
-            UserDTO userDTO = new UserDTO { UserName = HttpContext.User.Identity.Name };
+            UserDTO userDTO = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
 
             IEnumerable<TableDTO> tables = await TableService.GetUserTables(userDTO);
 
-            return Json(tables, JsonRequestBehavior.AllowGet);
+            if(tables != null)
+                return Json(tables, JsonRequestBehavior.AllowGet);
+
+            return null;
         }
         #endregion
 
@@ -133,12 +137,14 @@ namespace MyGame.Controllers
         [Authorize]
         public async Task<JsonResult> GetAvailableTables()
         {
-            UserDTO userDTO = new UserDTO { UserName = HttpContext.User.Identity.Name };
+            UserDTO userDTO = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
 
             IEnumerable<TableDTO> tables = await TableService.GetAvailableTables(userDTO);
 
-            JsonResult json = Json(tables, JsonRequestBehavior.AllowGet);
-            return json;
+            if(tables != null)
+                return Json(tables, JsonRequestBehavior.AllowGet);
+
+            return null;
         }
         #endregion
 
@@ -148,9 +154,13 @@ namespace MyGame.Controllers
         /// </summary
         public async Task<ActionResult> CreateNewtable()
         {
-            UserDTO user = new UserDTO { UserName = HttpContext.User.Identity.Name };
-            await TableService.CreateNewTable(user);
-            return RedirectToAction("TableList", "TAble", new { tableType = "myTables" });
+            UserDTO user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
+
+            OperationDetails details = await TableService.CreateNewTable(user);
+            if(details.Succedeed)
+                return RedirectToAction("TableList", "Table", new { tableType = "myTables" });
+
+            return null;
         }
         #endregion
 
@@ -171,8 +181,11 @@ namespace MyGame.Controllers
         [Authorize(Roles = "admin")]
         [HttpDelete]
         public async Task Delete(int id)
-        {
-            await TableService.DeteteTable(new TableDTO {Id = id });
+        {       
+            OperationDetails details = await TableService.DeteteTable(new TableDTO {Id = id });
+
+            if (!details.Succedeed)
+                throw new HttpException(403, "Error while deleting");
 
         }
         #endregion

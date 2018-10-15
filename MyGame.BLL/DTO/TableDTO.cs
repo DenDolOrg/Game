@@ -24,6 +24,6 @@ namespace MyGame.BLL.DTO
         /// <summary>
         /// Table figures data.
         /// </summary>
-        public IEnumerable<UserDTO> Opponents { get; set; }
+        public ICollection<UserDTO> Opponents { get; set; }
     }
 }

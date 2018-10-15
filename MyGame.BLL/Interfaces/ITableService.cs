@@ -17,7 +17,7 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="firstPlayer">First players information.</param>
         /// <returns>Returns table creation operation status like <see cref="OperatingSystem"/> instance.</returns>
-        Task CreateNewTable(UserDTO firstPlayer);
+        Task<OperationDetails> CreateNewTable(UserDTO firstPlayer);
 
         /// <summary>
         /// Deletes table with id = <c>tableId</c> from DB.

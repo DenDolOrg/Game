@@ -207,6 +207,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\CustomServicesFactory.cs" />
+    <Compile Include="Infrastructure\HttpContextManager.cs" />
     <Compile Include="Infrastructure\HttpContextServicesFactory.cs" />
     <Compile Include="Infrastructure\NinjectControllerFactory.cs" />
     <Compile Include="Infrastructure\ServiceFactory.cs" />

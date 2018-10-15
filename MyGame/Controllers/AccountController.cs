@@ -187,17 +187,9 @@ namespace MyGame.Controllers
         /// Action for processing logout event. Redirects to the home page;
         /// </summary>
         /// <returns>Returns view <c>Views/Home/Index</c></returns>
+        [Authorize]
         public ActionResult Logout()
         {
-            try
-            {
-                Session.RemoveAll();
-            }
-            catch
-            {
-                //It's OK, just test doesn't understand that Session.
-            }
-            
             AuthenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
         }
