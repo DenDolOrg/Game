@@ -130,6 +130,8 @@
     <Compile Include="MockEnity\MockFigure.cs" />
     <Compile Include="MockEnity\MockPlayerProfile.cs" />
     <Compile Include="MockEnity\MockTable.cs" />
+    <Compile Include="MockHelpers\MockDbAsyncResolver.cs" />
+    <Compile Include="MockHelpers\MockDbSets.cs" />
     <Compile Include="MockHelpers\MockHttpContext.cs" />
     <Compile Include="MockHelpers\MockHttpSession.cs" />
     <Compile Include="MockManagers\MockFigureManager.cs" />

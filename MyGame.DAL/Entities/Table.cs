@@ -22,7 +22,7 @@ namespace MyGame.DAL.Entities
         /// <summary>
         /// Creation time of table.
         /// </summary>
-        public DateTime CreationTime { get; set; }
+        public virtual DateTime CreationTime { get; set; }
 
         /// <summary>
         /// List of opponents playing on this table.

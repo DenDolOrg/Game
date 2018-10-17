@@ -11,11 +11,6 @@ namespace MyGame.DAL.Repositories.Tests
     [TestClass()]
     public class TableManagerTests
     {
-        [TestMethod()]
-        public void TableManagerTest()
-        {
-            Assert.Fail();
-        }
 
         [TestMethod()]
         public void CreateAsyncTest()
@@ -49,12 +44,6 @@ namespace MyGame.DAL.Repositories.Tests
 
         [TestMethod()]
         public void GetAvailableTablesTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void DisposeTest()
         {
             Assert.Fail();
         }

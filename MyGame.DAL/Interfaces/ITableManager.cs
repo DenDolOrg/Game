@@ -14,7 +14,7 @@ namespace MyGame.DAL.Interfaces
         /// </summary>
         /// <param name="id">Id of table to return.</param>
         /// <returns>Table with id in parameter.</returns>
-        Table FindById(int id);
+        Task<Table> FindByIdAsync(int id);
 
         /// <summary>
         /// Returns all tables from DB.

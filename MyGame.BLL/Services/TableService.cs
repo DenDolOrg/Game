@@ -74,7 +74,7 @@ namespace MyGame.BLL.Services
             OperationDetails successOD = new OperationDetails(true);
             OperationDetails failOD = new OperationDetails(false);
 
-            Table table = Database.TableManager.FindById(tableDTO.Id);
+            Table table = await Database.TableManager.FindByIdAsync(tableDTO.Id);
             if (table == null)
                 return failOD;
 
@@ -121,7 +121,7 @@ namespace MyGame.BLL.Services
         public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(TableDTO tableDTO)
         {
             IEnumerable<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(tableDTO.Id).ToListAsync();
-            if (tableFigures != null)
+            if (tableFigures.Count() != 0)
             {
                 return CreateFiguresDTO(tableFigures);
             }
@@ -130,9 +130,10 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region GET_TABLE
-        public TableDTO GetTable(TableDTO tableDTO)
+        public async Task<TableDTO> GetTable(TableDTO tableDTO)
         {
-            Table table = Database.TableManager.FindById(tableDTO.Id);
+            
+            Table table = await Database.TableManager.FindByIdAsync(tableDTO.Id);
             if(table != null)
             {
                 TableDTO tableDTO_out = new TableDTO
@@ -140,9 +141,9 @@ namespace MyGame.BLL.Services
                     Id = table.Id,
                     Opponents = GetOpponents(table),
                     CreationTime = table.CreationTime
-            };
+                };
 
-                return tableDTO;
+                return tableDTO_out;
             }
             return null;
         }

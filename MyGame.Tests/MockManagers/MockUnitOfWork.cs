@@ -14,8 +14,8 @@ namespace MyGame.Tests.MockManagers
 {
     internal class MockUnitOfWork : Mock<IUnitOfWork>
     {
-        private int _tablePerUserNum = 2;
-        private int _userNum = 2;
+        public int _tablePerUserNum = 2;
+        public int _userNum = 2;
 
         private List<MockApplicationUser> Users;
         private List<MockFigure> Figures;
@@ -87,7 +87,7 @@ namespace MyGame.Tests.MockManagers
             List<MockTable> tables = new List<MockTable>();
             for(int i = 1; i <= _tablePerUserNum; i++)
             {
-                tables.Add(new MockTable { Id = (id - 1) * _tablePerUserNum + i }); 
+                tables.Add(new MockTable { Id = (id - 1) * _tablePerUserNum + i, CreationTime = DateTime.Now }); 
             }
 
             MockApplicationUser newUser = new MockApplicationUser
@@ -116,6 +116,15 @@ namespace MyGame.Tests.MockManagers
         internal void AddUserToTable(MockApplicationUser user)
         {
             Users.Add(user);
+            if (user.Tables != null)
+            {
+                Tables.AddRange(user.Tables);
+                foreach(var t in user.Tables)
+                {
+                    t.SetupTable();
+                    Users.AddRange(t.Opponents);
+                }
+            }               
         }
         internal static ICollection<MockFigure> SetFigures(MockTable table)
         {

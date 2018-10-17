@@ -11,11 +11,6 @@ namespace MyGame.DAL.Repositories.Tests
     [TestClass()]
     public class FigureManagerTests
     {
-        [TestMethod()]
-        public void FigureManagerTest()
-        {
-            Assert.Fail();
-        }
 
         [TestMethod()]
         public void CreateAsyncTest()

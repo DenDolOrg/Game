@@ -44,7 +44,7 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="tableId">Id of table.</param>
         /// <returns>Universal table data model. Contains Id of table and list of opponents.</returns>
-        TableDTO GetTable(TableDTO tableDTO);
+        Task<TableDTO> GetTable(TableDTO tableDTO);
 
         /// <summary>
         /// Returns all tables information from DB.

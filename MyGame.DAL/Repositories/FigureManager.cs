@@ -68,7 +68,14 @@ namespace MyGame.DAL.Repositories
  
         }
         #endregion
+        #region FIGURES_ON_TABLE
+        public IQueryable<Figure> GetFiguresForTable(int tableId)
+        {
+            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
 
+            return tableFigures;
+        }
+        #endregion
         #region HELPERS
         /// <summary>
         /// Set figures start position.
@@ -107,12 +114,7 @@ namespace MyGame.DAL.Repositories
         #endregion
 
 
-        public IQueryable<Figure> GetFiguresForTable(int tableId)
-        {
-            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
-
-            return tableFigures;
-        }
+      
 
         public void Dispose()
         {

@@ -59,9 +59,9 @@ namespace MyGame.DAL.Repositories
         #endregion
 
         #region FIND_BY_ID
-        public Table FindById(int id)
+        public async Task<Table> FindByIdAsync(int id)
         {
-            return Database.Tables.Find(id);
+            return await Database.Tables.FindAsync(id);
         }
         #endregion
 

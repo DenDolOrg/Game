@@ -12,19 +12,7 @@ namespace MyGame.DAL.Repositories.Tests
     public class PlayerManagerTests
     {
         [TestMethod()]
-        public void PlayerManagerTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
         public void CreateAsyncTest()
-        {
-            Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void DisposeTest()
         {
             Assert.Fail();
         }

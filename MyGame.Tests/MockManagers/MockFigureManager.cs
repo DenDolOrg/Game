@@ -7,6 +7,7 @@ using Moq;
 using MyGame.DAL.Entities;
 using MyGame.DAL.Interfaces;
 using MyGame.Tests.MockEnity;
+using MyGame.Tests.MockHelpers;
 
 namespace MyGame.Tests.MockManagers
 {
@@ -50,7 +51,28 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
+        internal MockFigureManager MockGetFiguresForTable()
+        {
+            Setup(m => m.GetFiguresForTable(
+                It.IsAny<int>()
+                )).Returns(GetDbSetFigures(null));
 
+            Setup(m => m.GetFiguresForTable(
+                It.Is<int>(id => (from tl in Tables
+                                  where tl.Id == id
+                                  select tl).Count() == 1)))
+                                  .Returns((int id) => GetDbSetFigures((from fl in Figures
+                                                        where fl.Table.Id == id
+                                                        select fl.Object).ToList()));
+            return this;
+        }
+
+        private IQueryable<Figure> GetDbSetFigures(IEnumerable<Figure> figures)
+        {
+            return new MockDbSetFigure(figures)
+                .SetupDbSetFigure()
+                .Object;
+        }
 
 
 
