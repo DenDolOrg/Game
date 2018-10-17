@@ -17,17 +17,12 @@ namespace MyGame.DAL.Entities
         /// Id of current table.
         /// </summary>
         [Key]
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
         /// <summary>
         /// Creation time of table.
         /// </summary>
         public DateTime CreationTime { get; set; }
-
-        /// <summary>
-        /// List of figures on table.
-        /// </summary>
-        public ICollection<Figure> Figures { get; set; }
 
         /// <summary>
         /// List of opponents playing on this table.

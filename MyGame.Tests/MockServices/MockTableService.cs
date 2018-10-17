@@ -15,14 +15,12 @@ namespace MyGame.Tests.Services
 {
     internal class MockTableService : Mock<ITableService>
     {
+        internal int _tablePerUserNum = 2;
 
         internal  List<UserDTO> Users = new List<UserDTO>
             {
                 new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
                 new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-                new UserDTO{ Id = 3, Email = "email_3@gmail.com", Password = "333333", UserName = "username_3", Name = "name_3", Surname = "Surname_3"},
-                new UserDTO{ Id = 4, Email = "email_4@gmail.com", Password = "444444", UserName = "username_4", Name = "name_4", Surname = "Surname_4"},
-                new UserDTO{ Id = 5, Email = "email_5@gmail.com", Password = "555555", UserName = "username_5", Name = "name_5", Surname = "Surname_5"}
             };
 
         internal List<TableDTO> Tables { get; set; }
@@ -40,16 +38,15 @@ namespace MyGame.Tests.Services
 
         internal MockTableService MockDeleteUserTables()
         {
-            List<UserTestModel> models = new List<UserTestModel>(UserModels);
-
             Setup(m => m.DeteteUserTables(
                 It.IsAny<UserDTO>()
                 )).ReturnsAsync(new OperationDetails(false));
 
             Setup(m => m.DeteteUserTables(
-                It.Is<UserDTO>(u => ((models.FirstOrDefault(um => um.UserDTO.Id == u.Id) != null) &&
-                                       ClearAndCheck(models.FirstOrDefault(um => um.UserDTO.Id == u.Id))))
-                )).ReturnsAsync(new OperationDetails(true));
+                It.Is<UserDTO>(u => (from um in UserModels
+                                    where um.UserDTO.Id == u.Id
+                                    select um).Count() == 1)))
+                                    .ReturnsAsync(new OperationDetails(true));
             return this;
         }
 
@@ -62,9 +59,12 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync((ICollection<TableDTO>)null);
 
             Setup(m => m.GetUserTables(
-                It.Is<UserDTO>(u => UserModels.FirstOrDefault(um => um.UserDTO.UserName == u.UserName) != null)
-                )).ReturnsAsync((UserDTO user) => UserModels.Find(um => um.UserDTO.UserName == user.UserName).Tables);
-
+                It.Is<UserDTO>(u => (from um in UserModels
+                                     where um.UserDTO.UserName == u.UserName
+                                     select um).Count() == 1)))
+                                     .ReturnsAsync((UserDTO u) => (from um in UserModels
+                                                                   where um.UserDTO.UserName == u.UserName
+                                                                   select um.Tables).First());
             return this;
         }
 
@@ -82,9 +82,15 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync((List<TableDTO>)null);
 
             Setup(m => m.GetAvailableTables(
-                It.Is<UserDTO>(u => UserModels.FirstOrDefault(um => um.UserDTO.UserName == u.UserName) != null)
-                )).ReturnsAsync((UserDTO u) => Tables.Where(t => (t.Opponents.Count == 1) &&
-                                                            t.Opponents.Where(o => o.UserName == u.UserName).Count() == 0));
+                It.Is<UserDTO>(u => (from um in UserModels
+                                     where um.UserDTO.UserName == u.UserName
+                                     select um).Count() == 1)))
+                                     .ReturnsAsync((UserDTO u) => (from t in Tables
+                                                                   where t.Opponents.Count == 1 &&
+                                                                          (from o in t.Opponents
+                                                                          where o.UserName == u.UserName
+                                                                          select o).Count() == 0
+                                                                   select t));
             return this;
         }
 
@@ -95,9 +101,10 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync(new OperationDetails(false));
 
             Setup(m => m.CreateNewTable(
-                It.Is<UserDTO>(u => UserModels.FirstOrDefault(um => um.UserDTO.UserName == u.UserName) != null)
-                )).ReturnsAsync(new OperationDetails(true)).Callback((UserDTO u) => UserModels.Find(um => u.UserName == um.UserDTO.UserName)
-                                                            .Tables.Add(new TableDTO()));
+                It.Is<UserDTO>(u => (from um in UserModels
+                                     where um.UserDTO.UserName == u.UserName
+                                     select um).Count() == 1)))
+                                     .ReturnsAsync(new OperationDetails(true));
             return this;
         }
 
@@ -108,15 +115,17 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync(new OperationDetails(false));
 
             Setup(m => m.DeteteTable(
-                It.Is<TableDTO>(t => Tables.FirstOrDefault(tl => tl.Id == t.Id) != null)
-                )).ReturnsAsync(new OperationDetails(true)).Callback((TableDTO t) => Tables.Remove(Tables.Find(tl => tl.Id == t.Id)));
+                It.Is<TableDTO>(t => (from tl in Tables
+                                      where tl.Id == t.Id
+                                      select tl).Count() == 1)))
+                                      .ReturnsAsync(new OperationDetails(true));
             return this;
         }
         
         #region HELPERS
         private void CreateTables()
         {
-            for(int i = 1; i <= Users.Count * 3; i++)
+            for(int i = 1; i <= Users.Count * _tablePerUserNum; i++)
             {
                 Tables.Add(new TableDTO
                 {
@@ -143,10 +152,10 @@ namespace MyGame.Tests.Services
             for (int i = 0; i < Users.Count; i++)
             {
                 List<TableDTO> userTables = new List<TableDTO>();
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < _tablePerUserNum; j++)
                 {
-                    Tables[j + i * 3].Opponents.Add(Users.ElementAt(i));
-                    userTables.Add(Tables[j + i * 3]);
+                    Tables[j + i * _tablePerUserNum].Opponents.Add(Users.ElementAt(i));
+                    userTables.Add(Tables[j + i * _tablePerUserNum]);
                 }
                 UserModels.Add(
                     new UserTestModel

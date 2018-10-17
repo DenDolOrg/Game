@@ -98,6 +98,14 @@
     <Compile Include="Migrations\201810081957566_final1.Designer.cs">
       <DependentUpon>201810081957566_final1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810152129152_fig.cs" />
+    <Compile Include="Migrations\201810152129152_fig.Designer.cs">
+      <DependentUpon>201810152129152_fig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810152132378_fig2.cs" />
+    <Compile Include="Migrations\201810152132378_fig2.Designer.cs">
+      <DependentUpon>201810152132378_fig2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\FigureManager.cs" />
@@ -115,6 +123,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810081957566_final1.resx">
       <DependentUpon>201810081957566_final1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810152129152_fig.resx">
+      <DependentUpon>201810152129152_fig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810152132378_fig2.resx">
+      <DependentUpon>201810152132378_fig2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

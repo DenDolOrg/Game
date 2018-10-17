@@ -61,7 +61,7 @@ namespace MyGame.Controllers.Tests
         public async Task GetUserTablesTest()
         {
             //Arrange
-            UserDTO good_user = new UserDTO { UserName = "username_2" };
+            UserDTO good_user = new UserDTO { UserName = "username_1" };
             UserDTO bad_user = new UserDTO { UserName = "bad_username" };
 
             UserTestModel userWithoutTables = new UserTestModel
@@ -73,7 +73,9 @@ namespace MyGame.Controllers.Tests
             var mockTableService = new MockTableService()
                 .MockGetUserTables(userWithoutTables);
 
-            List<TableDTO> good_tables = mockTableService.Tables.GetRange(1 * 3, 3);
+            int tableNum = mockTableService._tablePerUserNum;
+
+            List<TableDTO> good_tables = mockTableService.Tables.GetRange(0, tableNum);
 
             //Act
             TableController tableController = new TableController(null, mockTableService.Object);
@@ -121,36 +123,27 @@ namespace MyGame.Controllers.Tests
             var mockTableService = new MockTableService()
                 .MockGetAvailableTables();
 
-            mockTableService.UserModels.ElementAt(0).Tables.ElementAt(1).Opponents.Add(mockTableService.UserModels.ElementAt(1).UserDTO);
-            mockTableService.UserModels.ElementAt(1).Tables.Add(mockTableService.UserModels.ElementAt(0).Tables.ElementAt(1));
-
-            mockTableService.UserModels.ElementAt(3).Tables.ElementAt(0).Opponents.Add(mockTableService.UserModels.ElementAt(1).UserDTO);
-            mockTableService.UserModels.ElementAt(1).Tables.Add(mockTableService.UserModels.ElementAt(3).Tables.ElementAt(0));
+            mockTableService.UserModels.ElementAt(0).Tables.ElementAt(0).Opponents.Add(mockTableService.UserModels.ElementAt(1).UserDTO);
+            mockTableService.UserModels.ElementAt(1).Tables.Add(mockTableService.UserModels.ElementAt(0).Tables.ElementAt(0));
 
             UserDTO good_user1 = new UserDTO { UserName = "username_2" };
-            UserDTO good_user2 = new UserDTO { UserName = "username_1" };
             UserDTO bad_user = new UserDTO { UserName = "bad_username" };
 
+            int tableNum = mockTableService._tablePerUserNum;
+            int userNum = mockTableService.Users.Count;
             //Act
             TableController tableController = new TableController(null, mockTableService.Object);
-            HttpContextManager.SetCurrentContext(new MockHttpContext(good_user1.UserName).CustomHttpContextBase);
 
+            HttpContextManager.SetCurrentContext(new MockHttpContext(good_user1.UserName).CustomHttpContextBase);
             var result1 = await tableController.GetAvailableTables();
 
-            HttpContextManager.SetCurrentContext(new MockHttpContext(good_user2.UserName).CustomHttpContextBase);
-
-            var result2 = await tableController.GetAvailableTables();
-
             HttpContextManager.SetCurrentContext(new MockHttpContext(bad_user.UserName).CustomHttpContextBase);
-
             var result_bad = await tableController.GetAvailableTables();
 
             List<TableDTO> resList_1 = Json.Decode<List<TableDTO>>(Json.Encode(result1.Data));
-            List<TableDTO> resList_2 = Json.Decode<List<TableDTO>>(Json.Encode(result2.Data));
 
             //Assert
-            Assert.AreEqual(resList_1.Count, 15 - 3 - 2, "Bad number of tables for 2 user.");
-            Assert.AreEqual(resList_2.Count, 15 - 3 - 1, "Bad number of tables for 1 user.");
+            Assert.AreEqual(resList_1.Count, tableNum * (userNum - 1) - 1, "Bad number of available tables for user");
             Assert.IsNull(result_bad, "List of tables for user with bad username is ot empty");
 
         }
@@ -161,7 +154,7 @@ namespace MyGame.Controllers.Tests
         public async Task CreateNewtableTest()
         {
             //Arrange 
-            UserDTO user_good = new UserDTO { UserName = "username_3" };
+            UserDTO user_good = new UserDTO { UserName = "username_1" };
             UserDTO user_bad = new UserDTO { UserName = "bad_username" };
 
             var mockTableService = new MockTableService()
@@ -179,7 +172,6 @@ namespace MyGame.Controllers.Tests
             //Assert
             Assert.IsNotNull(result_good, "Can't create table for valid username.");
             Assert.IsNull(result_bad, "Can create table for invalid username.");
-            Assert.IsTrue(mockTableService.UserModels.ElementAt(2).Tables.Count == 4, "Fail while adding to table list.");
         }
         #endregion
 

@@ -34,9 +34,6 @@ namespace MyGame.DAL.Repositories
                 IEnumerable<Figure> figures = SetFigures(table);
                 Database.Figures.AddRange(figures);
                 await Database.SaveChangesAsync();
-
-                table.Figures = new List<Figure>(figures);
-                await Database.SaveChangesAsync();
             }
             catch
             {

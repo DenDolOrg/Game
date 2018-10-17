@@ -52,11 +52,5 @@ namespace MyGame.BLL.Services.Tests
         {
             Assert.Fail();
         }
-
-        [TestMethod()]
-        public void DisposeTest()
-        {
-            Assert.Fail();
-        }
     }
 }

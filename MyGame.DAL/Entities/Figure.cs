@@ -16,22 +16,22 @@ namespace MyGame.DAL.Entities
         /// Id of figure.
         /// </summary>
         [Key]
-        public int Id { get; set; }
+        public virtual int Id { get; set; }
 
         /// <summary>
         /// Figure color.
         /// </summary>
-        public Colors Color { get; set; }
+        public virtual Colors Color { get; set; }
 
         /// <summary>
         /// X coordinate of figure.
         /// </summary>
-        public int X { get; set; }
+        public virtual int X { get; set; }
 
         /// <summary>
         /// Y coordinate of figure.
         /// </summary>
-        public int Y { get; set; }
+        public virtual int Y { get; set; }
 
         /// <summary>
         /// Table of current fugure.

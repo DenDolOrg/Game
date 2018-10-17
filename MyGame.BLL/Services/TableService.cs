@@ -101,9 +101,10 @@ namespace MyGame.BLL.Services
             if (user == null)
                 return failOD;
 
+            if (user.Tables == null)
+                return successOD;
+
             IEnumerable<int> tables = new List<int>(user.Tables.Select(t => t.Id));
-            if (tables == null || tables.Count() == 0)
-                return failOD;
 
             foreach(int id in tables)
             {

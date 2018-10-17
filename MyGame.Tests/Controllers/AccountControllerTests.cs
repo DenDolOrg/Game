@@ -21,12 +21,10 @@ namespace MyGame.Controllers.Tests
     {
         #region DATA_TO_USE
 
-        //List<UserDTO> users = new List<UserDTO>
+        //internal List<UserDTO> Users = new List<UserDTO>
         //    {
         //        new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
         //        new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-        //        new UserDTO{ Id = 3, Email = "email_3@gmail.com", Password = "333333", UserName = "username_3", Name = "name_3", Surname = "Surname_3"},
-        //        new UserDTO{ Id = 4, Email = "email_4@gmail.com", Password = "444444", UserName = "username_4", Name = "name_4", Surname = "Surname_4"}
         //    };
 
         MockAuthenticationManager mockAuthenticationManager = new MockAuthenticationManager()
@@ -56,8 +54,6 @@ namespace MyGame.Controllers.Tests
             //Arrange
             LoginModel loginModel_good = new LoginModel { Email = "email_1@gmail.com", Password = "111111" };
             LoginModel loginModel_bad_1 = new LoginModel { Email = "email_2@gmail.com", Password = "123456" };
-            LoginModel loginModel_bad_2 = new LoginModel { Email = "test_bad@mail.com", Password = "333333" };
-            LoginModel loginModel_bad_3 = new LoginModel { Email = "test_bad@mail.com", Password = "123456" };
 
             var mockUserService = new MockUserService()
                 .MockAuthenticate();
@@ -66,14 +62,10 @@ namespace MyGame.Controllers.Tests
             AccountController accountController = new AccountController(mockUserService.Object, null, mockAuthenticationManager.Object);
             ActionResult goodResult = await accountController.Login(loginModel_good);
             ActionResult badResult_1 = await accountController.Login(loginModel_bad_1);
-            ActionResult badResult_2 = await accountController.Login(loginModel_bad_2);
-            ActionResult badResult_3 = await accountController.Login(loginModel_bad_3);
 
             //Assert
             Assert.IsInstanceOfType(goodResult, typeof(RedirectToRouteResult), "Good login info Fail.");
             Assert.IsInstanceOfType(badResult_1, typeof(ViewResult), "No Fail while using bad login info.");
-            Assert.IsInstanceOfType(badResult_2, typeof(ViewResult), "No Fail while using bad login info.");
-            Assert.IsInstanceOfType(badResult_3, typeof(ViewResult), "No Fail while using bad login info.");
         }
         #endregion
 
@@ -107,27 +99,7 @@ namespace MyGame.Controllers.Tests
                 Surname = "surname"
             };
 
-            RegisterModel registerModel_bad_1 = new RegisterModel
-            {
-                Email = "email_3@gmail.com",
-                Password = "123456",
-                ConfirmPassword = "123456",
-                Nickname = "nickname",
-                Name = "name",
-                Surname = "surname"
-            };
-
-            RegisterModel registerModel_bad_2 = new RegisterModel
-            {
-                Email = "test@mail.com",
-                Password = "123456",
-                ConfirmPassword = "123456",
-                Nickname = "username_2",
-                Name = "name",
-                Surname = "surname"
-            };
-
-            RegisterModel registerModel_bad_3 = new RegisterModel
+            RegisterModel registerModel_bad = new RegisterModel
             {
                 Email = "email_1@gmail.com",
                 Password = "123456",
@@ -146,14 +118,10 @@ namespace MyGame.Controllers.Tests
             //Act
             AccountController accountController = new AccountController(mockUserService.Object, null, mockAuthenticationManager.Object);
             ActionResult goodResult = await accountController.Register(registerModel_good);
-            ActionResult badResult_1 = await accountController.Register(registerModel_bad_1);
-            ActionResult badResult_2 = await accountController.Register(registerModel_bad_2);
-            ActionResult badResult_3 = await accountController.Register(registerModel_bad_3);
+            ActionResult badResult_3 = await accountController.Register(registerModel_bad);
 
             //Assert
             Assert.IsInstanceOfType(goodResult, typeof(RedirectToRouteResult), "Good Reg info Fail");
-            Assert.IsInstanceOfType(badResult_1, typeof(ViewResult), "No Fail with bad info.");
-            Assert.IsInstanceOfType(badResult_2, typeof(ViewResult), "No Fail with bad info.");
             Assert.IsInstanceOfType(badResult_3, typeof(ViewResult), "No Fail with bad info.");
         }
         #endregion
@@ -218,14 +186,6 @@ namespace MyGame.Controllers.Tests
         public async Task GetAllUsersTest()
         {
             //Arrange
-            List<UserDTO> users = new List<UserDTO>
-            {
-                new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
-                new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-                new UserDTO{ Id = 3, Email = "email_3@gmail.com", Password = "333333", UserName = "username_3", Name = "name_3", Surname = "Surname_3"},
-                new UserDTO{ Id = 4, Email = "email_4@gmail.com", Password = "444444", UserName = "username_4", Name = "name_4", Surname = "Surname_4"}
-            };
-
             var mockUserService = new MockUserService()
                 .GetAllUsers();
 
@@ -234,7 +194,7 @@ namespace MyGame.Controllers.Tests
             var result = await accountController.GetAllUsers();
 
             //Assert
-            Assert.AreEqual(Json.Encode(users), Json.Encode(result.Data), "Not the same Json result.");
+            Assert.AreEqual(Json.Encode(mockUserService.Users), Json.Encode(result.Data), "Not the same Json result.");
         }
         #endregion
     }

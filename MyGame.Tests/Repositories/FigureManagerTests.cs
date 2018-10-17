@@ -34,11 +34,5 @@ namespace MyGame.DAL.Repositories.Tests
         {
             Assert.Fail();
         }
-
-        [TestMethod()]
-        public void DisposeTest()
-        {
-            Assert.Fail();
-        }
     }
 }
