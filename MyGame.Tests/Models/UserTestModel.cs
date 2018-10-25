@@ -10,6 +10,6 @@ namespace MyGame.Tests.Models
     internal class UserTestModel
     {
         internal UserDTO UserDTO { get; set; }
-        internal ICollection<TableDTO> Tables { get; set; }
+        internal ICollection<GameDTO> Games { get; set; }
     }
 }

@@ -44,11 +44,11 @@ namespace MyGame.Controllers
         /// <summary>
         /// Service which contains methods to work with tables.
         /// </summary>
-        private ITableService TableService
+        private IGameService GameService
         {
             get
             {
-                return serviceFactory.CreateTableService();
+                return serviceFactory.CreateGameService();
             }
         }
 
@@ -59,16 +59,16 @@ namespace MyGame.Controllers
         {
             serviceFactory = new HttpContextServicesFactory(
                 () => HttpContext.GetOwinContext().Get<IUserService>(),
-                () => HttpContext.GetOwinContext().Get<ITableService>(),
+                () => HttpContext.GetOwinContext().Get<IGameService>(),
                 () => null);
         }
 
         /// <summary>
         /// Initialises a new instance of <see cref="HomeController"/> with custom services(for unit testing).
         /// </summary>
-        public HomeController(IUserService userService, ITableService tableService = null, IAuthenticationManager authenticationManager = null)
+        public HomeController(IUserService userService, IGameService gameService = null, IAuthenticationManager authenticationManager = null)
         {
-            serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
+            serviceFactory = new CustomServicesFactory(userService, gameService, authenticationManager);
         }
         #endregion
 
@@ -81,7 +81,7 @@ namespace MyGame.Controllers
             
             UserDTO receivedUserDTO;
             string userName = HttpContextManager.Current.User.Identity.Name;
-            if(!string.IsNullOrEmpty(userName))
+            if (!string.IsNullOrEmpty(userName))
             {
                 receivedUserDTO = await UserService.GetUser(new UserDTO { UserName = userName });
                 if (receivedUserDTO != null)
@@ -92,7 +92,9 @@ namespace MyGame.Controllers
 
                 }
             }
-           
+            else
+                HttpContextManager.Current.Session.Clear();
+
             return View();
         }
 

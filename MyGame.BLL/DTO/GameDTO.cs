@@ -9,7 +9,7 @@ namespace MyGame.BLL.DTO
     /// <summary>
     /// Main table data model to transter. 
     /// </summary>
-    public class TableDTO
+    public class GameDTO
     {
         /// <summary>
         /// Table Id.
@@ -19,11 +19,12 @@ namespace MyGame.BLL.DTO
         /// <summary>
         /// Creation time of table.
         /// </summary>
-        public DateTime CreationTime { get; set; }
+        public string CreationTime { get; set; }
 
         /// <summary>
         /// Table figures data.
         /// </summary>
         public ICollection<UserDTO> Opponents { get; set; }
+
     }
 }

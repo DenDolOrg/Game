@@ -33,11 +33,11 @@ namespace MyGame.DAL.Entities
         /// </summary>
         public virtual PlayerProfile PlayerProfile { get; set; }
 
-        public virtual ICollection<Table> Tables { get; set; }
+        public virtual ICollection<Game> Games { get; set; }
 
         public ApplicationUser()
         {
-            Tables = new HashSet<Table>();
+            Games = new HashSet<Game>();
         }
     }
 }

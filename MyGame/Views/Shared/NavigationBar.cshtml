@@ -9,17 +9,17 @@
                 Tables
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
-                <li>@Html.ActionLink("Available tables", "TableList", "Table", new { tableType = "available" }, new { @class = "dropdown-item" })</li>
+                <li>@Html.ActionLink("Available games", "GameList", "Game", new { gameType = "available" }, new { @class = "dropdown-item" })</li>
 
-                <li>@Html.ActionLink("My tables", "TableList", "Table", new { tableType = "myTables" }, new { @class = "dropdown-item" })</li>
+                <li>@Html.ActionLink("My games", "GameList", "Game", new { gameType = "myGames" }, new { @class = "dropdown-item" })</li>
                 @if (HttpContext.Current.User.IsInRole("admin"))
                 {
                     <li>
-                        @Html.ActionLink("All tables", "TableList", "Table", new { tableType = "all" }, new { @class = "dropdown-item" })
+                        @Html.ActionLink("All games", "GameList", "Game", new { gameType = "all" }, new { @class = "dropdown-item" })
                     </li>
                 }
 
-                <li>@Html.ActionLink("Create new table", "CreateNewtable", "Table", null, new { @class = "dropdown-item" })</li>
+                <li>@Html.ActionLink("Create new game", "CreateNewGame", "Game", null, new { @class = "dropdown-item" })</li>
             </ul>
 
         </div>

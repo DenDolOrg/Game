@@ -52,11 +52,10 @@ namespace MyGame.Infrastructure
         {
             ninjectKernel.Bind<IUnitOfWork>().To<IdentityUnitOfWork>();
             ninjectKernel.Bind<IUserService>().To<UserService>()
-                .When(request => (request.Target == null) || (request.Target.Name.EndsWith("Controller"))); ;
+                .When(request => (request.Target == null) || request.Target.Name.EndsWith("Controller"));
 
-            ninjectKernel.Bind<ITableService>().To<TableService>()
-                .When(request => (request.Target == null) || (request.Target.Name.EndsWith("Controller"))); ;
-
+            ninjectKernel.Bind<IGameService>().To<GameService>()
+               .When(request => (request.Target == null) || request.Target.Name.EndsWith("Controller"));
         }
 
         public IKernel GetCurrentKernel()

@@ -16,14 +16,15 @@
     <div id="header">
         @Html.ActionLink("MY STRANGE GAME", "Index", "Home", null, new { @id = "homeLink" })
         @if (Session["FullName"] == null)
-        { Html.RenderPartial("WelcomeGuest"); }
-
+        {
+            Html.RenderPartial("WelcomeGuest");
+        }
         else
         {
             Html.RenderPartial("WelcomeUser");
-            {
-                Html.RenderPartial("NavigationBar");
-            }
+
+            Html.RenderPartial("NavigationBar");
+
         }
     </div>
 

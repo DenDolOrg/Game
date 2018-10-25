@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNet.Identity;
 using MyGame.BLL.DTO;
 using MyGame.BLL.Infrastructure;
@@ -35,16 +36,15 @@ namespace MyGame.BLL.Services
         #region AUTHENTICATION
         public async Task<ClaimsIdentity> Authenticate(UserDTO userDTO)
         {
-            ClaimsIdentity claim = null;
-            ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
+            var user = await Database.UserManager.FindByEmailAsync(userDTO.Email);
             if(user != null)
             {
                 if(await Database.UserManager.CheckPasswordAsync(user, userDTO.Password))
                 {
-                    claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+                    return await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
                 }
             }        
-            return claim;
+            return null;
         }
         #endregion
 
@@ -55,6 +55,8 @@ namespace MyGame.BLL.Services
             OperationDetails failOD = new OperationDetails(false);
 
             ApplicationUser user = await Database.UserManager.FindByIdAsync(userDTO.Id);
+            if (user == null)
+                return failOD;
             var logins = user.Logins;
             var rolesForUser = await Database.UserManager.GetRolesAsync(user.Id);
                 
@@ -94,18 +96,26 @@ namespace MyGame.BLL.Services
             {
                 user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
                 if(user != null)
-                {
                     return new OperationDetails(false, "Account with such Nickname already exist.", "Nickname");
-                }
+
                 user = new ApplicationUser { Email = userDTO.Email, UserName = userDTO.UserName };
-                var result = await Database.UserManager.CreateAsync(user, userDTO.Password);
 
-                await Database.UserManager.AddToRoleAsync(user.Id, userDTO.Role);
+                var createUserRes = await Database.UserManager.CreateAsync(user, userDTO.Password);
+                if (!createUserRes.Succeeded)
+                    throw new HttpException(500, "Unexpected error.");
 
-                PlayerProfile playerProfile = new PlayerProfile { Id = user.Id, Surname = userDTO.Surname, Name = userDTO.Name };
-                await Database.PlayerManager.CreateAsync(playerProfile);
+                var addToRoleRes = await Database.UserManager.AddToRoleAsync(user.Id, userDTO.Role);
+                if(!addToRoleRes.Succeeded)
+                    throw new HttpException(500, "Unexpected error.");
+
+                var playerProfile = new PlayerProfile { Id = user.Id, Surname = userDTO.Surname, Name = userDTO.Name };
+
+                if(!(await Database.PlayerManager.CreateAsync(playerProfile)))
+                    throw new HttpException(500, "Unexpected error.");
+
                 return new OperationDetails(true);
 
+                
             }
             else
             {
@@ -123,7 +133,10 @@ namespace MyGame.BLL.Services
                 if (role == null)
                 {
                     role = new ApplicationRole { Name = roleName };
-                    await Database.RoleManager.CreateAsync(role);
+
+                    var createRoleRes = await Database.RoleManager.CreateAsync(role);
+                    if(!createRoleRes.Succeeded)
+                        throw new HttpException(500, "Unexpected error.");
                 }
             }
             var adminAccount = await Database.UserManager.FindByEmailAsync(adminDTO.Email);
@@ -141,12 +154,11 @@ namespace MyGame.BLL.Services
         #region GET_USER
         public async Task<UserDTO> GetUser(UserDTO userDTO)
         {
-            UserDTO userDtoToSend = null;
-            ApplicationUser user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
+            var user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
 
             if (user != null)
             {
-                userDtoToSend = new UserDTO
+                var userDtoToSend = new UserDTO
                 {
                     Id = user.Id,
                     Email = user.Email,
@@ -154,8 +166,9 @@ namespace MyGame.BLL.Services
                     Surname = user.PlayerProfile.Surname,
                     UserName = user.UserName
                 };
+                return userDtoToSend;
             }
-            return userDtoToSend;
+            return null;
         }
         #endregion
 

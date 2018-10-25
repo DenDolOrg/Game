@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MyGame.BLL.Services
 {
-    public class TableService: ITableService
+    public class GameService: IGameService
     {
 
         /// <summary>
@@ -24,13 +24,13 @@ namespace MyGame.BLL.Services
         /// Initializes a new instance of <see cref="UserService"/>.
         /// </summary>
         /// <param name="db">Instance of <see cref="IUnitOfWork"/></param>
-        public TableService(IUnitOfWork db)
+        public GameService(IUnitOfWork db)
         {
             Database = db;
         }
 
         #region CREATE
-        public async Task<OperationDetails> CreateNewTable(UserDTO firstPlayer)
+        public async Task<OperationDetails> CreateNewGame(UserDTO firstPlayer)
         {
             OperationDetails successOD = new OperationDetails(true);
             OperationDetails failOD = new OperationDetails(false);
@@ -38,20 +38,23 @@ namespace MyGame.BLL.Services
             ApplicationUser user = await Database.UserManager.FindByNameAsync(firstPlayer.UserName);
             if (user != null)
             {
-                Table newTable = new Table()
+                List<ApplicationUser> opponents = new List<ApplicationUser> { user };
+                var newGame = new Game
                 {
-                    Opponents = new List<ApplicationUser>
-                    {
-                        user
-                    }
+                    Opponents = opponents,
                 };
-                bool tableCreateRes = await Database.TableManager.CreateAsync(newTable);
-                bool figuresCreateRes = await Database.FigureManager.CreateAsync(newTable.Id);
 
-                if (!(tableCreateRes && figuresCreateRes))
+
+                bool gameCreateRes = await Database.GameManager.CreateAsync(newGame);
+
+                bool tableCreateRes = await Database.TableManager.CreateAsync(newGame);
+                bool figuresCreateRes = await Database.FigureManager.CreateAsync(newGame.Id);
+                
+
+                if (!(gameCreateRes && tableCreateRes && figuresCreateRes))
                     return failOD;
 
-                user.Tables.Add(newTable);
+                user.Games.Add(newGame);                
                 try
                 {
                     await Database.SaveChangesAsync();
@@ -69,19 +72,20 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region DELETE
-        public async Task<OperationDetails> DeteteTable(TableDTO tableDTO)
+        public async Task<OperationDetails> DeteteGame(GameDTO tableDTO)
         {
             OperationDetails successOD = new OperationDetails(true);
             OperationDetails failOD = new OperationDetails(false);
 
-            Table table = await Database.TableManager.FindByIdAsync(tableDTO.Id);
-            if (table == null)
+            Game game = await Database.GameManager.FindByIdAsync(tableDTO.Id);
+            if (game == null)
                 return failOD;
 
-            bool FiguresDelResult = await Database.FigureManager.DeleteAsync(table.Id);
-            bool TableDelResult = await Database.TableManager.DeleteAsync(table);
+            bool figuresDelResult = await Database.FigureManager.DeleteAsync(game.Id);
+            bool tableDelResult = await Database.TableManager.DeleteAsync(game);
+            bool gameDelResult = await Database.GameManager.DeleteAsync(game);
 
-            if (!(FiguresDelResult && TableDelResult))
+            if (!(figuresDelResult && tableDelResult && gameDelResult))
                 return failOD;
 
             return successOD;
@@ -90,8 +94,8 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
-        #region DELETE_USER_TABLES
-        public async Task<OperationDetails> DeteteUserTables(UserDTO userDTO)
+        #region DELETE_USER_GAME
+        public async Task<OperationDetails> DeteteUserGame(UserDTO userDTO)
         {
             OperationDetails successOD = new OperationDetails(true);
             OperationDetails failOD = new OperationDetails(false);
@@ -101,15 +105,15 @@ namespace MyGame.BLL.Services
             if (user == null)
                 return failOD;
 
-            if (user.Tables == null)
+            if (user.Games == null)
                 return successOD;
 
-            IEnumerable<int> tables = new List<int>(user.Tables.Select(t => t.Id));
+            IEnumerable<int> games = user.Games.Select(g => g.Id);
 
-            foreach(int id in tables)
+            foreach(int id in games)
             {
-                var TableDelResult = await DeteteTable(new TableDTO { Id = id });
-                if (!TableDelResult.Succedeed)
+                var GameDelResult = await DeteteGame(new GameDTO { Id = id });
+                if (!GameDelResult.Succedeed)
                     return failOD;
             }
 
@@ -118,9 +122,9 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region GET_FIGURES
-        public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(TableDTO tableDTO)
+        public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(GameDTO gameDTO)
         {
-            IEnumerable<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(tableDTO.Id).ToListAsync();
+            IEnumerable<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(gameDTO.Id).ToListAsync();
             if (tableFigures.Count() != 0)
             {
                 return CreateFiguresDTO(tableFigures);
@@ -129,18 +133,17 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
-        #region GET_TABLE
-        public async Task<TableDTO> GetTable(TableDTO tableDTO)
+        #region GET_GAME
+        public async Task<GameDTO> GetGame(GameDTO tableDTO)
         {
-            
-            Table table = await Database.TableManager.FindByIdAsync(tableDTO.Id);
-            if(table != null)
+            Game game = await Database.GameManager.FindByIdAsync(tableDTO.Id);
+            if(game != null)
             {
-                TableDTO tableDTO_out = new TableDTO
+                GameDTO tableDTO_out = new GameDTO
                 {
-                    Id = table.Id,
-                    Opponents = GetOpponents(table),
-                    CreationTime = table.CreationTime
+                    Id = game.Id,
+                    Opponents = GetOpponents(game),
+                    CreationTime = game.Table.CreationTime.ToShortDateString()
                 };
 
                 return tableDTO_out;
@@ -149,38 +152,38 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
-        #region GET_ALL_TABLES
-        public async Task<IEnumerable<TableDTO>> GetAllTables()
+        #region GET_ALL_Games
+        public async Task<IEnumerable<GameDTO>> GetAllGames()
         {
-            IEnumerable<Table> tableList =  await Database.TableManager.GetAllTabes().ToListAsync();
+            IEnumerable<Game> gameList =  await Database.GameManager.GetAllGames().ToListAsync();
 
-            return CreateTablesDTO(tableList);
+            return CreateGameDTO(gameList);
         }
         #endregion
 
-        #region GET_TABLES_FOR_USER
-        public async Task<IEnumerable<TableDTO>> GetUserTables(UserDTO userDTO)
+        #region GET_GAMES_FOR_USER
+        public async Task<IEnumerable<GameDTO>> GetUserGames(UserDTO userDTO)
         {
             ApplicationUser user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
 
             if (user == null)
                 return null;
-            IEnumerable<Table> tables = await Database.TableManager.GetTablesForUser(user.Id).ToListAsync();
+            IEnumerable<Game> games = await Database.GameManager.GetGamesForUser(user.Id).ToListAsync();
 
-            return CreateTablesDTO(tables);
+            return CreateGameDTO(games);
         }
         #endregion
 
-        #region AVAILABLE_TABLES
-        public async Task<IEnumerable<TableDTO>> GetAvailableTables(UserDTO userDTO)
+        #region AVAILABLE_GAMES
+        public async Task<IEnumerable<GameDTO>> GetAvailableGames(UserDTO userDTO)
         {
             ApplicationUser user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
             if (user == null)
                 return null;
 
-            IEnumerable<Table> tables = await Database.TableManager.GetAvailableTables(user.Id).ToListAsync();
+            IEnumerable<Game> games = await Database.GameManager.GetAvailableGames(user.Id).ToListAsync();
 
-            return CreateTablesDTO(tables);
+            return CreateGameDTO(games);
         }
         #endregion
 
@@ -199,51 +202,22 @@ namespace MyGame.BLL.Services
         /// </summary>
         /// <param name="table">Table to scan.</param>
         /// <returns>List of universal table data model. Each of it contains Id of table and list of opponents.</returns>
-        private ICollection<UserDTO> GetOpponents(Table table)
+        private ICollection<UserDTO> GetOpponents(Game game)
         {
-            List<UserDTO> opponents = new List<UserDTO>
+            List<UserDTO> opponents = new List<UserDTO>();
+            foreach (ApplicationUser u in game.Opponents)
             {
-                new UserDTO(),
-                new UserDTO()
-            };
-            int i = 0;
-            foreach (ApplicationUser u in table.Opponents)
-            {
-                opponents[i++] = new UserDTO
+                opponents.Add(new UserDTO
                 {
                     Id = u.Id,
                     Name = u.PlayerProfile.Name,
                     Surname = u.PlayerProfile.Surname,
                     Email = u.Email,
                     UserName = u.UserName
-                };
+                });
             }
 
             return opponents;
-        }
-
-        /// <summary>
-        /// Creates list of <see cref="TableDTO"/> for list of <see cref="Table"/>
-        /// </summary>
-        /// <param name="tables">Table list.</param>
-        /// <returns>List of tableDTOs.</returns>
-        private IEnumerable<TableDTO> CreateTablesDTO(IEnumerable<Table> tables)
-        {
-            List<TableDTO> tableDTOs = new List<TableDTO>();
-
-            ICollection<UserDTO> opponents;
-            for (int i = 0; i < tables.Count(); i++)
-            {
-                Table t = tables.ElementAt(i);
-                opponents = GetOpponents(t);
-                tableDTOs.Add(new TableDTO
-                {
-                    Id = t.Id,
-                    Opponents = opponents,
-                    CreationTime = t.CreationTime
-                });
-            }
-            return tableDTOs;
         }
 
         private IEnumerable<FigureDTO> CreateFiguresDTO(IEnumerable<Figure> figures)
@@ -261,6 +235,30 @@ namespace MyGame.BLL.Services
                 });
             }
             return figureDTOs.AsEnumerable();
+        }
+
+        /// <summary>
+        /// Creates list of <see cref="GameDTO"/> for list of <see cref="Table"/>
+        /// </summary>
+        /// <param name="games">Table list.</param>
+        /// <returns>List of tableDTOs.</returns>
+        private IEnumerable<GameDTO> CreateGameDTO(IEnumerable<Game> games)
+        {
+            List<GameDTO> gameDTOs = new List<GameDTO>();
+
+            ICollection<UserDTO> opponents;
+            for (int i = 0; i < games.Count(); i++)
+            {
+                Game g = games.ElementAt(i);
+                opponents = GetOpponents(g);
+                gameDTOs.Add(new GameDTO
+                {
+                    Id = g.Id,
+                    Opponents = opponents,
+                    CreationTime = g.Table.CreationTime.ToShortDateString()
+                });
+            }
+            return gameDTOs;
         }
         #endregion
 

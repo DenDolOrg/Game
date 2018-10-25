@@ -3,7 +3,7 @@ namespace MyGame.DAL.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class fig2 : DbMigration
+    public partial class Game : DbMigration
     {
         public override void Up()
         {

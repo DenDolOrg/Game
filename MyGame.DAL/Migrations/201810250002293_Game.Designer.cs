@@ -7,13 +7,13 @@ namespace MyGame.DAL.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.0-30225")]
-    public sealed partial class newDb : IMigrationMetadata
+    public sealed partial class Game : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(newDb));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Game));
         
         string IMigrationMetadata.Id
         {
-            get { return "201810081904109_newDb"; }
+            get { return "201810250002293_Game"; }
         }
         
         string IMigrationMetadata.Source

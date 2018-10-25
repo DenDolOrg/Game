@@ -9,7 +9,7 @@
     <script type="text/javascript">
         var actionAddress = @Html.Raw(Json.Encode(Model.ActionName));
     </script>
-    <script src="~/Scripts/TableController.js"></script>
+    <script src="~/Scripts/GameController.js"></script>
 }
 
 <h1>List of tables:</h1>
@@ -24,22 +24,24 @@
                 <th scope="col">Actions</th>
             </tr>
         </thead>
-        <tbody ng-controller="TableListController">
-            <tr ng-repeat="tableModel in tableList.data">
-                <th scope="row">{{tableModel.Id}}</th>
-                <td ng-repeat="opponent in tableModel.Opponents">
-                    {{opponent.Name}} {{opponent.Surname}}
-                </td>
-
+        <tbody ng-controller="GameListController">
+            <tr ng-repeat="gameModel in gameList.data">
+                <th scope="row">{{gameModel.Id}}</th>
                 <td>
-                    Some Date
+                    {{gameModel.Opponents[0].Name}} {{gameModel.Opponents[0].Surname}}
+                </td>
+                <td>
+                    {{gameModel.Opponents[1].Name}} {{gameModel.Opponents[1].Surname}}
+                </td>
+                <td>
+                    {{gameModel.CreationTime}}
                 </td>
                 <td>
                     <div class="btn-group">
-                        <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-warning btn-sm">Join</a>
+                        <a href="#" ng-click="DeteleTable(gameModel)" class="btn btn-secondary btn-warning btn-sm">Join</a>
                         @if (HttpContext.Current.User.IsInRole("admin"))
                         {
-                            <a href="#" ng-click="DeteleTable(tableModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
+                            <a href="#" ng-click="DeteleTable(gameModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
                         }
                     </div>
 

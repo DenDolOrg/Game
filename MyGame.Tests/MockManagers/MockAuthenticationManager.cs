@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Owin.Security;
 using System.Security.Claims;
 
-namespace MyGame.Tests.Services
+namespace MyGame.Tests.MockManagers
 {
     internal class MockAuthenticationManager : Mock<IAuthenticationManager>
     {

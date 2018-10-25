@@ -20,15 +20,12 @@ namespace MyGame.Controllers.Tests
     [TestClass()]
     public class TableControllerTests
     {
-        #region DATA_TO_USE
-        //List<UserDTO> users = new List<UserDTO>
-        //    {
-        //        new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
-        //        new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-        //        new UserDTO{ Id = 3, Email = "email_3@gmail.com", Password = "333333", UserName = "username_3", Name = "name_3", Surname = "Surname_3"},
-        //        new UserDTO{ Id = 4, Email = "email_4@gmail.com", Password = "444444", UserName = "username_4", Name = "name_4", Surname = "Surname_4"}
-        //    };
-        #endregion
+
+        [TestInitialize]
+        public void Init()
+        {
+            ControllerDataToUse.SetData();
+        }
 
         #region TABLE_LIST
         [TestMethod()]
@@ -37,113 +34,93 @@ namespace MyGame.Controllers.Tests
             //Arrange
             string all = "all";
             string available = "available";
-            string myTables = "myTables";
+            string myGames = "myGames";
 
-            string allResult = "/Table/GetAllTables";
-            string availableResult = "/Table/GetAvailableTables";
-            string myTablesResult = "/Table/GetUserTables";
+            string allResult = "/Game/GetAllGames";
+            string availableResult = "/Game/GetAvailableGames";
+            string myGamesResult = "/Game/GetUserGames";
             //Act
-            TableController tableController = new TableController(null);
+            GameController tableController = new GameController(null);
 
-            TableActionModel result_all = (TableActionModel)tableController.TableList(all).Model;
-            TableActionModel result_available = (TableActionModel)tableController.TableList(available).Model;
-            TableActionModel result_myTables = (TableActionModel)tableController.TableList(myTables).Model;
+            TableActionModel result_all = (TableActionModel)tableController.GameList(all).Model;
+            TableActionModel result_available = (TableActionModel)tableController.GameList(available).Model;
+            TableActionModel result_myGames = (TableActionModel)tableController.GameList(myGames).Model;
 
             //Assert
             Assert.AreEqual(allResult, result_all.ActionName, "Do not return good action name for All");
             Assert.AreEqual(availableResult, result_available.ActionName, "Do not return good action name for Available");
-            Assert.AreEqual(myTablesResult, result_myTables.ActionName, "Do not return good action name for My tables");
+            Assert.AreEqual(myGamesResult, result_myGames.ActionName, "Do not return good action name for My tables");
         }
         #endregion
 
         #region USER_TABLES
         [TestMethod()]
-        public async Task GetUserTablesTest()
+        public async Task GetUserGamesTest()
         {
             //Arrange
-            UserDTO good_user = new UserDTO { UserName = "username_1" };
+            UserDTO good_user = new UserDTO { UserName = ControllerDataToUse.UserDTO.UserName };
             UserDTO bad_user = new UserDTO { UserName = "bad_username" };
 
-            UserTestModel userWithoutTables = new UserTestModel
-            {
-                UserDTO = new UserDTO { UserName = "testUserName" },
-                Tables = new List<TableDTO>()
-            };
-
-            var mockTableService = new MockTableService()
-                .MockGetUserTables(userWithoutTables);
-
-            int tableNum = mockTableService._tablePerUserNum;
-
-            List<TableDTO> good_tables = mockTableService.Tables.GetRange(0, tableNum);
+            var mockGameService = new MockGameService()
+                .MockGetUserGames();
 
             //Act
-            TableController tableController = new TableController(null, mockTableService.Object);
+            GameController tableController = new GameController(null, mockGameService.Object);
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(good_user.UserName).CustomHttpContextBase);
-            var goodTablesRes = await tableController.GetUserTables();
+            var goodGamesRes = await tableController.GetUserGames();
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(bad_user.UserName).CustomHttpContextBase);
-            var badTablesRes = await tableController.GetUserTables();
-
-            HttpContextManager.SetCurrentContext(new MockHttpContext(userWithoutTables.UserDTO.UserName).CustomHttpContextBase);
-            var noTablesRes = await tableController.GetUserTables();
+            var badGamesRes = await tableController.GetUserGames();
 
             //Assert
-            Assert.AreEqual(Json.Encode(good_tables), Json.Encode(goodTablesRes.Data), "Are not equal good tables");
-            Assert.AreEqual(Json.Encode(noTablesRes.Data), Json.Encode(new List<TableDTO>()), "Not empty list of tables for user with no tables");
-            Assert.IsNull(badTablesRes, "Not null tables for user with bad bad username");
+            Assert.AreEqual(Json.Encode(new List<GameDTO> { ControllerDataToUse.GameDTO }), Json.Encode(goodGamesRes.Data), "Are not equal good tables");
+            Assert.IsNull(badGamesRes, "Not null tables for user with bad bad username");
         }
         #endregion
 
         #region ALL_TABLES
         [TestMethod()]
-        public async Task GetAllTablesTest()
+        public async Task GetAllGamesTest()
         {
             //Arrange
-            var mockTableService = new MockTableService()
-                .MockGetAllTables();
+            var mockGameService = new MockGameService()
+                .MockGetAllGames();
 
-            List<TableDTO> tables = mockTableService.Tables;
             //Act
-            TableController tableController = new TableController(null,mockTableService.Object);
-            var result = await tableController.GetAllTables();
+            GameController tableController = new GameController(null, mockGameService.Object);
+            var result = await tableController.GetAllGames();
 
             //Assert
-            Assert.AreEqual(Json.Encode(tables), Json.Encode(result.Data));
+            Assert.AreEqual(Json.Encode(new List<GameDTO> { ControllerDataToUse.GameDTO }), Json.Encode(result.Data));
         }
         #endregion
 
         #region AVAILABLE_TABLES
         [TestMethod()]
-        public async Task GetAvailableTablesTest()
+        public async Task GetAvailableGamesTest()
         {
             //Arrange
 
-            var mockTableService = new MockTableService()
-                .MockGetAvailableTables();
+            var mockGameService = new MockGameService()
+                .MockGetAvailableGames();
 
-            mockTableService.UserModels.ElementAt(0).Tables.ElementAt(0).Opponents.Add(mockTableService.UserModels.ElementAt(1).UserDTO);
-            mockTableService.UserModels.ElementAt(1).Tables.Add(mockTableService.UserModels.ElementAt(0).Tables.ElementAt(0));
-
-            UserDTO good_user1 = new UserDTO { UserName = "username_2" };
+            UserDTO good_user1 = new UserDTO { UserName = ControllerDataToUse.UserDTO.UserName };
             UserDTO bad_user = new UserDTO { UserName = "bad_username" };
 
-            int tableNum = mockTableService._tablePerUserNum;
-            int userNum = mockTableService.Users.Count;
             //Act
-            TableController tableController = new TableController(null, mockTableService.Object);
+            GameController tableController = new GameController(null, mockGameService.Object);
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(good_user1.UserName).CustomHttpContextBase);
-            var result1 = await tableController.GetAvailableTables();
+            var result1 = await tableController.GetAvailableGames();
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(bad_user.UserName).CustomHttpContextBase);
-            var result_bad = await tableController.GetAvailableTables();
+            var result_bad = await tableController.GetAvailableGames();
 
-            List<TableDTO> resList_1 = Json.Decode<List<TableDTO>>(Json.Encode(result1.Data));
+            List<GameDTO> resList_1 = Json.Decode<List<GameDTO>>(Json.Encode(result1.Data));
 
             //Assert
-            Assert.AreEqual(resList_1.Count, tableNum * (userNum - 1) - 1, "Bad number of available tables for user");
+            Assert.AreEqual(resList_1.Count, 1, "Bad number of available tables for user");
             Assert.IsNull(result_bad, "List of tables for user with bad username is ot empty");
 
         }
@@ -154,20 +131,20 @@ namespace MyGame.Controllers.Tests
         public async Task CreateNewtableTest()
         {
             //Arrange 
-            UserDTO user_good = new UserDTO { UserName = "username_1" };
+            UserDTO user_good = new UserDTO { UserName = ControllerDataToUse.UserDTO.UserName };
             UserDTO user_bad = new UserDTO { UserName = "bad_username" };
 
-            var mockTableService = new MockTableService()
-                .MockCreateTable();
+            var mockGameService = new MockGameService()
+                .MockCreateGame();
             
             //Act
-            TableController tableController = new TableController(null, mockTableService.Object);
+            GameController tableController = new GameController(null, mockGameService.Object);
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_good.UserName).CustomHttpContextBase);
-            var result_good = await tableController.CreateNewtable();
+            var result_good = await tableController.CreateNewGame();
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_bad.UserName).CustomHttpContextBase);
-            var result_bad = await tableController.CreateNewtable();
+            var result_bad = await tableController.CreateNewGame();
 
             //Assert
             Assert.IsNotNull(result_good, "Can't create table for valid username.");
@@ -181,19 +158,16 @@ namespace MyGame.Controllers.Tests
         public async Task DeleteTest()
         {
             //Arrange
-            TableDTO good_table = new TableDTO { Id = 1 };
-            TableDTO bad_table = new TableDTO { Id = 124 };
+            GameDTO good_table = new GameDTO { Id = ControllerDataToUse.UserDTO.Id };
+            GameDTO bad_table = new GameDTO { Id = 124 };
 
-            var mockTableService = new MockTableService()
-                .MockDeleteTable();
+            var mockGameService = new MockGameService()
+                .MockDeleteGame();
 
             //Act
-            TableController tableController = new TableController(null, mockTableService.Object);
+            GameController tableController = new GameController(null, mockGameService.Object);
             await tableController.Delete(good_table.Id);
             await tableController.Delete(bad_table.Id);
-
-            //Assert
-            Assert.IsTrue(mockTableService.Tables.First().Id == 2);
         }
         #endregion
     }

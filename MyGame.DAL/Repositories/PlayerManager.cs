@@ -46,10 +46,13 @@ namespace MyGame.DAL.Repositories
 
         public async Task<bool> DeleteAsync(PlayerProfile item)
         {
+            if (item == null)
+                return false;
+
             try
             {
-                Database.PlayerProfile.Remove(item);
-                await Database.SaveChangesAsync();
+                if(Database.PlayerProfile.Remove(item) != null)
+                    await Database.SaveChangesAsync();
             }
             catch
             {

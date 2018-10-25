@@ -15,10 +15,14 @@ namespace MyGame.DAL.EntityFramework
         {
         }
 
-        public DbSet<PlayerProfile> PlayerProfile { get; set; }
-        public DbSet<Table> Tables { get; set; }
+        public virtual DbSet<PlayerProfile> PlayerProfile { get; set; }
+        
+        public virtual DbSet<Game> Games { get; set; }
 
-        public DbSet<Figure> Figures { get; set; }
+        public virtual DbSet<Table> Tables { get; set; }
+
+        public virtual DbSet<Figure> Figures { get; set; }
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -31,12 +35,5 @@ namespace MyGame.DAL.EntityFramework
             modelBuilder.Entity<UserClaim>().ToTable("UserClaim");
             modelBuilder.Entity<UserLogin>().ToTable("UserLogin");
         }
-
-        //public System.Data.Entity.DbSet<MyGame.Models.TableModel> TableModels { get; set; }
-
-        //public static ApplicationContext Create()
-        //{
-        //    return new ApplicationContext();
-        //}
     }
 }

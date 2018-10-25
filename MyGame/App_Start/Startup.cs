@@ -41,7 +41,7 @@ namespace MyGame.App_Start
         {
 
             app.CreatePerOwinContext(CreareUserService);
-            app.CreatePerOwinContext(CreareTableService);
+            app.CreatePerOwinContext(CreareGameService);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
@@ -64,10 +64,9 @@ namespace MyGame.App_Start
         {
             return kernel.Get<IUserService>();
         }
-
-        private ITableService CreareTableService()
+        private IGameService CreareGameService()
         {
-            return kernel.Get<ITableService>();
+            return kernel.Get<IGameService>();
         }
 
         /// <summary>

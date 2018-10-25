@@ -38,11 +38,11 @@ namespace MyGame.Controllers
         /// <summary>
         /// Service which contains methods to work with tables.
         /// </summary>
-        private ITableService TableService
+        private IGameService GameService
         {
             get
             {
-                return serviceFactory.CreateTableService();
+                return serviceFactory.CreateGameService();
             }
         }
 
@@ -65,19 +65,18 @@ namespace MyGame.Controllers
         {
             serviceFactory = new HttpContextServicesFactory(
                 () => HttpContext.GetOwinContext().Get<IUserService>(),
-                () => HttpContext.GetOwinContext().Get<ITableService>(),
+                () => HttpContext.GetOwinContext().Get<IGameService>(),
                 () => HttpContext.GetOwinContext().Authentication);
         }
 
         /// <summary>
         /// Initialises a new instance of <see cref="AccountController"/> with custom services(for unit testing).
         /// </summary>
-        public AccountController(IUserService userService, ITableService tableService = null, IAuthenticationManager authenticationManager = null)
+        public AccountController(IUserService userService, IGameService gameService = null, IAuthenticationManager authenticationManager = null)
         {
-            serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
+            serviceFactory = new CustomServicesFactory(userService, gameService, authenticationManager);
         }
         #endregion
-
 
         #region LOGIN(GET)
         /// <summary>
@@ -209,7 +208,7 @@ namespace MyGame.Controllers
                 Id = id
             };
 
-            var UserTableDelResult = await TableService.DeteteUserTables(userDTO);
+            var UserTableDelResult = await GameService.DeteteUserGame(userDTO);
             var UserDelResult = await UserService.Delete(userDTO);
 
             if (!(UserDelResult.Succedeed && UserTableDelResult.Succedeed))

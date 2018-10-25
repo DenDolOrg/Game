@@ -202,7 +202,7 @@
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\TableController.cs" />
+    <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -211,7 +211,7 @@
     <Compile Include="Infrastructure\HttpContextServicesFactory.cs" />
     <Compile Include="Infrastructure\NinjectControllerFactory.cs" />
     <Compile Include="Infrastructure\ServiceFactory.cs" />
-    <Compile Include="Models\FieldModel.cs" />
+    <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PlayerModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
@@ -306,7 +306,7 @@
     <Content Include="Scripts\FillTableFithFigures.js" />
     <Content Include="Scripts\Bibles\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\Bibles\jquery-ui-1.12.1.min.js" />
-    <Content Include="Scripts\TableController.js" />
+    <Content Include="Scripts\GameController.js" />
     <Content Include="Scripts\Bibles\jquery-3.3.1.js" />
     <Content Include="Scripts\Bibles\jquery-3.3.1.min.js" />
     <Content Include="Scripts\Bibles\jquery-3.3.1.slim.js" />
@@ -335,15 +335,14 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\WelcomeGuest.cshtml" />
     <Content Include="Views\Shared\WelcomeUser.cshtml" />
-    <Content Include="Views\Table\TableList.cshtml" />
-    <Content Include="Views\Table\square.cshtml" />
-    <Content Include="Views\Table\SIngleTable.cshtml" />
+    <Content Include="Views\Game\GameList.cshtml" />
+    <Content Include="Views\Game\square.cshtml" />
+    <Content Include="Views\Game\SIngleTable.cshtml" />
     <Content Include="Views\Shared\NavigationBar.cshtml" />
     <Content Include="Views\Account\UserList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Game\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

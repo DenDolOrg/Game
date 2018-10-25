@@ -10,18 +10,18 @@ namespace MyGame.Infrastructure
     public class CustomServicesFactory : ServiceFactory
     {
         private readonly IUserService _userService;
-        private readonly ITableService _tableService;
+        private readonly IGameService _gameService;
         private readonly IAuthenticationManager _authenticationManager;
 
         /// <summary>
         /// Initialises new instance of <see cref="CustomServicesFactory"/>.
         /// </summary>
         /// <param name="userService">Custom version of <see cref="IUserService"/>.</param>
-        /// <param name="tableService">Custom version of <see cref="ITableService"/>.</param>
-        public CustomServicesFactory(IUserService userService, ITableService tableService, IAuthenticationManager authenticationManager)
+        /// <param name="tableService">Custom version of <see cref="IGameService"/>.</param>
+        public CustomServicesFactory(IUserService userService, IGameService gameService, IAuthenticationManager authenticationManager)
         {
             _userService = userService;
-            _tableService = tableService;
+            _gameService = gameService;
             _authenticationManager = authenticationManager;
         }
 
@@ -30,9 +30,9 @@ namespace MyGame.Infrastructure
             return _authenticationManager;
         }
 
-        public override ITableService CreateTableService()
+        public override IGameService CreateGameService()
         {
-            return _tableService;
+            return _gameService;
         }
 
         public override IUserService CreateUserService()

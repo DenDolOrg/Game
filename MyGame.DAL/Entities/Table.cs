@@ -17,23 +17,22 @@ namespace MyGame.DAL.Entities
         /// Id of current table.
         /// </summary>
         [Key]
-        public virtual int Id { get; set; }
+        [ForeignKey("Game")]
+        public int Id { get; set; }
 
         /// <summary>
         /// Creation time of table.
         /// </summary>
-        public virtual DateTime CreationTime { get; set; }
+        public DateTime CreationTime { get; set; }
 
         /// <summary>
-        /// List of opponents playing on this table.
+        /// Game for this table.
         /// </summary>
-        public virtual ICollection<ApplicationUser> Opponents { get; set; }
-
+        public virtual Game Game { get; set; }
 
         public Table()
         {
             CreationTime = DateTime.Now;
-            Opponents = new HashSet<ApplicationUser>();
         }
     }
 }

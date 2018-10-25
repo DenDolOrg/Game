@@ -15,7 +15,7 @@ using MyGame.BLL.Infrastructure;
 namespace MyGame.Controllers
 {
     [Authorize]
-    public class TableController : Controller
+    public class GameController : Controller
     {
 
         #region SERVICES
@@ -38,71 +38,71 @@ namespace MyGame.Controllers
         /// <summary>
         /// Service which contains methods to work with tables.
         /// </summary>
-        private ITableService TableService
+        private IGameService GameService
         {
             get
             {
-                return serviceFactory.CreateTableService();
+                return serviceFactory.CreateGameService();
             }
         }
 
         /// <summary>
-        /// Initialises a new instance of <see cref="TableController"/> with default services.
+        /// Initialises a new instance of <see cref="GameController"/> with default services.
         /// </summary>
-        public TableController()
+        public GameController()
         {
             serviceFactory = new HttpContextServicesFactory(
                 () => HttpContext.GetOwinContext().Get<IUserService>(),
-                () => HttpContext.GetOwinContext().Get<ITableService>(),
+                () => HttpContext.GetOwinContext().Get<IGameService>(),
                 () => null);
         }
 
         /// <summary>
-        /// Initialises a new instance of <see cref="TableController"/> with custom services(for unit testing).
+        /// Initialises a new instance of <see cref="GameController"/> with custom services(for unit testing).
         /// </summary>
-        public TableController(IUserService userService, ITableService tableService = null, IAuthenticationManager authenticationManager = null)
+        public GameController(IUserService userService, IGameService gameService = null, IAuthenticationManager authenticationManager = null)
         {
-            serviceFactory = new CustomServicesFactory(userService, tableService, authenticationManager);
+            serviceFactory = new CustomServicesFactory(userService, gameService, authenticationManager);
         }
         #endregion
 
-        #region TABLE_LIST
+        #region GAME_LIST
         /// <summary>
         /// Decides which list to show.
         /// </summary>
-        /// <param name="tableType">Table type to show.</param>
+        /// <param name="gameType">Table type to show.</param>
         /// <returns>View with needed list.</returns>
         [Authorize]
-        public ViewResult TableList(string tableType)
+        public ViewResult GameList(string gameType)
         {
             TableActionModel tableAction = new TableActionModel();
-            if (tableType == "all")
-                tableAction.ActionName = "/Table/GetAllTables";
+            if (gameType == "all")
+                tableAction.ActionName = "/Game/GetAllGames";
 
-            else if (tableType == "available")
-                tableAction.ActionName = "/Table/GetAvailableTables";
+            else if (gameType == "available")
+                tableAction.ActionName = "/Game/GetAvailableGames";
 
-            else if (tableType == "myTables")
-                tableAction.ActionName = "/Table/GetUserTables";
+            else if (gameType == "myGames")
+                tableAction.ActionName = "/Game/GetUserGames";
             else
                 return null;
 
-            return View("TableList", tableAction);
+            return View(tableAction);
         }
         #endregion
 
-        #region USER_TABLES
+        #region USER_GAMES
         /// <summary>
         /// Returns tables where current user is one of the opponents.
         /// </summary>
         /// <returns>Json object for table list.</returns>
         [HttpGet]
         [Authorize]
-        public async Task<JsonResult> GetUserTables()
+        public async Task<JsonResult> GetUserGames()
         {
             UserDTO userDTO = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
 
-            IEnumerable<TableDTO> tables = await TableService.GetUserTables(userDTO);
+            IEnumerable<GameDTO> tables = await GameService.GetUserGames(userDTO);
 
             if(tables != null)
                 return Json(tables, JsonRequestBehavior.AllowGet);
@@ -111,7 +111,7 @@ namespace MyGame.Controllers
         }
         #endregion
 
-        #region ALL_TABLES
+        #region ALL_GAMES
 
         /// <summary>
         /// Returns all table.
@@ -120,11 +120,11 @@ namespace MyGame.Controllers
 
         [HttpGet]
         [Authorize(Roles = "admin")]
-        public async Task<JsonResult> GetAllTables()
+        public async Task<JsonResult> GetAllGames()
         {
-            IEnumerable<TableDTO> tables = await TableService.GetAllTables();
+            IEnumerable<GameDTO> games = await GameService.GetAllGames();
 
-            return Json(tables, JsonRequestBehavior.AllowGet);
+            return Json(games, JsonRequestBehavior.AllowGet);
         }
         #endregion
 
@@ -135,14 +135,14 @@ namespace MyGame.Controllers
         /// <returns>Json object for table list.</returns>
         [HttpGet]
         [Authorize]
-        public async Task<JsonResult> GetAvailableTables()
+        public async Task<JsonResult> GetAvailableGames()
         {
             UserDTO userDTO = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
 
-            IEnumerable<TableDTO> tables = await TableService.GetAvailableTables(userDTO);
+            IEnumerable<GameDTO> games = await GameService.GetAvailableGames(userDTO);
 
-            if(tables != null)
-                return Json(tables, JsonRequestBehavior.AllowGet);
+            if(games != null)
+                return Json(games, JsonRequestBehavior.AllowGet);
 
             return null;
         }
@@ -152,27 +152,19 @@ namespace MyGame.Controllers
         /// <summary>
         /// Creates new table for user.
         /// </summary
-        public async Task<ActionResult> CreateNewtable()
+        public async Task<ActionResult> CreateNewGame()
         {
             UserDTO user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
 
-            OperationDetails details = await TableService.CreateNewTable(user);
+            OperationDetails details = await GameService.CreateNewGame(user);
             if(details.Succedeed)
-                return RedirectToAction("TableList", "Table", new { tableType = "myTables" });
+                return RedirectToAction("GameList", "Game", new { gameType = "myGames" });
 
             return null;
         }
         #endregion
 
-        //#region JOIN_TABLE
-        //public async Task<ActionResult> JoinTable(int tableId)
-        //{
-
-        //}
-        
-        //#endregion
-
-        #region DELETE_TABLE
+        #region DELETE_GAME
         /// <summary>
         /// Deletes table with some id.
         /// </summary>
@@ -182,7 +174,7 @@ namespace MyGame.Controllers
         [HttpDelete]
         public async Task Delete(int id)
         {       
-            OperationDetails details = await TableService.DeteteTable(new TableDTO {Id = id });
+            OperationDetails details = await GameService.DeteteGame(new GameDTO {Id = id });
 
             if (!details.Succedeed)
                 throw new HttpException(403, "Error while deleting");

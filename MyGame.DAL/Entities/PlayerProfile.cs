@@ -19,17 +19,17 @@ namespace MyGame.DAL.Entities
         /// </summary>
         [Key]
         [ForeignKey("ApplicationUser")]
-        public virtual int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Players name.
         /// </summary>
-        public virtual string Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Players surname.
         /// </summary>
-        public virtual string Surname { get; set; }
+        public string Surname { get; set; }
 
         /// <summary>
         /// Foreign key. Contains link on appropriate user.

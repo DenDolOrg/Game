@@ -29,6 +29,7 @@ namespace MyGame.DAL.Repositories
             UserManager = new ApplicationUserManager(new UserStore<ApplicationUser, ApplicationRole, int, UserLogin, UserRole, UserClaim>(db));
             RoleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole, int, UserRole>(db));
             PlayerManager = new PlayerManager(db);
+            GameManager = new GameManager(db);
             TableManager = new TableManager(db);
             FigureManager = new FigureManager(db);
         }
@@ -54,9 +55,17 @@ namespace MyGame.DAL.Repositories
         /// <summary>
         /// Table manager.
         /// </summary>
-        public ITableManager TableManager { get; }
+        public IGameManager GameManager { get; }
 
+        /// <summary>
+        /// Figure manager.
+        /// </summary>
         public IFigureManager FigureManager { get; }
+
+        /// <summary>
+        /// Table manager.
+        /// </summary>
+        public ITableManager TableManager { get; }
 
 
         public async Task SaveChangesAsync()
@@ -79,6 +88,8 @@ namespace MyGame.DAL.Repositories
                 if(disposing)
                 {
                     UserManager.Dispose();
+                    TableManager.Dispose();
+                    GameManager.Dispose();
                     RoleManager.Dispose();
                     PlayerManager.Dispose();
                 }

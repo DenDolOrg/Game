@@ -1,36 +1,32 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MyGame.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Moq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using MyGame.Models;
-
 using MyGame.Tests.Services;
 using MyGame.BLL.DTO;
 using System.Web.Helpers;
-using Newtonsoft.Json;
+using MyGame.Tests.MockManagers;
+using MyGame.Tests.Models;
+using System.Collections.Generic;
 
 namespace MyGame.Controllers.Tests
 {
     [TestClass()]
     public class AccountControllerTests
     {
-        #region DATA_TO_USE
 
-        //internal List<UserDTO> Users = new List<UserDTO>
-        //    {
-        //        new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
-        //        new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-        //    };
+        MockAuthenticationManager mockAuthenticationManager;
 
-        MockAuthenticationManager mockAuthenticationManager = new MockAuthenticationManager()
+        [TestInitialize]
+        public void Init()
+        {
+            mockAuthenticationManager = new MockAuthenticationManager()
             .MockSignOut()
             .MockSignIn();
-        #endregion
+
+            ControllerDataToUse.SetData();
+        }
+         
 
         #region LOGIN_GET
         [TestMethod()]
@@ -52,7 +48,7 @@ namespace MyGame.Controllers.Tests
         public async Task LoginPOSTTest()
         {
             //Arrange
-            LoginModel loginModel_good = new LoginModel { Email = "email_1@gmail.com", Password = "111111" };
+            LoginModel loginModel_good = new LoginModel { Email = ControllerDataToUse.UserDTO.Email, Password = ControllerDataToUse.UserDTO.Password };
             LoginModel loginModel_bad_1 = new LoginModel { Email = "email_2@gmail.com", Password = "123456" };
 
             var mockUserService = new MockUserService()
@@ -91,17 +87,7 @@ namespace MyGame.Controllers.Tests
             //Arrange
             RegisterModel registerModel_good = new RegisterModel
             {
-                Email = "test@mail.com",
-                Password = "123456",
-                ConfirmPassword = "123456",
-                Nickname = "nickname",
-                Name = "name",
-                Surname = "surname"
-            };
-
-            RegisterModel registerModel_bad = new RegisterModel
-            {
-                Email = "email_1@gmail.com",
+                Email = "new_email@gmail.com",
                 Password = "123456",
                 ConfirmPassword = "123456",
                 Nickname = "username_1",
@@ -109,11 +95,20 @@ namespace MyGame.Controllers.Tests
                 Surname = "surname"
             };
 
+            RegisterModel registerModel_bad = new RegisterModel
+            {
+                Email = ControllerDataToUse.UserDTO.Email,
+                Password = ControllerDataToUse.UserDTO.Password,
+                ConfirmPassword = ControllerDataToUse.UserDTO.Password,
+                Nickname = ControllerDataToUse.UserDTO.UserName,
+                Name = ControllerDataToUse.UserDTO.Name,
+                Surname = ControllerDataToUse.UserDTO.Surname
+            };
+
             var mockUserService = new MockUserService()
                 .MockCreate()
                 .MockAuthenticate();
 
-            //mockModelState.Setup(s => s.IsValid).Returns(true);
                 
             //Act
             AccountController accountController = new AccountController(mockUserService.Object, null, mockAuthenticationManager.Object);
@@ -146,14 +141,14 @@ namespace MyGame.Controllers.Tests
         public async Task DeleteTest()
         {
             //Arrange
-            UserDTO user_good = new UserDTO { Id = 1 };
+            UserDTO user_good = new UserDTO { Id = ControllerDataToUse.UserDTO.Id };
             UserDTO user_bad = new UserDTO { Id = 20 };
 
             var mockUserService = new MockUserService()
                 .MockDelete();
 
-            var mockTableService = new MockTableService()
-                .MockDeleteUserTables();
+            var mockTableService = new MockGameService()
+                .MockDeleteUserGames();
 
             //Act
             AccountController accountController = new AccountController(mockUserService.Object, mockTableService.Object);
@@ -194,7 +189,7 @@ namespace MyGame.Controllers.Tests
             var result = await accountController.GetAllUsers();
 
             //Assert
-            Assert.AreEqual(Json.Encode(mockUserService.Users), Json.Encode(result.Data), "Not the same Json result.");
+            Assert.AreEqual(Json.Encode(new List<UserDTO> { ControllerDataToUse.UserDTO  }), Json.Encode(result.Data), "Not the same Json result.");
         }
         #endregion
     }

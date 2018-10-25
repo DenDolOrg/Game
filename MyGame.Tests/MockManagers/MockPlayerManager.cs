@@ -6,18 +6,36 @@ using System.Threading.Tasks;
 using Moq;
 using MyGame.DAL.Entities;
 using MyGame.DAL.Interfaces;
-using MyGame.Tests.MockEnity;
+using MyGame.Tests.Models;
 
 namespace MyGame.Tests.MockManagers
 {
     internal class MockPlayerManager : Mock<IPlayerManager>
     {
-        List<MockApplicationUser> Users { get; set; }
-
-
-        internal void AddData(ref List<MockApplicationUser> users)
+        public MockPlayerManager MockDeleteAsync()
         {
-            Users = users;
+            Setup(m => m.DeleteAsync(
+                It.IsAny<PlayerProfile>()))
+                .ReturnsAsync(false);
+
+            Setup(m => m.DeleteAsync(
+                It.Is<PlayerProfile>(p => p.Id == ServiceDataToUse.User.PlayerProfile.Id)))
+                .ReturnsAsync(true);
+
+            return this;
+        }
+
+        public MockPlayerManager MockCreateAsync()
+        {
+            Setup(m => m.CreateAsync(
+                It.IsAny<PlayerProfile>()))
+                .ReturnsAsync(false);
+
+            Setup(m => m.CreateAsync(
+                It.Is<PlayerProfile>(p => p.Id == 2)))
+                .ReturnsAsync(true);
+
+            return this;
         }
     }
 }

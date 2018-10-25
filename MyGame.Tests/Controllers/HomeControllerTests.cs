@@ -14,59 +14,67 @@ using MyGame.BLL.DTO;
 using System.Security.Principal;
 using System.Web.Routing;
 using MyGame.Tests.MockHelpers;
+using MyGame.Tests.Models;
 
 namespace MyGame.Controllers.Tests
 {
     [TestClass()]
     public class HomeControllerTests
     {
-        #region DATA_TO_USE
-        //List<UserDTO> users = new List<UserDTO>
-        //    {
-        //        new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
-        //        new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-        //        new UserDTO{ Id = 3, Email = "email_3@gmail.com", Password = "333333", UserName = "username_3", Name = "name_3", Surname = "Surname_3"},
-        //        new UserDTO{ Id = 4, Email = "email_4@gmail.com", Password = "444444", UserName = "username_4", Name = "name_4", Surname = "Surname_4"}
-        //    };
 
-        #endregion
+        [TestInitialize]
+        public void Init()
+        {
+            ControllerDataToUse.SetData();
+        }
 
         #region INDEX
         [TestMethod()]
         public async Task IndexTest()
         {
             //Arrange
-            UserDTO user = new UserDTO { UserName = "username_1", Name = "name_1", Surname = "Surname_1" };
             UserDTO guest_1 = new UserDTO { UserName = "bad_username", Name = "somename", Surname = "someSurname" };
             UserDTO guest_2 = new UserDTO();
 
-            string fullName = user.Name + " " + user.Surname;
+            string fullName = ControllerDataToUse.UserDTO.Name + " " + ControllerDataToUse.UserDTO.Surname;
 
             var mockUserService = new MockUserService()
                 .GetUser();
 
 
-            //Act
+            //Act_1
             HomeController homeController = new HomeController(mockUserService.Object);
 
-            HttpContextManager.SetCurrentContext(new MockHttpContext(user.UserName).CustomHttpContextBase);
+            HttpContextManager.SetCurrentContext(new MockHttpContext(ControllerDataToUse.UserDTO.UserName).CustomHttpContextBase);
             ActionResult goodResult = await homeController.Index();
 
-            //Assert
+            //Assert_1
             Assert.AreEqual(fullName, HttpContextManager.Current.Session["FullName"], "Bad user full name inside Session");
-
+            
+            //Act_2
             HttpContextManager.SetCurrentContext(new MockHttpContext(guest_1.UserName).CustomHttpContextBase);
             ActionResult guest1Result = await homeController.Index();
 
-            //Assert
+            //Assert_2
             Assert.ThrowsException<KeyNotFoundException>(() => HttpContextManager.Current.Session["FullName"], "Exist full name in session for guest with name");
 
+            //Act_3
+
+            HttpContextManager.SetCurrentContext(new MockHttpContext(guest_2.UserName).CustomHttpContextBase);
+            HttpContextManager.Current.Session["FullName"] = fullName;
+            ActionResult logoutResult = await homeController.Index();
+
+            //Assert_3
+            Assert.ThrowsException<KeyNotFoundException>(() => HttpContextManager.Current.Session["FullName"], "Exist full name in session for guest who loged out");
+
+            //Act_4
             HttpContextManager.SetCurrentContext(new MockHttpContext(guest_2.UserName).CustomHttpContextBase);
             ActionResult guest2Result = await homeController.Index();
 
-            //Assert
+            //Assert_4
             Assert.ThrowsException<KeyNotFoundException>(() => HttpContextManager.Current.Session["FullName"], "Exist full name in session for new guest");
 
+            //Assert_final
             Assert.IsNotNull(goodResult, "Do not return View for user.");
             Assert.IsNotNull(guest1Result, "Do not return View for guest with name.");
             Assert.IsNotNull(guest2Result, "Do not return View for new guest.");            

@@ -19,10 +19,10 @@ namespace MyGame.Infrastructure
         public abstract IUserService CreateUserService();
 
         /// <summary>
-        /// Creates new realisation of <see cref="ITableService"/>.
+        /// Creates new realisation of <see cref="IGameService"/>.
         /// </summary>
-        /// <returns>Realization of <see cref="ITableService"/>.</returns>
-        public abstract ITableService CreateTableService();
+        /// <returns>Realization of <see cref="IGameService"/>.</returns>
+        public abstract IGameService CreateGameService();
 
         public abstract IAuthenticationManager CreateAuthenticationManager();
     }

@@ -23,16 +23,14 @@ namespace MyGame.DAL.Repositories
         }
 
         #region CREATE
-        public async Task<bool> CreateAsync(int tableId)
+        public async Task<bool> CreateAsync(int gameId)
         {
-            Table table = await Database.Tables.FindAsync(tableId);
-            if (table == null)
+            Game game = await Database.Games.FindAsync(gameId);         
+            if (game == null)
                 return false;
-
             try
             {
-                IEnumerable<Figure> figures = SetFigures(table);
-                Database.Figures.AddRange(figures);
+                Database.Figures.AddRange(SetFigures(game));
                 await Database.SaveChangesAsync();
             }
             catch
@@ -41,23 +39,21 @@ namespace MyGame.DAL.Repositories
             }
 
             return true;
-
         }
         #endregion
 
         #region DELETE
-        public async Task<bool> DeleteAsync(int tableId)
+        public async Task<bool> DeleteAsync(int gameId)
         {
-            IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
+            IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Game.Id == gameId);
             if (tableFigures == null)
                 return false;
 
             try
             {
                 foreach (Figure f in tableFigures)
-                {
                     Database.Figures.Remove(f);
-                }
+
                 await Database.SaveChangesAsync();
             }
             catch
@@ -65,13 +61,13 @@ namespace MyGame.DAL.Repositories
                 return false;
             }
             return true;
- 
         }
         #endregion
+
         #region FIGURES_ON_TABLE
-        public IQueryable<Figure> GetFiguresForTable(int tableId)
+        public IQueryable<Figure> GetFiguresForTable(int gameId)
         {
-            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
+            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Game.Id == gameId);
 
             return tableFigures;
         }
@@ -80,7 +76,7 @@ namespace MyGame.DAL.Repositories
         /// <summary>
         /// Set figures start position.
         /// </summary>
-        private IEnumerable<Figure> SetFigures(Table table)
+        private ICollection<Figure> SetFigures(Game game)
         {
             List<Figure> figures = new List<Figure>();
             Colors color = Colors.Black;
@@ -100,7 +96,7 @@ namespace MyGame.DAL.Repositories
                     figures.Add(new Figure
                     {
                         Color = color,
-                        Table = table,
+                        Game = game,
                         X = xCoord,
                         Y = yCoord + y0
                     });
@@ -108,13 +104,12 @@ namespace MyGame.DAL.Repositories
                 y0 = 7;
                 color = Colors.White;
             }
-
             return figures;
         }
         #endregion
 
 
-      
+
 
         public void Dispose()
         {

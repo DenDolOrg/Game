@@ -24,13 +24,12 @@ namespace MyGame.DAL.Repositories
         {
             Database = db;
         }
-
-        #region CREATE
-        public async Task<bool> CreateAsync(Table item)
+        public async Task<bool> CreateAsync(Game game)
         {
+            Table newTable = new Table { Id = game.Id };
             try
             {
-                Database.Tables.Add(item);
+                Database.Tables.Add(newTable);
                 await Database.SaveChangesAsync();
             }
             catch
@@ -40,14 +39,13 @@ namespace MyGame.DAL.Repositories
 
             return true;
         }
-        #endregion
 
-        #region DELETE
-        public async Task<bool> DeleteAsync(Table item)
+        public async Task<bool> DeleteAsync(Game game)
         {
             try
             {
-                Database.Tables.Remove(item);
+                if(game.Table != null)
+                    Database.Tables.Remove(game.Table);
                 await Database.SaveChangesAsync();
             }
             catch
@@ -56,43 +54,12 @@ namespace MyGame.DAL.Repositories
             }
             return true;
         }
-        #endregion
 
-        #region FIND_BY_ID
-        public async Task<Table> FindByIdAsync(int id)
-        {
-            return await Database.Tables.FindAsync(id);
-        }
-        #endregion
-
-        #region GET_ALL_TABLES
-        public IQueryable<Table> GetAllTabes()
-        {
-            IQueryable<Table> tables  = Database.Tables;
-            return tables;
-        }
-        #endregion
-
-        #region GET_USER_TABLES
-        public IQueryable<Table> GetTablesForUser(int userId)
-        {
-            IQueryable<Table> tables = Database.Tables.Where(t => t.Opponents.Where(o => o.Id == userId).Count() > 0);
-
-            return tables;
-        }
-        #endregion
-
-        #region GET_AVAILABLE_TABLES
-        public IQueryable<Table> GetAvailableTables(int userId)
-        {
-            IQueryable<Table> tables = Database.Tables.Where(t => (t.Opponents.Count == 1) && (t.Opponents.Where( o => o.Id == userId).Count() == 0));
-
-            return tables;
-        }
-        #endregion
         public void Dispose()
         {
             Database.Dispose();
         }
+
+       
     }
 }

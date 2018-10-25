@@ -20,7 +20,6 @@ namespace MyGame.DAL.Identity
         /// <seealso cref="ApplicationUser"/>
         public ApplicationUserManager(IUserStore<ApplicationUser, int> store) : base(store)
         {
-
         }
 
 

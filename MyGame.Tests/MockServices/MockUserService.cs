@@ -11,25 +11,17 @@ using MyGame.Models;
 using MyGame.BLL.Infrastructure;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using MyGame.Tests.Models;
 
 namespace MyGame.Tests.Services
 {
     internal class MockUserService : Mock<IUserService>
     {
-        internal List<UserDTO> Users = new List<UserDTO>
-            {
-                new UserDTO{ Id = 1, Email = "email_1@gmail.com", Password = "111111", UserName = "username_1", Name = "name_1", Surname = "Surname_1"},
-                new UserDTO{ Id = 2, Email = "email_2@gmail.com", Password = "222222", UserName = "username_2", Name = "name_2", Surname = "Surname_2"},
-            };
-
-
         internal MockUserService MockAuthenticate()
         {
             Setup(m => m.Authenticate(
-                It.Is<UserDTO>(u => (from ul in Users
-                                     where ul.Email == u.Email && ul.Password == u.Password
-                                     select ul).Count() == 1)))
-                                     .ReturnsAsync(new ClaimsIdentity());
+                It.Is<UserDTO>(u => u.Email == ControllerDataToUse.UserDTO.Email && u.Password == ControllerDataToUse.UserDTO.Password )))
+                .ReturnsAsync(new ClaimsIdentity());
             return this;
         }
 
@@ -40,10 +32,8 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync(new OperationDetails(false));
 
             Setup(m => m.Create(
-                It.Is<UserDTO>(u => (from ul in Users
-                                     where ul.Email == u.Email || ul.UserName == u.UserName
-                                     select ul).Count() == 0)))
-                                     .ReturnsAsync(new OperationDetails(true));
+                It.Is<UserDTO>(u => u.UserName != ControllerDataToUse.UserDTO.UserName && u.Email != ControllerDataToUse.UserDTO.Email)))
+                .ReturnsAsync(new OperationDetails(true));
             return this;
         }
 
@@ -54,16 +44,14 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync(new OperationDetails(false));
 
             Setup(m => m.Delete(
-                It.Is<UserDTO>(u => (from ul in Users
-                                     where ul.Id == u.Id
-                                     select ul).Count() == 1)))
-                                     .ReturnsAsync(new OperationDetails(true));
+                It.Is<UserDTO>(u => u.Id == ControllerDataToUse.UserDTO.Id)))
+                .ReturnsAsync(new OperationDetails(true));
             return this;
         }
 
         internal MockUserService GetAllUsers()
         {
-            Setup(m => m.GetAllUsers()).ReturnsAsync(Users);
+            Setup(m => m.GetAllUsers()).ReturnsAsync(new List<UserDTO> { ControllerDataToUse.UserDTO });
             return this;
         }
 
@@ -74,12 +62,8 @@ namespace MyGame.Tests.Services
                 )).ReturnsAsync((UserDTO)null);
 
             Setup(m => m.GetUser(
-                It.Is<UserDTO>(u => (from ul in Users
-                                     where ul.UserName == u.UserName
-                                     select ul).Count() == 1)))
-                                     .ReturnsAsync((UserDTO u) => (from ul in Users
-                                                                   where ul.UserName == u.UserName
-                                                                   select ul).First());
+                It.Is<UserDTO>(u => u.UserName == ControllerDataToUse.UserDTO.UserName)))
+                                     .ReturnsAsync(ControllerDataToUse.UserDTO);
             return this;
         }
 
