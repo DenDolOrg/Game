@@ -92,9 +92,13 @@
     <Compile Include="Interfaces\IGameManager.cs" />
     <Compile Include="Interfaces\ITableManager.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
-    <Compile Include="Migrations\201810250002293_Game.cs" />
-    <Compile Include="Migrations\201810250002293_Game.Designer.cs">
-      <DependentUpon>201810250002293_Game.cs</DependentUpon>
+    <Compile Include="Migrations\201810250956151_WhiteId.cs" />
+    <Compile Include="Migrations\201810250956151_WhiteId.Designer.cs">
+      <DependentUpon>201810250956151_WhiteId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810251059120_Table.cs" />
+    <Compile Include="Migrations\201810251059120_Table.Designer.cs">
+      <DependentUpon>201810251059120_Table.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,8 +113,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201810250002293_Game.resx">
-      <DependentUpon>201810250002293_Game.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201810250956151_WhiteId.resx">
+      <DependentUpon>201810250956151_WhiteId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810251059120_Table.resx">
+      <DependentUpon>201810251059120_Table.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

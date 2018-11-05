@@ -17,14 +17,14 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="firstPlayer">First players information.</param>
         /// <returns>Returns table creation operation status like <see cref="OperatingSystem"/> instance.</returns>
-        Task<OperationDetails> CreateNewGame(UserDTO firstPlayer);
+        Task<GameDTO> CreateNewGame(GameDTO gameDTO);
 
         /// <summary>
         /// Deletes table with id = <c>tableId</c> from DB.
         /// </summary>
         /// <param name="tableId">Id of table to detele.</param>
         /// <returns>Returns table deletion operation status like <see cref="OperatingSystem"/> instance.</returns>
-        Task<OperationDetails> DeteteGame(GameDTO tableDTO);
+        Task<OperationDetails> DeteteGame(GameDTO gameDTO);
 
         /// <summary>
         /// Deletes all user tables.
@@ -37,7 +37,7 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <param name="tableId">Id of table where figures are.</param>
         /// <returns>List of universal figure data model. Each of it contains Id, X coordinate, Y coordinate of figure.</returns>
-        //Task<IEnumerable<FigureDTO>> GetFiguresOnTable(TableDTO tableDTO);
+        Task<IEnumerable<FigureDTO>> GetFiguresOnTable(GameDTO gameDTO);
 
         /// <summary>
         /// Get table inforamtion with id = <c>tableId</c>.
@@ -63,6 +63,19 @@ namespace MyGame.BLL.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<GameDTO>> GetAvailableGames(UserDTO userDTO);
+
+        /// <summary>
+        /// Changing figure position on the table. 
+        /// </summary>
+        /// <param name="figureData">Id of figure to change and new coords.<param>
+        Task<OperationDetails> ChangeFigurePos(FigureDTO figureData);
+
+        /// <summary>
+        /// Adding user to the game.
+        /// </summary>
+        /// <param name="userDTO">User info.</param>
+        /// <param name="gameDTO">Game info.</param>
+        Task<OperationDetails> JoinGame(UserDTO userDTO, GameDTO gameDTO);
 
     }
 }

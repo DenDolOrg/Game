@@ -1,4 +1,4 @@
-﻿@model MyGame.Models.TableActionModel
+﻿@model MyGame.Models.GameActionModel
 
 @{
     ViewBag.Title = "Table";
@@ -38,10 +38,10 @@
                 </td>
                 <td>
                     <div class="btn-group">
-                        <a href="#" ng-click="DeteleTable(gameModel)" class="btn btn-secondary btn-warning btn-sm">Join</a>
+                        <a href="~/Game/EnterGame/{{gameModel.Id}}"  class="btn btn-secondary btn-warning btn-sm">Join</a>
                         @if (HttpContext.Current.User.IsInRole("admin"))
                         {
-                            <a href="#" ng-click="DeteleTable(gameModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
+                            <a href="#" ng-click="DeteleGame(gameModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
                         }
                     </div>
 

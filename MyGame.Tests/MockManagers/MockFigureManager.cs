@@ -49,6 +49,18 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
+        public MockFigureManager MockFindByIdAsync()
+        {
+            Setup(m => m.FindByIdAsync(
+                It.IsAny<int>()))
+                .ReturnsAsync((Figure)null);
+
+            Setup(m => m.FindByIdAsync(
+                It.Is<int>(id => id == ServiceDataToUse.Figure.Id)))
+                .ReturnsAsync(ServiceDataToUse.Figure);
+            return this;
+        }
+
         private IQueryable<Figure> GetDbSetFigures(List<Figure> figures)
         {
             return MockDbSet.GetDataSet(figures).Object;

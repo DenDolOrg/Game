@@ -182,7 +182,7 @@ namespace MyGame.Controllers.Tests
         {
             //Arrange
             var mockUserService = new MockUserService()
-                .GetAllUsers();
+                .MockGetAllUsers();
 
             //Act
             AccountController accountController = new AccountController(mockUserService.Object);

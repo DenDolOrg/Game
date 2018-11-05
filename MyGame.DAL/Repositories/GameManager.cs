@@ -90,9 +90,40 @@ namespace MyGame.DAL.Repositories
             return games;
         }
         #endregion
+
+        #region ADD_OPPONENT
+        public async Task<Game> AddOpponentToGame(int gameId, int userId)
+        {
+            Game game;
+            try
+            {
+                var user = Database.Users.Find(userId);
+                game = await Database.Games.FindAsync(gameId);
+
+                if (user == null || game == null)
+                    return null;
+
+                if (game.Opponents.Count != 2)
+                    game.Opponents.Add(user);
+                else
+                {
+                    if (!game.Opponents.Select(o => o.Id).Contains(user.Id))
+                        return null;
+                }
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return null;
+            }
+            return game;
+        }
+        #endregion
         public void Dispose()
         {
             Database.Dispose();
         }
+
+
     }
 }

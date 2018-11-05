@@ -13,7 +13,24 @@ namespace MyGame.Tests.Models
     {
         public static UserDTO UserDTO { get; set; }
 
+        public static FigureDTO FigureDTO { get; set; }
+
         public static GameDTO GameDTO { get; set; }
+
+        public static UserDTO Clone(this UserDTO user)
+        {
+            var clone = new UserDTO
+            {
+                Id = UserDTO.Id,
+                Email = UserDTO.Email,
+                Name = UserDTO.Name,
+                Surname = UserDTO.Surname,
+                UserName = UserDTO.UserName,
+                Password = UserDTO.Password
+            };
+
+            return clone;
+        }
 
         public static void SetData()
         {
@@ -29,7 +46,20 @@ namespace MyGame.Tests.Models
 
             GameDTO = new GameDTO
             {
-                Id = 1
+                Id = 1,
+                BlackPlayerId = 1,
+                Opponents = new List<UserDTO>
+                {
+                    UserDTO.Clone()
+                }
+            };
+
+            FigureDTO = new FigureDTO
+            {
+                Id = 1,
+                Color = "black",
+                XCoord = 1,
+                YCoord = 1,
             };
         }
     }

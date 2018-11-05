@@ -19,7 +19,7 @@ namespace MyGame.Tests.MockManagers
 
             Setup(m => m.CreateAsync(
                 It.IsAny<Game>()))
-                .ReturnsAsync(true).Callback((Game t) => t.Id = 2);
+                .ReturnsAsync(true).Callback((Game t) => { t.Id = 2; t.Table = ServiceDataToUse.Table; });
             return this;
         }
 
@@ -77,6 +77,26 @@ namespace MyGame.Tests.MockManagers
             Setup(m => m.GetAvailableGames(
                 It.Is<int>(id => id == ServiceDataToUse.User.Id)))
                 .Returns(GetDbSetGames(new List<Game> { ServiceDataToUse.Game }));
+            return this;
+        }
+
+        public MockGameManager MockAddOpponentToGame()
+        {
+            Setup(m => m.AddOpponentToGame(
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+                .ReturnsAsync((Game)null);
+
+            Setup(m => m.AddOpponentToGame(
+                It.Is<int>(gId => gId == ServiceDataToUse.Game.Id),
+                It.Is<int>(uId => (uId == ServiceDataToUse.User.Id) &&
+                                  (ServiceDataToUse.Game.Opponents.Count != 2))))
+                .ReturnsAsync(ServiceDataToUse.Game).Callback<int, int>((gId, uId) =>
+                {
+                    if(!ServiceDataToUse.Game.Opponents.Select(o => o.Id).Contains(uId))
+                        ServiceDataToUse.Game.Opponents.Add(ServiceDataToUse.User.Clone());
+                });
+
             return this;
         }
 

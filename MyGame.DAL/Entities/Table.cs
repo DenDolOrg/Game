@@ -30,9 +30,11 @@ namespace MyGame.DAL.Entities
         /// </summary>
         public virtual Game Game { get; set; }
 
+        public virtual ICollection<Figure> Figures { get; set; }
         public Table()
         {
             CreationTime = DateTime.Now;
+            Figures = new HashSet<Figure>();
         }
     }
 }

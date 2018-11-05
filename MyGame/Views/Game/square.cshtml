@@ -1,3 +1,11 @@
 ﻿@model MyGame.Models.FieldModel
 
-<div class="tableSquare" style="background-color: @Model.Color" data-Xcoord="@Model.X" , data-Ycoord="@Model.Y"></div>
+@if(Model.Color == "#3B363A")
+{
+    <div class="tableSquare blackSquares" style="background-color: @Model.Color" data-Xcoord="@Model.X" , data-Ycoord="@Model.Y"></div>
+}
+else
+{
+    <div class="tableSquare" style="background-color: @Model.Color" data-Xcoord="@Model.X" , data-Ycoord="@Model.Y"></div>
+}
+

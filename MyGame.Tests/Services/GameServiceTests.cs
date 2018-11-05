@@ -46,17 +46,17 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(userManager, gameManager, tableManager, figureManager);
 
-            UserDTO good_user = new UserDTO { UserName = ServiceDataToUse.User.UserName };
-            UserDTO bad_user = new UserDTO { UserName = "bad_username" };
+            var good_game = new GameDTO { Opponents = new List<UserDTO> { new UserDTO {UserName = ServiceDataToUse.User.UserName } } };
+            var bad_game = new GameDTO { Opponents = new List<UserDTO> { new UserDTO { UserName = "bad_username" } } };
 
             //Act
-            GameService service = new GameService(Work.Object);
-            OperationDetails details_good = await service.CreateNewGame(good_user);
-            OperationDetails details_bad = await service.CreateNewGame(bad_user);
+            var service = new GameService(Work.Object);
+            var userDTO_good = await service.CreateNewGame(good_game);
+            var userDTO_bad = await service.CreateNewGame(bad_game);
 
             //Assert
-            Assert.IsTrue(details_good.Succedeed, "Failed while creating new table.");
-            Assert.IsFalse(details_bad.Succedeed, "Succes while creating new table for user with bad username.");
+            Assert.IsNotNull(userDTO_good, "Failed while creating new table.");
+            Assert.IsNull(userDTO_bad, "Succes while creating new table for user with bad username.");
         }
         #endregion
 
@@ -77,12 +77,12 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(null, gameManager, tableManager, figureManager);
 
-            GameDTO tableDTO_good = new GameDTO { Id = ServiceDataToUse.Table.Id };
-            GameDTO tableDTO_bad = new GameDTO { Id = 124 };
+            var tableDTO_good = new GameDTO { Id = ServiceDataToUse.Table.Id };
+            var tableDTO_bad = new GameDTO { Id = 124 };
             //Act
             GameService service = new GameService(Work.Object);
-            OperationDetails details_good = await service.DeteteGame(tableDTO_good);
-            OperationDetails details_bad = await service.DeteteGame(tableDTO_bad);
+            var details_good = await service.DeteteGame(tableDTO_good);
+            var details_bad = await service.DeteteGame(tableDTO_bad);
 
             //Assert
             Assert.IsTrue(details_good.Succedeed, "Failed while deleting new table.");
@@ -92,7 +92,7 @@ namespace MyGame.BLL.Services.Tests
 
         #region DETELE_USER_TABLES
         [TestMethod()]
-        public async Task DeteteUserTablesTest()
+        public async Task DeteteUserGamesTest()
         {
             //Arrange
             userManager = new MockUserManager(new MockUserStore().Object)
@@ -105,18 +105,18 @@ namespace MyGame.BLL.Services.Tests
             figureManager = new MockFigureManager()
                .MockDeleteAsync();
 
-            Work.SetManagers(userManager, gameManager,null, figureManager);
+            Work.SetManagers(userManager, gameManager, null, figureManager);
 
-            UserDTO user_good = new UserDTO { Id = ServiceDataToUse.User.Id };
-            UserDTO user_bad = new UserDTO { Id = 123};
+            var user_good = new UserDTO { Id = ServiceDataToUse.User.Id };
+            var user_bad = new UserDTO { Id = 123 };
 
             //Act
-            GameService service = new GameService(Work.Object);
-            OperationDetails details_good = await service.DeteteUserGame(user_good);
-            OperationDetails details_bad = await service.DeteteUserGame(user_bad);
+            var service = new GameService(Work.Object);
+            var details_good = await service.DeteteUserGame(user_good);
+            var details_bad = await service.DeteteUserGame(user_bad);
 
             //Assert
-            Assert.IsTrue(details_good.Succedeed, "Failed while deleting good user tables.");           
+            Assert.IsTrue(details_good.Succedeed, "Failed while deleting good user tables.");
             Assert.IsFalse(details_bad.Succedeed, "Succes while deleting bad user tables.");
         }
         #endregion
@@ -131,11 +131,11 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(null, null, null, figureManager);
 
-            GameDTO table_good = new GameDTO { Id = ServiceDataToUse.User.Id };
-            GameDTO table_bad = new GameDTO { Id = 123 };
-            
+            var table_good = new GameDTO { Id = ServiceDataToUse.User.Id };
+            var table_bad = new GameDTO { Id = 123 };
+
             //Act
-            GameService service = new GameService(Work.Object);
+            var service = new GameService(Work.Object);
             var result_good = await service.GetFiguresOnTable(table_good);
             var result_bad = await service.GetFiguresOnTable(table_bad);
 
@@ -155,14 +155,14 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(null, gameManager);
 
-            GameDTO table_good = new GameDTO{ Id = 1 };
-            GameDTO table_bad = new GameDTO{ Id = 123 };
-  
-            //Act
-            GameService service = new GameService(Work.Object);
+            var table_good = new GameDTO { Id = 1 };
+            var table_bad = new GameDTO { Id = 123 };
 
-            GameDTO result_good = await service.GetGame(table_good);
-            GameDTO result_bad = await service.GetGame(table_bad);
+            //Act
+            var service = new GameService(Work.Object);
+
+            var result_good = await service.GetGame(table_good);
+            var result_bad = await service.GetGame(table_bad);
 
             //Assert
             Assert.AreEqual(result_good.Id, table_good.Id, "Not the same id returned for good table.");
@@ -203,11 +203,11 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(userManager, gameManager);
 
-            UserDTO user_good = new UserDTO { UserName = ServiceDataToUse.User.UserName};
-            UserDTO user_bad = new UserDTO { UserName = "bad_username"};
+            var user_good = new UserDTO { UserName = ServiceDataToUse.User.UserName };
+            var user_bad = new UserDTO { UserName = "bad_username" };
 
             //Act
-            GameService service = new GameService(Work.Object);
+            var service = new GameService(Work.Object);
             var result_good = await service.GetUserGames(user_good);
             var result_bad = await service.GetUserGames(user_bad);
 
@@ -230,17 +230,85 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(userManager, gameManager);
 
-            UserDTO user_good = new UserDTO { UserName = ServiceDataToUse.User.UserName };
-            UserDTO user_bad = new UserDTO { UserName = "bad_username" };
+            var user_good = new UserDTO { UserName = ServiceDataToUse.User.UserName };
+            var user_bad = new UserDTO { UserName = "bad_username" };
 
             //Act
-            GameService service = new GameService(Work.Object);
+            var service = new GameService(Work.Object);
             var result_good = await service.GetAvailableGames(user_good);
             var result_bad = await service.GetAvailableGames(user_bad);
 
             //Assert
             Assert.AreEqual(result_good.Count(), 1);
             Assert.IsNull(result_bad);
+        }
+        #endregion
+
+        #region CHANGE_FIGURE_POSITION
+        [TestMethod()]
+        public async Task ChangeFigurePosTest()
+        {
+            //Arrange
+            figureManager = new MockFigureManager()
+                .MockFindByIdAsync();
+
+            Work.SetManagers(null, null, null, figureManager);
+
+            var figure_good = new FigureDTO { Id = ServiceDataToUse.Figure.Id, XCoord = 2, YCoord = 2 };
+            var figure_bad = new FigureDTO { Id = 123 };
+
+            //Act
+            GameService service = new GameService(Work.Object);
+            var result_good = await service.ChangeFigurePos(figure_good);
+            var result_bad = await service.ChangeFigurePos(figure_bad);
+
+            //Assert
+            Assert.IsTrue(result_good.Succedeed, "Failed while changing position for valid figure.");
+            Assert.AreEqual(ServiceDataToUse.Figure.X, 2, "Bad X coord.");
+            Assert.AreEqual(ServiceDataToUse.Figure.Y, 2, "Bad Y coord.");
+            Assert.IsFalse(result_bad.Succedeed, "Succes while changing position for invalid figure.");
+        }
+        #endregion
+
+        #region JOIN_GAME
+        [TestMethod()]
+        public async Task JoinGameTest()
+        {
+            //Arrange
+            userManager = new MockUserManager(new MockUserStore().Object)
+                .MockFindByNameAsync();
+
+            gameManager = new MockGameManager()
+                .MockFindByIdAsync()
+                .MockAddOpponentToGame();
+
+            Work.SetManagers(userManager, gameManager);
+
+            var user_good = new UserDTO { UserName = ServiceDataToUse.User.UserName };
+            var user_bad = new UserDTO { UserName = "bad_username" };
+
+            var game_good = new GameDTO { Id = ServiceDataToUse.Game.Id };
+            var game_bad = new GameDTO { Id = 123 };
+
+            ServiceDataToUse.Game.Opponents.Clear();
+            //Act
+            var service = new GameService(Work.Object);
+
+            var result_good_1 = await service.JoinGame(user_good, game_good);
+            var result_bad_1 = await service.JoinGame(user_bad, game_good);
+            var result_bad_2 = await service.JoinGame(user_good, game_bad);
+            var result_good_3 = await service.JoinGame(user_good, game_good);
+
+            ServiceDataToUse.User.Id = 2;
+            var result_good_2 = await service.JoinGame(user_good, game_good);
+
+            //Assert
+            Assert.IsTrue(result_good_1.Succedeed, "Error while adding valid user to valid table.");
+            Assert.IsTrue(result_good_2.Succedeed, "Error while adding second valid user to valid table.");
+            Assert.IsTrue(result_good_3.Succedeed, "Error while adding same valid user to valid table.");
+            Assert.AreEqual(ServiceDataToUse.Game.Opponents.Count, 2);
+            Assert.IsFalse(result_bad_1.Succedeed, "Succes while adding invalid user to valid table.");
+            Assert.IsFalse(result_bad_2.Succedeed, "Succes while adding valid user to invalid table.");
         }
         #endregion
     }

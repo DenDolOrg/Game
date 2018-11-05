@@ -35,5 +35,13 @@ namespace MyGame.DAL.Interfaces
         /// <param name="userId">User id.</param>
         /// <returns>List of games.</returns>
         IQueryable<Game> GetAvailableGames(int userId);
+
+        /// <summary>
+        /// Adding user to gamel like an opponent.
+        /// </summary>
+        /// <param name="gameId">Game id.</param>
+        /// <param name="userId">User id.</param>
+        /// <returns>Success status of operation.</returns>
+        Task<Game> AddOpponentToGame(int gameId, int userId);
     }
 }

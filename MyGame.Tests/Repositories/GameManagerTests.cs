@@ -49,8 +49,8 @@ namespace MyGame.DAL.Repositories.Tests
             Game game = ServiceDataToUse.Game;
 
             //Act
-            var tableManager = new GameManager(context.Object);
-            var result = await tableManager.DeleteAsync(game);
+            var gameManager = new GameManager(context.Object);
+            var result = await gameManager.DeleteAsync(game);
 
             //Assert
             Assert.IsTrue(result, "Failed while deleting table with new id.");
@@ -65,12 +65,10 @@ namespace MyGame.DAL.Repositories.Tests
             var context = new MockApplicationContext()
                 .MockGames();
 
-            Table table = ServiceDataToUse.Table;
-
             //Act
-            var tableManager = new GameManager(context.Object);
-            var result_good = await tableManager.FindByIdAsync(ServiceDataToUse.Table.Id);
-            var result_bad = await tableManager.FindByIdAsync(123);
+            var gameManager = new GameManager(context.Object);
+            var result_good = await gameManager.FindByIdAsync(ServiceDataToUse.Table.Id);
+            var result_bad = await gameManager.FindByIdAsync(123);
 
             //Assert
             Assert.IsNotNull(result_good, "Failed finding table with id.");
@@ -86,11 +84,9 @@ namespace MyGame.DAL.Repositories.Tests
             var context = new MockApplicationContext()
                 .MockGames();
 
-            Table table = ServiceDataToUse.Table;
-
             //Act
-            var tableManager = new GameManager(context.Object);
-            var result = tableManager.GetAllGames();
+            var gameManager = new GameManager(context.Object);
+            var result = gameManager.GetAllGames();
 
             //Assert
             Assert.AreEqual(result.Count(), 1, "Failed getting all tables.");
@@ -132,6 +128,38 @@ namespace MyGame.DAL.Repositories.Tests
 
             //Assert
             Assert.AreEqual(result.Count(), 0, "Failed getting available tables.");
+        }
+        #endregion
+
+        #region ADD_OPPONENT
+        [TestMethod()]
+        public async Task AddOpponentToGameTest()
+        {
+            //Arrange
+            var context = new MockApplicationContext()
+                .MockGames()
+                .MockUsers();
+
+            ServiceDataToUse.Game.Opponents.Clear();
+            //Act
+            var gameManager = new GameManager(context.Object);
+            var result_good_1 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Id);
+
+            ServiceDataToUse.User.Id = 3;
+            var result_good_2 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Id);
+
+            var result_good_3 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Id);
+
+            var result_bad_1 = await gameManager.AddOpponentToGame(123, ServiceDataToUse.User.Id);
+            var result_bad_2 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, 123);
+
+            //Assert
+            Assert.IsNotNull(result_good_1, "Failed while adding valid user to valid game.");
+            Assert.IsNotNull(result_good_2, "Failed while adding second valid user to valid game.");
+            Assert.IsNotNull(result_good_3, "Failed while adding same user to valid game.");
+            Assert.AreEqual(ServiceDataToUse.Game.Opponents.Count, 2, "Not valid number of opponents.");
+            Assert.IsNull(result_bad_1, "Succes while adding invalid user to valid game.");
+            Assert.IsNull(result_bad_2, "Succes while adding valid user to invalid game.");
         }
         #endregion
     }

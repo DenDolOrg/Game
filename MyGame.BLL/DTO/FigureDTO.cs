@@ -14,17 +14,17 @@ namespace MyGame.BLL.DTO
         /// <summary>
         /// Figure Id.
         /// </summary>
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// X coordinate of figure.
         /// </summary>
-        public string XCoord { get; set; }
+        public int XCoord { get; set; }
 
         /// <summary>
         /// Y coordinate of figure.
         /// </summary>
-        public string YCoord { get; set; }
+        public int YCoord { get; set; }
 
         /// <summary>
         /// Figure color.

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using MyGame.Models;
 using MyGame.Infrastructure;
 using MyGame.BLL.Infrastructure;
+using MyGame.Real_time;
+using MyGame.DAL.Entities;
 
 namespace MyGame.Controllers
 {
@@ -75,7 +77,7 @@ namespace MyGame.Controllers
         [Authorize]
         public ViewResult GameList(string gameType)
         {
-            TableActionModel tableAction = new TableActionModel();
+            GameActionModel tableAction = new GameActionModel();
             if (gameType == "all")
                 tableAction.ActionName = "/Game/GetAllGames";
 
@@ -117,7 +119,6 @@ namespace MyGame.Controllers
         /// Returns all table.
         /// </summary>
         /// <returns>Json object for table list.</returns>
-
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<JsonResult> GetAllGames()
@@ -148,19 +149,40 @@ namespace MyGame.Controllers
         }
         #endregion
 
-        #region CREATE_TABLE
+        #region CREATE_TABLE_POST
         /// <summary>
         /// Creates new table for user.
         /// </summary
-        public async Task<ActionResult> CreateNewGame()
+        [HttpPost]
+        public async Task<ActionResult> CreateNewGame(NewGameModel model)
         {
-            UserDTO user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
+            var user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
 
-            OperationDetails details = await GameService.CreateNewGame(user);
-            if(details.Succedeed)
-                return RedirectToAction("GameList", "Game", new { gameType = "myGames" });
+            var newGameDTO = new GameDTO
+            {
+                Opponents = new List<UserDTO> { user },
+                BlackPlayerId = model.FirstColor == "Black" ? user.Id : 0,
+                WhitePlayerId = model.FirstColor == "White" ? user.Id : 0,
+            };
 
-            return null;
+            var createdGameDTO = await GameService.CreateNewGame(newGameDTO);
+            if(createdGameDTO == null)
+                throw new HttpException(503, "Unexpected error.");
+
+            return RedirectToAction("EnterGame", new { gameId = createdGameDTO.Id});
+            
+        }
+        #endregion
+
+        #region CREATE_TABLE_GET
+        /// <summary>
+        /// Shows form for creating new game.
+        /// </summary>
+        /// <returns>Form view.</returns>
+        [HttpGet]
+        public ActionResult CreateNewGame()
+        {
+            return View("CreateGameForm");
         }
         #endregion
 
@@ -178,6 +200,42 @@ namespace MyGame.Controllers
 
             if (!details.Succedeed)
                 throw new HttpException(403, "Error while deleting");
+
+        }
+        #endregion
+
+        #region ENTER_GAME
+        /// <summary>
+        /// Enter game with some id.
+        /// </summary>
+        /// <param name="gameId">Id of game to enter.</param>
+        public async Task<ActionResult> EnterGame(int gameId)
+        {
+            var user = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
+            var game = new GameDTO { Id = gameId };
+
+            if(user == null)
+                throw new HttpException(404, "Unexpected error");
+
+            var joinResult = await GameService.JoinGame(user, game);
+
+            if (!joinResult.Succedeed)
+                return RedirectToAction("GameList", new { gameType = "available" });
+
+            var figures = await GameService.GetFiguresOnTable(game);
+            if (figures == null)
+                throw new HttpException(404, "Unexpected error");
+
+            var gameModel = new GameModel
+            {
+                ThisPlayerId = user.Id,
+                GameId = game.Id,
+                BlackId = game.BlackPlayerId,
+                WhiteId = game.WhitePlayerId,
+                Figures = await GameService.GetFiguresOnTable(game)
+            };
+
+            return View("SingleTable", gameModel);
 
         }
         #endregion

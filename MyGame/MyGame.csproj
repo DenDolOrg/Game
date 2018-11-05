@@ -65,6 +65,12 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.3.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.3.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Edm, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Edm.5.6.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
@@ -211,12 +217,15 @@
     <Compile Include="Infrastructure\HttpContextServicesFactory.cs" />
     <Compile Include="Infrastructure\NinjectControllerFactory.cs" />
     <Compile Include="Infrastructure\ServiceFactory.cs" />
+    <Compile Include="Models\FieldModel.cs" />
     <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\NewGameModel.cs" />
     <Compile Include="Models\PlayerModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
-    <Compile Include="Models\TableActionModel.cs" />
+    <Compile Include="Models\GameActionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Real time\StepHub.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Bootstrap\bootstrap-grid.css" />
@@ -317,6 +326,9 @@
     <Content Include="Scripts\Bibles\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\Bibles\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\Bibles\modernizr-2.8.3.js" />
+    <Content Include="Scripts\jquery.signalR-2.3.0.js" />
+    <Content Include="Scripts\jquery.signalR-2.3.0.min.js" />
+    <Content Include="Scripts\makeMove.js" />
     <Content Include="Scripts\UserController.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -340,6 +352,7 @@
     <Content Include="Views\Game\SIngleTable.cshtml" />
     <Content Include="Views\Shared\NavigationBar.cshtml" />
     <Content Include="Views\Account\UserList.cshtml" />
+    <Content Include="Views\Game\CreateGameForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

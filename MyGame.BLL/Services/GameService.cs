@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MyGame.BLL.Services
 {
-    public class GameService: IGameService
+    public class GameService : IGameService
     {
 
         /// <summary>
@@ -30,44 +30,50 @@ namespace MyGame.BLL.Services
         }
 
         #region CREATE
-        public async Task<OperationDetails> CreateNewGame(UserDTO firstPlayer)
+        public async Task<GameDTO> CreateNewGame(GameDTO gameDTO)
         {
-            OperationDetails successOD = new OperationDetails(true);
-            OperationDetails failOD = new OperationDetails(false);
-
-            ApplicationUser user = await Database.UserManager.FindByNameAsync(firstPlayer.UserName);
+            ApplicationUser user = await Database.UserManager.FindByNameAsync(gameDTO.Opponents.First().UserName);
             if (user != null)
             {
                 List<ApplicationUser> opponents = new List<ApplicationUser> { user };
                 var newGame = new Game
                 {
-                    Opponents = opponents,
+                    Opponents = opponents
                 };
 
+                if (gameDTO.WhitePlayerId == 0)
+                    newGame.BlackPlayerId = user.Id;
+                else
+                    newGame.WhitePlayerId = user.Id;
 
                 bool gameCreateRes = await Database.GameManager.CreateAsync(newGame);
 
                 bool tableCreateRes = await Database.TableManager.CreateAsync(newGame);
                 bool figuresCreateRes = await Database.FigureManager.CreateAsync(newGame.Id);
-                
+
 
                 if (!(gameCreateRes && tableCreateRes && figuresCreateRes))
-                    return failOD;
+                    return null;
 
-                user.Games.Add(newGame);                
+                user.Games.Add(newGame);
                 try
                 {
                     await Database.SaveChangesAsync();
                 }
                 catch
                 {
-                    return failOD;
+                    return null;
                 }
 
-                return successOD;
-                
+                return new GameDTO
+                {
+                    Id = newGame.Id,
+                    Opponents = GetOpponents(newGame),
+                    CreationTime = newGame.Table.CreationTime.ToShortTimeString()
+                };
+
             }
-            return failOD;
+            return null;
         }
         #endregion
 
@@ -89,8 +95,8 @@ namespace MyGame.BLL.Services
                 return failOD;
 
             return successOD;
-            
-            
+
+
         }
         #endregion
 
@@ -110,7 +116,7 @@ namespace MyGame.BLL.Services
 
             IEnumerable<int> games = user.Games.Select(g => g.Id);
 
-            foreach(int id in games)
+            foreach (int id in games)
             {
                 var GameDelResult = await DeteteGame(new GameDTO { Id = id });
                 if (!GameDelResult.Succedeed)
@@ -124,7 +130,7 @@ namespace MyGame.BLL.Services
         #region GET_FIGURES
         public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(GameDTO gameDTO)
         {
-            IEnumerable<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(gameDTO.Id).ToListAsync();
+            ICollection<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(gameDTO.Id).ToListAsync();
             if (tableFigures.Count() != 0)
             {
                 return CreateFiguresDTO(tableFigures);
@@ -134,15 +140,17 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region GET_GAME
-        public async Task<GameDTO> GetGame(GameDTO tableDTO)
+        public async Task<GameDTO> GetGame(GameDTO gameDTO)
         {
-            Game game = await Database.GameManager.FindByIdAsync(tableDTO.Id);
-            if(game != null)
+            Game game = await Database.GameManager.FindByIdAsync(gameDTO.Id);
+            if (game != null)
             {
                 GameDTO tableDTO_out = new GameDTO
                 {
                     Id = game.Id,
                     Opponents = GetOpponents(game),
+                    WhitePlayerId = game.WhitePlayerId,
+                    BlackPlayerId = game.BlackPlayerId,
                     CreationTime = game.Table.CreationTime.ToShortDateString()
                 };
 
@@ -152,10 +160,10 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
-        #region GET_ALL_Games
+        #region GET_ALL_GAMES
         public async Task<IEnumerable<GameDTO>> GetAllGames()
         {
-            IEnumerable<Game> gameList =  await Database.GameManager.GetAllGames().ToListAsync();
+            IEnumerable<Game> gameList = await Database.GameManager.GetAllGames().ToListAsync();
 
             return CreateGameDTO(gameList);
         }
@@ -187,13 +195,62 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
-        //#region JOIN_TO_TABLE
-       
-        //public async Task<OperationDetails> JoinToTable(UserDTO userDTO, TableDTO tableDTO)
-        //{
-        //    ApplicationUser user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
-        //}
-        //#endregion
+        #region CHANGE_FIGURE_POSITION
+        public async Task<OperationDetails> ChangeFigurePos(FigureDTO figureData)
+        {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
+
+            Figure figure = await Database.FigureManager.FindByIdAsync(figureData.Id);
+            if (figure == null)
+                return failOD;
+
+            figure.X = figureData.XCoord;
+            figure.Y = figureData.YCoord;
+
+            try
+            {
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return failOD;
+            }
+
+            return successOD;
+        }
+        #endregion
+
+        #region JOIN_TO_TABLE
+
+        public async Task<OperationDetails> JoinGame(UserDTO userDTO, GameDTO gameDTO)
+        {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
+
+            if (userDTO == null || gameDTO == null)
+                return failOD;
+
+            var user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
+            if (user == null)
+                return failOD;
+
+            var game = await Database.GameManager.AddOpponentToGame(gameDTO.Id, user.Id);
+
+            if (game == null)
+                return failOD;
+
+            if (game.WhitePlayerId == 0 && game.BlackPlayerId != user.Id)
+                game.WhitePlayerId = user.Id;
+            else if(game.BlackPlayerId == 0 && game.WhitePlayerId != user.Id)
+                game.BlackPlayerId = user.Id;
+
+            gameDTO.WhitePlayerId = game.WhitePlayerId;
+            gameDTO.BlackPlayerId = game.BlackPlayerId;
+
+            return successOD;
+        }
+        #endregion
 
         #region HELPERS
 
@@ -220,7 +277,7 @@ namespace MyGame.BLL.Services
             return opponents;
         }
 
-        private IEnumerable<FigureDTO> CreateFiguresDTO(IEnumerable<Figure> figures)
+        private ICollection<FigureDTO> CreateFiguresDTO(ICollection<Figure> figures)
         {
             List<FigureDTO> figureDTOs = new List<FigureDTO>();
 
@@ -228,13 +285,13 @@ namespace MyGame.BLL.Services
             {
                 figureDTOs.Add(new FigureDTO
                 {
-                    Id = f.Id.ToString(),
-                    XCoord = f.X.ToString(),
-                    YCoord = f.Y.ToString(),
+                    Id = f.Id,
+                    XCoord = f.X,
+                    YCoord = f.Y,
                     Color = f.Color.ToString()
                 });
             }
-            return figureDTOs.AsEnumerable();
+            return figureDTOs;
         }
 
         /// <summary>
@@ -262,9 +319,11 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
+
         public void Dispose()
         {
             Database.Dispose();
         }
+
     }
 }
