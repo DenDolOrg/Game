@@ -1,5 +1,5 @@
-﻿function FillTable(figures) {
-    figures.forEach(function (value, index, array) {
+﻿function FillTable(model) {
+    model.Figures.forEach(function (value, index, array) {
 
         var ImgSrc = "../../Images/black.png";
         if (value.Color == "White") {

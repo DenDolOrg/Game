@@ -100,6 +100,21 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
+        public MockGameManager MockTurnChange()
+        {
+            Setup(m => m.TurnChange(
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            Setup(m => m.TurnChange(
+                It.Is<int>(g => g == ServiceDataToUse.Game.Id),
+                It.IsAny<int>()))
+                .ReturnsAsync(true);
+
+            return this;
+
+        }
         #region HELPERS
 
         private IQueryable<Game> GetDbSetGames(List<Game> tables)

@@ -46,7 +46,7 @@ namespace MyGame.BLL.Services.Tests
 
             Work.SetManagers(userManager, gameManager, tableManager, figureManager);
 
-            var good_game = new GameDTO { Opponents = new List<UserDTO> { new UserDTO {UserName = ServiceDataToUse.User.UserName } } };
+            var good_game = new GameDTO { Opponents = new List<UserDTO> { new UserDTO { UserName = ServiceDataToUse.User.UserName } } };
             var bad_game = new GameDTO { Opponents = new List<UserDTO> { new UserDTO { UserName = "bad_username" } } };
 
             //Act
@@ -311,5 +311,29 @@ namespace MyGame.BLL.Services.Tests
             Assert.IsFalse(result_bad_2.Succedeed, "Succes while adding valid user to invalid table.");
         }
         #endregion
+
+        [TestMethod()]
+        public async Task ChangeTurnPriorityTest()
+        {
+            //Arrange
+            gameManager = new MockGameManager()
+                .MockFindByIdAsync()
+                .MockTurnChange();
+
+            Work.SetManagers(null, gameManager);
+
+            var table_good = new GameDTO { Id = ServiceDataToUse.Game.Id, LastTurnPlayerId = 2 };
+            var table_bad = new GameDTO { Id = 123, LastTurnPlayerId = 2 };
+
+            //Act
+            var service = new GameService(Work.Object);
+
+            var result_good = await service.ChangeTurnPriority(table_good);
+            var result_bad = await service.ChangeTurnPriority(table_bad);
+
+            //Assert
+            Assert.IsTrue(result_good.Succedeed, "Error while changing turn priority for valid game");
+            Assert.IsFalse(result_bad.Succedeed, "Success while changing turn priority for invalid game");
+        }
     }
 }

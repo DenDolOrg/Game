@@ -312,6 +312,7 @@
     <Content Include="Scripts\Bibles\bootstrap.js" />
     <Content Include="Scripts\Bibles\bootstrap.min.js" />
     <Content Include="Scripts\Bibles\popper.min.js" />
+    <Content Include="Scripts\eatFigure.js" />
     <Content Include="Scripts\FillTableFithFigures.js" />
     <Content Include="Scripts\Bibles\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\Bibles\jquery-ui-1.12.1.min.js" />

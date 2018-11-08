@@ -3,6 +3,7 @@ using MyGame.BLL.DTO;
 using MyGame.Controllers;
 using MyGame.Infrastructure;
 using MyGame.Models;
+using MyGame.Real_time;
 using MyGame.Tests.MockHelpers;
 using MyGame.Tests.Models;
 using MyGame.Tests.Services;
@@ -21,7 +22,7 @@ namespace MyGame.Controllers.Tests
     public class GameControllerTests
     {
         MockGameService mockGameService;
-        MockUserService userService;
+        MockUserService mockUserService;
 
         [TestInitialize]
         public void Init()
@@ -138,12 +139,14 @@ namespace MyGame.Controllers.Tests
 
             mockGameService = new MockGameService()
                 .MockCreateGame();
+            mockUserService = new MockUserService()
+                .MockGetUser();
 
             //Act
-            var gameController = new GameController(null, mockGameService.Object);
+            var gameController = new GameController(mockUserService.Object, mockGameService.Object);
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_good.UserName).CustomHttpContextBase);
-            var result_good = await gameController.CreateNewGame( new NewGameModel { FirstColor = "black"});
+            var result_good = await gameController.CreateNewGame(new NewGameModel { FirstColor = "black" });
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_bad.UserName).CustomHttpContextBase);
 
@@ -178,43 +181,70 @@ namespace MyGame.Controllers.Tests
         {
             //Arrange 
             var game_good = ControllerDataToUse.GameDTO;
-            var game_bad = new GameDTO { Id = 123};
+            var game_bad = new GameDTO { Id = 123 };
 
             UserDTO user_good;
-            var user_bad = new UserDTO { UserName = "badUsername"};
+            var user_bad = new UserDTO { UserName = "badUsername" };
 
             mockGameService = new MockGameService()
                 .MockGetFiguresOnTable()
+                .MockGetGame()
                 .MockJoinGame();
 
-            userService = new MockUserService()
+            mockUserService = new MockUserService()
                 .MockGetUser();
 
             //Act
-            var gameController = new GameController(userService.Object, mockGameService.Object);
+            var gameController = new GameController(mockUserService.Object, mockGameService.Object);
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_bad.UserName).CustomHttpContextBase);
 
             //Assert
             await Assert.ThrowsExceptionAsync<HttpException>(async () => await gameController.EnterGame(game_good.Id), "User with invalid username can join game with valid id.");
-            
+
             //Act
             ControllerDataToUse.UserDTO.UserName = "newUsername_1";
+            ControllerDataToUse.UserDTO.Id = 2;
             user_good = ControllerDataToUse.UserDTO;
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_good.UserName).CustomHttpContextBase);
             var result_1_good = await gameController.EnterGame(game_good.Id);
 
             ControllerDataToUse.UserDTO.UserName = "newUsername_2";
+            ControllerDataToUse.UserDTO.Id = 3;
             user_good = ControllerDataToUse.UserDTO;
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_good.UserName).CustomHttpContextBase);
             var result_1_bad = await gameController.EnterGame(game_good.Id);
 
             var result_2_bad = await gameController.EnterGame(game_bad.Id);
             //Assert
-            Assert.IsInstanceOfType(result_1_bad, typeof(RedirectToRouteResult), "Valid user can join game with invalid id.");        
-            Assert.IsInstanceOfType(result_1_good, typeof(ViewResult),"Valid user can't join game with valid id.");
-            Assert.IsInstanceOfType(result_2_bad, typeof(RedirectToRouteResult),"3 user can join game with valid id.");   
+            Assert.IsInstanceOfType(result_1_bad, typeof(RedirectToRouteResult), "Valid user can join game with invalid id.");
+            Assert.IsInstanceOfType(result_1_good, typeof(ViewResult), "Valid user can't join game with valid id.");
+            Assert.IsInstanceOfType(result_2_bad, typeof(RedirectToRouteResult), "3 user can join game with valid id.");
         }
         #endregion
+
+        [TestMethod()]
+        public async Task ChangeFigurePosTest()
+        {
+            //Arrange 
+            var step_good = new StepModel { FigureId = ControllerDataToUse.FigureDTO.Id.ToString(), NewXPos = "2", NewYPos = "3", GameId = ControllerDataToUse.GameDTO.Id.ToString()};
+            var step_bad_1 = new StepModel { FigureId = "123", NewXPos = "2", NewYPos = "3", GameId = ControllerDataToUse.GameDTO.Id.ToString() };
+            var step_bad_2 = new StepModel { FigureId = ControllerDataToUse.FigureDTO.Id.ToString(), NewXPos = "2", NewYPos = "3", GameId = "123" };
+
+            mockGameService = new MockGameService()
+                .MockChangeFigurePos()
+                .MockChangeTurnPriority();
+            mockUserService = new MockUserService()
+                .MockGetUser();
+
+            HttpContextManager.SetCurrentContext(new MockHttpContext(ControllerDataToUse.UserDTO.UserName).CustomHttpContextBase);
+            //Act
+            var gameController = new GameController(mockUserService.Object, mockGameService.Object);
+
+            await gameController.ChangeFigurePos(step_good);
+            await Assert.ThrowsExceptionAsync<HttpException>(async() => await gameController.ChangeFigurePos(step_bad_1), "Can make changes for invalid figure id");
+            await Assert.ThrowsExceptionAsync<HttpException>(async  () => await gameController.ChangeFigurePos(step_bad_2), "Can make changes for invalid game id");
+        }
+
     }
 }

@@ -31,10 +31,10 @@ namespace MyGame.BLL.DTO
         /// </summary>
         public int BlackPlayerId { get; set; }
 
-        ///// <summary>
-        ///// Table figures data.
-        ///// </summary>
-        //public ICollection<FigureDTO> Figures { get; set; }
+        /// <summary>
+        /// Id of player who has made last turn.
+        /// </summary>
+        public int LastTurnPlayerId { get; set; }
 
         /// <summary>
         /// Opponents data.

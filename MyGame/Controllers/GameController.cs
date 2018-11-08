@@ -156,7 +156,9 @@ namespace MyGame.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateNewGame(NewGameModel model)
         {
-            var user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
+            var user = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
+            if(user == null)
+                throw new HttpException(503, "Unexpected error.");
 
             var newGameDTO = new GameDTO
             {
@@ -214,7 +216,7 @@ namespace MyGame.Controllers
             var user = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
             var game = new GameDTO { Id = gameId };
 
-            if(user == null)
+            if(user == null || game == null)
                 throw new HttpException(404, "Unexpected error");
 
             var joinResult = await GameService.JoinGame(user, game);
@@ -232,12 +234,43 @@ namespace MyGame.Controllers
                 GameId = game.Id,
                 BlackId = game.BlackPlayerId,
                 WhiteId = game.WhitePlayerId,
-                Figures = await GameService.GetFiguresOnTable(game)
+                Figures = await GameService.GetFiguresOnTable(game),
+                isMyTurn = (game.LastTurnPlayerId != user.Id),
+                MyName = user.UserName
+
             };
+            var opponentName = game.Opponents.FirstOrDefault(o => o.UserName != user.UserName);
+            if (opponentName != null)
+                gameModel.OpponentName = opponentName.UserName;
 
             return View("SingleTable", gameModel);
 
         }
         #endregion
+
+        [HttpPost]
+        public async Task ChangeFigurePos(StepModel model)
+        {
+            var changePosResult = await GameService.ChangeFigurePos(new FigureDTO
+            {
+                Id = int.Parse(model.FigureId),
+                XCoord = int.Parse(model.NewXPos),
+                YCoord = int.Parse(model.NewYPos)
+            });
+            var opponent = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
+
+            if(opponent == null)
+                throw new HttpException(404, "Unexpected error.");
+
+            var changeTurnQuery = await GameService.ChangeTurnPriority(new GameDTO
+            {
+                Id = int.Parse(model.GameId),
+                LastTurnPlayerId = opponent.Id
+            });
+            if (!changePosResult.Succedeed || !changeTurnQuery.Succedeed)
+                throw new HttpException(404, "Unexpected error.");
+
+
+        }
     }
 }

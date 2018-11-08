@@ -71,6 +71,12 @@ namespace MyGame.BLL.Interfaces
         Task<OperationDetails> ChangeFigurePos(FigureDTO figureData);
 
         /// <summary>
+        /// Changing turn priority. 
+        /// </summary>
+        /// <param name="figureData">Id of figure to change and new coords.<param>
+        Task<OperationDetails> ChangeTurnPriority(GameDTO gameDTO);
+
+        /// <summary>
         /// Adding user to the game.
         /// </summary>
         /// <param name="userDTO">User info.</param>

@@ -58,7 +58,7 @@ namespace MyGame.Tests.Services
             return this;
         }
 
-        public MockGameService MockGetTable()
+        public MockGameService MockGetGame()
         {
             Setup(m => m.GetGame(
                 It.IsAny<GameDTO>()))
@@ -116,7 +116,37 @@ namespace MyGame.Tests.Services
             Setup(m => m.JoinGame(
                 It.Is<UserDTO>(u => u.UserName == ControllerDataToUse.UserDTO.UserName && ControllerDataToUse.GameDTO.Opponents.Count != 2),
                 It.Is<GameDTO>(g => g.Id == ControllerDataToUse.GameDTO.Id)))
-                .ReturnsAsync(new OperationDetails(true)).Callback<UserDTO, GameDTO>((u, g) => ControllerDataToUse.GameDTO.Opponents.Add(u.Clone()));
+                .ReturnsAsync(new OperationDetails(true)).Callback<UserDTO, GameDTO>((u, g) => {
+                    if(!ControllerDataToUse.GameDTO.Opponents.Select(o => o.Id).Contains(u.Id))
+                        ControllerDataToUse.GameDTO.Opponents.Add(u.Clone());
+                    g.Opponents = ControllerDataToUse.GameDTO.Opponents;
+                    });
+            return this;
+        }
+
+        public MockGameService MockChangeFigurePos()
+        {
+            Setup(m => m.ChangeFigurePos(
+            It.IsAny<FigureDTO>()))
+            .ReturnsAsync(new OperationDetails(false));
+
+            Setup(m => m.ChangeFigurePos(
+            It.Is<FigureDTO>(f => f.Id == ControllerDataToUse.FigureDTO.Id)))
+            .ReturnsAsync(new OperationDetails(true));
+
+            return this;
+        }
+
+        public MockGameService MockChangeTurnPriority()
+        {
+            Setup(m => m.ChangeTurnPriority(
+            It.IsAny<GameDTO>()))
+            .ReturnsAsync(new OperationDetails(false));
+
+            Setup(m => m.ChangeTurnPriority(
+            It.Is<GameDTO>(g => g.Id == ControllerDataToUse.GameDTO.Id)))
+            .ReturnsAsync(new OperationDetails(true));
+
             return this;
         }
     }

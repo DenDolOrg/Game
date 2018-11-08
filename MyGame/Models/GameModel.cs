@@ -24,7 +24,22 @@ namespace MyGame.Models
         /// <summary>
         /// Id of current player. 
         /// </summary>
-        public int ThisPlayerId { get; set; }
+        public int ThisPlayerId { get; set; }       
+        
+        /// <summary>
+        /// Username of the opponent.
+        /// </summary>
+        public string OpponentName { get; set; }
+
+        /// <summary>
+        /// Username of current user.
+        /// </summary>
+        public string MyName { get; set; }
+
+        /// <summary>
+        /// True if now is current player's turn.
+        /// </summary>
+        public bool isMyTurn { get; set; }
 
         /// <summary>
         /// Id of player who plays with white figures.

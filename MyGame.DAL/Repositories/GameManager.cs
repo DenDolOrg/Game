@@ -119,6 +119,26 @@ namespace MyGame.DAL.Repositories
             return game;
         }
         #endregion
+
+        #region TURN_CHANGE
+        public async Task<bool> TurnChange(int gameId, int userId)
+        {
+            var game = await Database.Games.FindAsync(gameId);
+            if (game == null)
+                return false;
+
+            game.LastTurnPlayerId = userId;
+            try
+            {
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+        #endregion
         public void Dispose()
         {
             Database.Dispose();

@@ -30,6 +30,11 @@ namespace MyGame.DAL.Entities
         /// </summary>
         public virtual ICollection<ApplicationUser> Opponents { get; set; }
 
+        /// <summary>
+        /// Id of player who has made last turn.
+        /// </summary>
+        public int LastTurnPlayerId { get; set; }
+
         public virtual Table Table { get; set; }
 
         public Game()

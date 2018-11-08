@@ -46,6 +46,8 @@ namespace MyGame.BLL.Services
                 else
                     newGame.WhitePlayerId = user.Id;
 
+                newGame.LastTurnPlayerId = newGame.BlackPlayerId;
+
                 bool gameCreateRes = await Database.GameManager.CreateAsync(newGame);
 
                 bool tableCreateRes = await Database.TableManager.CreateAsync(newGame);
@@ -69,7 +71,10 @@ namespace MyGame.BLL.Services
                 {
                     Id = newGame.Id,
                     Opponents = GetOpponents(newGame),
-                    CreationTime = newGame.Table.CreationTime.ToShortTimeString()
+                    CreationTime = newGame.Table.CreationTime.ToShortTimeString(),
+                    LastTurnPlayerId = newGame.LastTurnPlayerId,
+                    BlackPlayerId = newGame.BlackPlayerId,
+                    WhitePlayerId = newGame.WhitePlayerId
                 };
 
             }
@@ -151,6 +156,7 @@ namespace MyGame.BLL.Services
                     Opponents = GetOpponents(game),
                     WhitePlayerId = game.WhitePlayerId,
                     BlackPlayerId = game.BlackPlayerId,
+                    LastTurnPlayerId = game.LastTurnPlayerId,
                     CreationTime = game.Table.CreationTime.ToShortDateString()
                 };
 
@@ -245,9 +251,22 @@ namespace MyGame.BLL.Services
             else if(game.BlackPlayerId == 0 && game.WhitePlayerId != user.Id)
                 game.BlackPlayerId = user.Id;
 
+            if (game.LastTurnPlayerId == 0 && user.Id == game.BlackPlayerId)
+                game.LastTurnPlayerId = user.Id;
+
             gameDTO.WhitePlayerId = game.WhitePlayerId;
             gameDTO.BlackPlayerId = game.BlackPlayerId;
+            gameDTO.LastTurnPlayerId = game.LastTurnPlayerId;
+            gameDTO.Opponents = GetOpponents(game);
 
+            try
+            {
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return failOD;
+            }
             return successOD;
         }
         #endregion
@@ -312,14 +331,31 @@ namespace MyGame.BLL.Services
                 {
                     Id = g.Id,
                     Opponents = opponents,
-                    CreationTime = g.Table.CreationTime.ToShortDateString()
+                    CreationTime = g.Table.CreationTime.ToShortDateString(),
+                    LastTurnPlayerId = g.LastTurnPlayerId,
+                    BlackPlayerId =g.BlackPlayerId,
+                    WhitePlayerId = g.WhitePlayerId
                 });
             }
             return gameDTOs;
         }
         #endregion
 
+        #region TURN_PRIORITY
+        public async Task<OperationDetails> ChangeTurnPriority(GameDTO gameDTO)
+        {
+            OperationDetails successOD = new OperationDetails(true);
+            OperationDetails failOD = new OperationDetails(false);
 
+            var turnChangeRes = await Database.GameManager.TurnChange(gameDTO.Id, gameDTO.LastTurnPlayerId);
+
+            if (!turnChangeRes)
+                return failOD;
+
+            await Database.SaveChangesAsync();
+            return successOD;
+        }
+        #endregion
         public void Dispose()
         {
             Database.Dispose();

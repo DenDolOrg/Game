@@ -162,5 +162,25 @@ namespace MyGame.DAL.Repositories.Tests
             Assert.IsNull(result_bad_2, "Succes while adding valid user to invalid game.");
         }
         #endregion
+
+        [TestMethod()]
+        public async Task TurnChangeTest()
+        {
+            //Arrange
+            var good_game_id = ServiceDataToUse.Game.Id;
+            var bad_game_id = 123;
+
+            var context = new MockApplicationContext()
+                .MockGames();
+
+            //Act
+            var gameManager = new GameManager(context.Object);
+            var result_good = await gameManager.TurnChange(good_game_id, 2);
+            var result_bad = await gameManager.TurnChange(bad_game_id, 2);
+
+            //Assert
+            Assert.IsTrue(result_good, "Failed while changing game with valid id.");
+            Assert.IsFalse(result_bad, "Success while changing game with invalid id.");
+        }
     }
 }
