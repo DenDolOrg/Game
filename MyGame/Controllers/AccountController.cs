@@ -201,23 +201,15 @@ namespace MyGame.Controllers
         /// <param name="email">Email of user to delete.</param>
         /// <returns></returns>
         [Authorize(Roles = "admin")]
-        public async Task<bool> Delete(int id)
+        public async Task Delete(int id)
         {
-            UserDTO userDTO = new UserDTO
-            {
-                Id = id
-            };
+            UserDTO userDTO = new UserDTO{ Id = id };
 
-            var UserTableDelResult = await GameService.DeteteUserGame(userDTO);
-            var UserDelResult = await UserService.Delete(userDTO);
+            var userTableDelResult = await GameService.DeteteUserGame(userDTO);
+            var userDelResult = await UserService.Delete(userDTO);
 
-            if (!(UserDelResult.Succedeed && UserTableDelResult.Succedeed))
-                return false;
-
-            return true;
-
-
-
+            if (!(userDelResult.Succedeed && userTableDelResult.Succedeed))
+                throw new HttpException(409, userTableDelResult.ErrorMessage + " " + userDelResult.ErrorMessage);
         }
         #endregion
 

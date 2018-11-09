@@ -116,11 +116,30 @@ namespace MyGame.DAL.Repositories
         }
         #endregion
 
+        #region DELETE_SINGLE_FIGURE
+        public async Task<bool> DeleteSingleFigureAsync(int figureId)
+        {
+            var figure = await Database.Figures.FindAsync(figureId);
+            if (figure == null)
+                return false;
+            try
+            {
+                Database.Figures.Remove(figure);
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
         public void Dispose()
         {
             Database.Dispose();
         }
-
 
     }
 }

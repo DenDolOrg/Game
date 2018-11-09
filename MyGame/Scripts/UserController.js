@@ -15,8 +15,6 @@
             $http.delete("/Account/Delete/" + userModel.Id).then(function SuccessDeleteUser() {
                 var index = $scope.userList.data.indexOf(userModel);
                 $scope.userList.data.splice(index, 1);
-            }, function FailedDeleteUser() {
-                alert("Unexpected error occurred.");
             });
         }
     };

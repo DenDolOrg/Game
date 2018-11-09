@@ -191,11 +191,11 @@ namespace MyGame.Controllers.Tests
                 .MockGetGame()
                 .MockJoinGame();
 
-            mockUserService = new MockUserService()
-                .MockGetUser();
+            //mockUserService = new MockUserService()
+            //    .MockGetUser();
 
             //Act
-            var gameController = new GameController(mockUserService.Object, mockGameService.Object);
+            var gameController = new GameController(null, mockGameService.Object);
 
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_bad.UserName).CustomHttpContextBase);
 
@@ -212,28 +212,69 @@ namespace MyGame.Controllers.Tests
             ControllerDataToUse.UserDTO.UserName = "newUsername_2";
             ControllerDataToUse.UserDTO.Id = 3;
             user_good = ControllerDataToUse.UserDTO;
+            
             HttpContextManager.SetCurrentContext(new MockHttpContext(user_good.UserName).CustomHttpContextBase);
-            var result_1_bad = await gameController.EnterGame(game_good.Id);
-
-            var result_2_bad = await gameController.EnterGame(game_bad.Id);
             //Assert
-            Assert.IsInstanceOfType(result_1_bad, typeof(RedirectToRouteResult), "Valid user can join game with invalid id.");
+            await Assert.ThrowsExceptionAsync<HttpException>(async () => await gameController.EnterGame(game_bad.Id), "Valid user can join game with invalid id.");
+            await Assert.ThrowsExceptionAsync<HttpException>(async() => await gameController.EnterGame(game_good.Id), "3 user can join game with valid id.");
             Assert.IsInstanceOfType(result_1_good, typeof(ViewResult), "Valid user can't join game with valid id.");
-            Assert.IsInstanceOfType(result_2_bad, typeof(RedirectToRouteResult), "3 user can join game with valid id.");
         }
         #endregion
 
+        #region CHANGE_FIG_POS
         [TestMethod()]
-        public async Task ChangeFigurePosTest()
+        public async Task ChangeFieldTest()
         {
             //Arrange 
-            var step_good = new StepModel { FigureId = ControllerDataToUse.FigureDTO.Id.ToString(), NewXPos = "2", NewYPos = "3", GameId = ControllerDataToUse.GameDTO.Id.ToString()};
-            var step_bad_1 = new StepModel { FigureId = "123", NewXPos = "2", NewYPos = "3", GameId = ControllerDataToUse.GameDTO.Id.ToString() };
-            var step_bad_2 = new StepModel { FigureId = ControllerDataToUse.FigureDTO.Id.ToString(), NewXPos = "2", NewYPos = "3", GameId = "123" };
+            var step_good_1 = new StepModel
+            {
+                FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
+                NewXPos = "2",
+                NewYPos = "3",
+                GameId = ControllerDataToUse.GameDTO.Id.ToString(),
+                FigureIdToDelete = null
+            };
+
+            var step_good_2 = new StepModel
+            {
+                FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
+                NewXPos = "2",
+                NewYPos = "3",
+                GameId = ControllerDataToUse.GameDTO.Id.ToString(),
+                FigureIdToDelete = ControllerDataToUse.FigureDTO.Id.ToString()
+            };
+
+            var step_bad_1 = new StepModel
+            {
+                FigureId = "123",
+                NewXPos = "2",
+                NewYPos = "3",
+                GameId = ControllerDataToUse.GameDTO.Id.ToString(),
+                FigureIdToDelete = null
+            };
+
+            var step_bad_2 = new StepModel
+            {
+                FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
+                NewXPos = "2",
+                NewYPos = "3",
+                GameId = "123",
+                FigureIdToDelete = null
+            };
+            var step_bad_3 = new StepModel
+            {
+                FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
+                NewXPos = "2",
+                NewYPos = "3",
+                GameId = ControllerDataToUse.GameDTO.Id.ToString(),
+                FigureIdToDelete = "123"
+            };
 
             mockGameService = new MockGameService()
                 .MockChangeFigurePos()
-                .MockChangeTurnPriority();
+                .MockChangeTurnPriority()
+                .MockDeleteFigure();
+
             mockUserService = new MockUserService()
                 .MockGetUser();
 
@@ -241,10 +282,12 @@ namespace MyGame.Controllers.Tests
             //Act
             var gameController = new GameController(mockUserService.Object, mockGameService.Object);
 
-            await gameController.ChangeFigurePos(step_good);
-            await Assert.ThrowsExceptionAsync<HttpException>(async() => await gameController.ChangeFigurePos(step_bad_1), "Can make changes for invalid figure id");
-            await Assert.ThrowsExceptionAsync<HttpException>(async  () => await gameController.ChangeFigurePos(step_bad_2), "Can make changes for invalid game id");
+            await gameController.ChangeField(step_good_1);
+            await gameController.ChangeField(step_good_2);
+            await Assert.ThrowsExceptionAsync<HttpException>(async () => await gameController.ChangeField(step_bad_1), "Can make changes for invalid figure id");
+            await Assert.ThrowsExceptionAsync<HttpException>(async () => await gameController.ChangeField(step_bad_2), "Can make changes for invalid game id");
+            await Assert.ThrowsExceptionAsync<HttpException>(async () => await gameController.ChangeField(step_bad_3), "Can make changes for invalid figure to delete id");
         }
-
+        #endregion
     }
 }

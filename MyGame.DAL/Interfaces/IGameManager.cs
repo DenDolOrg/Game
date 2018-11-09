@@ -42,7 +42,7 @@ namespace MyGame.DAL.Interfaces
         /// <param name="gameId">Game id.</param>
         /// <param name="userId">User id.</param>
         /// <returns>Success status of operation.</returns>
-        Task<Game> AddOpponentToGame(int gameId, int userId);
+        Task<Game> AddOpponentToGame(int gameId, ApplicationUser user);
 
         Task<bool> TurnChange(int gameId, int userId);
     }

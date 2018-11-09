@@ -335,5 +335,30 @@ namespace MyGame.BLL.Services.Tests
             Assert.IsTrue(result_good.Succedeed, "Error while changing turn priority for valid game");
             Assert.IsFalse(result_bad.Succedeed, "Success while changing turn priority for invalid game");
         }
+
+        [TestMethod()]
+        public async Task DeleteFigureTest()
+        {
+            //Arrange
+
+            figureManager = new MockFigureManager()
+                .MockDeleteSingleFigureAsync();
+
+            Work.SetManagers(null, null, null, figureManager);
+
+            var figure_good = new FigureDTO { Id = ServiceDataToUse.Figure.Id };
+            var figure_bad = new FigureDTO { Id = 123 };
+
+            //Act
+            var service = new GameService(Work.Object);
+
+            var result_good = await service.DeleteFigure(figure_good);
+            var result_bad = await service.DeleteFigure(figure_bad);
+
+            //Assert
+            Assert.IsTrue(result_good.Succedeed, "Error while delting figure with valid id");
+            Assert.IsFalse(result_bad.Succedeed, "Success while deleting figure with invalid id");
+        }
+
     }
 }

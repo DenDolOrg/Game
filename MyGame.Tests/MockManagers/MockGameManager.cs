@@ -84,16 +84,16 @@ namespace MyGame.Tests.MockManagers
         {
             Setup(m => m.AddOpponentToGame(
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<ApplicationUser>()))
                 .ReturnsAsync((Game)null);
 
             Setup(m => m.AddOpponentToGame(
                 It.Is<int>(gId => gId == ServiceDataToUse.Game.Id),
-                It.Is<int>(uId => (uId == ServiceDataToUse.User.Id) &&
+                It.Is<ApplicationUser>(u => (u.Id == ServiceDataToUse.User.Id) &&
                                   (ServiceDataToUse.Game.Opponents.Count != 2))))
-                .ReturnsAsync(ServiceDataToUse.Game).Callback<int, int>((gId, uId) =>
+                .ReturnsAsync(ServiceDataToUse.Game).Callback<int, ApplicationUser>((gId, u) =>
                 {
-                    if(!ServiceDataToUse.Game.Opponents.Select(o => o.Id).Contains(uId))
+                    if(!ServiceDataToUse.Game.Opponents.Select(o => o.Id).Contains(u.Id))
                         ServiceDataToUse.Game.Opponents.Add(ServiceDataToUse.User.Clone());
                 });
 

@@ -86,22 +86,19 @@ namespace MyGame.BLL.Services
         public async Task<OperationDetails> DeteteGame(GameDTO tableDTO)
         {
             OperationDetails successOD = new OperationDetails(true);
-            OperationDetails failOD = new OperationDetails(false);
 
             Game game = await Database.GameManager.FindByIdAsync(tableDTO.Id);
             if (game == null)
-                return failOD;
+                return new OperationDetails(false, "No game with requested id.");
 
             bool figuresDelResult = await Database.FigureManager.DeleteAsync(game.Id);
             bool tableDelResult = await Database.TableManager.DeleteAsync(game);
             bool gameDelResult = await Database.GameManager.DeleteAsync(game);
 
             if (!(figuresDelResult && tableDelResult && gameDelResult))
-                return failOD;
+                return new OperationDetails(false, "Failed while deleting game or table or figures.");
 
             return successOD;
-
-
         }
         #endregion
 
@@ -109,12 +106,11 @@ namespace MyGame.BLL.Services
         public async Task<OperationDetails> DeteteUserGame(UserDTO userDTO)
         {
             OperationDetails successOD = new OperationDetails(true);
-            OperationDetails failOD = new OperationDetails(false);
 
             ApplicationUser user = await Database.UserManager.FindByIdAsync(userDTO.Id);
 
             if (user == null)
-                return failOD;
+                return new OperationDetails(false, "No user with requested id.");
 
             if (user.Games == null)
                 return successOD;
@@ -123,9 +119,9 @@ namespace MyGame.BLL.Services
 
             foreach (int id in games)
             {
-                var GameDelResult = await DeteteGame(new GameDTO { Id = id });
-                if (!GameDelResult.Succedeed)
-                    return failOD;
+                var gameDelResult = await DeteteGame(new GameDTO { Id = id });
+                if (!gameDelResult.Succedeed)
+                    return new OperationDetails(false, gameDelResult.ErrorMessage);
             }
 
             return successOD;
@@ -136,10 +132,9 @@ namespace MyGame.BLL.Services
         public async Task<IEnumerable<FigureDTO>> GetFiguresOnTable(GameDTO gameDTO)
         {
             ICollection<Figure> tableFigures = await Database.FigureManager.GetFiguresForTable(gameDTO.Id).ToListAsync();
-            if (tableFigures.Count() != 0)
-            {
+            if (tableFigures != null && tableFigures.Count() != 0)
                 return CreateFiguresDTO(tableFigures);
-            }
+
             return null;
         }
         #endregion
@@ -170,8 +165,10 @@ namespace MyGame.BLL.Services
         public async Task<IEnumerable<GameDTO>> GetAllGames()
         {
             IEnumerable<Game> gameList = await Database.GameManager.GetAllGames().ToListAsync();
+            if(gameList != null && gameList.Count() != 0)
+                return CreateGameDTO(gameList);
 
-            return CreateGameDTO(gameList);
+            return null;
         }
         #endregion
 
@@ -182,6 +179,7 @@ namespace MyGame.BLL.Services
 
             if (user == null)
                 return null;
+
             IEnumerable<Game> games = await Database.GameManager.GetGamesForUser(user.Id).ToListAsync();
 
             return CreateGameDTO(games);
@@ -205,11 +203,10 @@ namespace MyGame.BLL.Services
         public async Task<OperationDetails> ChangeFigurePos(FigureDTO figureData)
         {
             OperationDetails successOD = new OperationDetails(true);
-            OperationDetails failOD = new OperationDetails(false);
 
             Figure figure = await Database.FigureManager.FindByIdAsync(figureData.Id);
             if (figure == null)
-                return failOD;
+                return new OperationDetails(false, "No figure with requested id.");
 
             figure.X = figureData.XCoord;
             figure.Y = figureData.YCoord;
@@ -220,7 +217,7 @@ namespace MyGame.BLL.Services
             }
             catch
             {
-                return failOD;
+                return new OperationDetails(false, "Error while saving changes to database"); ;
             }
 
             return successOD;
@@ -228,23 +225,18 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region JOIN_TO_TABLE
-
         public async Task<OperationDetails> JoinGame(UserDTO userDTO, GameDTO gameDTO)
         {
             OperationDetails successOD = new OperationDetails(true);
-            OperationDetails failOD = new OperationDetails(false);
-
-            if (userDTO == null || gameDTO == null)
-                return failOD;
 
             var user = await Database.UserManager.FindByNameAsync(userDTO.UserName);
             if (user == null)
-                return failOD;
+                return new OperationDetails(false, "Error while searching user.");
 
-            var game = await Database.GameManager.AddOpponentToGame(gameDTO.Id, user.Id);
+            var game = await Database.GameManager.AddOpponentToGame(gameDTO.Id, user);
 
             if (game == null)
-                return failOD;
+                return new OperationDetails(false, "Error while adding user to the game.");
 
             if (game.WhitePlayerId == 0 && game.BlackPlayerId != user.Id)
                 game.WhitePlayerId = user.Id;
@@ -259,15 +251,53 @@ namespace MyGame.BLL.Services
             gameDTO.LastTurnPlayerId = game.LastTurnPlayerId;
             gameDTO.Opponents = GetOpponents(game);
 
+            userDTO.Id = user.Id;
+
             try
             {
                 await Database.SaveChangesAsync();
             }
             catch
             {
-                return failOD;
+                return new OperationDetails(false, "Error while saving changes to database.");
             }
             return successOD;
+        }
+        #endregion
+
+        #region TURN_PRIORITY
+        public async Task<OperationDetails> ChangeTurnPriority(GameDTO gameDTO)
+        {
+            OperationDetails successOD = new OperationDetails(true);
+
+            var turnChangeRes = await Database.GameManager.TurnChange(gameDTO.Id, gameDTO.LastTurnPlayerId);
+
+            if (!turnChangeRes)
+                return new OperationDetails(false, "Failed while changing turn priority.");
+
+            try
+            {
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return new OperationDetails(false, "Error while saving changes to database.");
+            }
+
+            return successOD;
+        }
+        #endregion
+
+        #region DELETE_FIGURE
+        public async Task<OperationDetails> DeleteFigure(FigureDTO figureDTO)
+        {
+            OperationDetails successOD = new OperationDetails(true);
+            if (!(await Database.FigureManager.DeleteSingleFigureAsync(figureDTO.Id)))
+            {
+                return new OperationDetails(false, "Failed while deleting figure.");
+            }
+            return successOD;
+
         }
         #endregion
 
@@ -341,21 +371,8 @@ namespace MyGame.BLL.Services
         }
         #endregion
 
-        #region TURN_PRIORITY
-        public async Task<OperationDetails> ChangeTurnPriority(GameDTO gameDTO)
-        {
-            OperationDetails successOD = new OperationDetails(true);
-            OperationDetails failOD = new OperationDetails(false);
+        
 
-            var turnChangeRes = await Database.GameManager.TurnChange(gameDTO.Id, gameDTO.LastTurnPlayerId);
-
-            if (!turnChangeRes)
-                return failOD;
-
-            await Database.SaveChangesAsync();
-            return successOD;
-        }
-        #endregion
         public void Dispose()
         {
             Database.Dispose();

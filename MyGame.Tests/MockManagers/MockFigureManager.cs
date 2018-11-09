@@ -61,9 +61,24 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
+        public MockFigureManager MockDeleteSingleFigureAsync()
+        {
+            Setup(m => m.DeleteSingleFigureAsync(
+                It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            Setup(m => m.DeleteSingleFigureAsync(
+                It.Is<int>(id => id == ServiceDataToUse.Figure.Id)))
+                .ReturnsAsync(true);
+
+            return this;
+        }
+
         private IQueryable<Figure> GetDbSetFigures(List<Figure> figures)
         {
             return MockDbSet.GetDataSet(figures).Object;
         }
+
+
     }
 }

@@ -143,15 +143,14 @@ namespace MyGame.DAL.Repositories.Tests
             ServiceDataToUse.Game.Opponents.Clear();
             //Act
             var gameManager = new GameManager(context.Object);
-            var result_good_1 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Id);
+            var result_good_1 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Clone());
 
             ServiceDataToUse.User.Id = 3;
-            var result_good_2 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Id);
+            var result_good_2 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Clone());
 
-            var result_good_3 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Id);
+            var result_good_3 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, ServiceDataToUse.User.Clone());
 
-            var result_bad_1 = await gameManager.AddOpponentToGame(123, ServiceDataToUse.User.Id);
-            var result_bad_2 = await gameManager.AddOpponentToGame(ServiceDataToUse.Game.Id, 123);
+            var result_bad_1 = await gameManager.AddOpponentToGame(123, ServiceDataToUse.User.Clone());
 
             //Assert
             Assert.IsNotNull(result_good_1, "Failed while adding valid user to valid game.");
@@ -159,10 +158,10 @@ namespace MyGame.DAL.Repositories.Tests
             Assert.IsNotNull(result_good_3, "Failed while adding same user to valid game.");
             Assert.AreEqual(ServiceDataToUse.Game.Opponents.Count, 2, "Not valid number of opponents.");
             Assert.IsNull(result_bad_1, "Succes while adding invalid user to valid game.");
-            Assert.IsNull(result_bad_2, "Succes while adding valid user to invalid game.");
         }
         #endregion
 
+        #region TURN_CHANGE
         [TestMethod()]
         public async Task TurnChangeTest()
         {
@@ -182,5 +181,6 @@ namespace MyGame.DAL.Repositories.Tests
             Assert.IsTrue(result_good, "Failed while changing game with valid id.");
             Assert.IsFalse(result_bad, "Success while changing game with invalid id.");
         }
+        #endregion
     }
 }

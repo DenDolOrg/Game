@@ -15,13 +15,7 @@ namespace MyGame.Real_time
     {
         public void UpdateField(StepModel step)
         {
-            FigureDTO figureDTO = new FigureDTO
-            {
-                Id = Int32.Parse(step.FigureId),
-                XCoord = Int32.Parse(step.NewXPos),
-                YCoord = Int32.Parse(step.NewYPos)
-            };
-                Clients.User(step.ReceiverName).changePosition(step);
+            Clients.User(step.ReceiverName).changeField(step);
         }
 
         public void JoinSignal(JoinSignalModel joinModel)
@@ -40,6 +34,9 @@ namespace MyGame.Real_time
 
         [JsonProperty("figureId")]
         public string FigureId { get; set; }
+
+        [JsonProperty("figureDelId")]
+        public string FigureIdToDelete { get; set; }
 
         [JsonProperty("newX")]
         public string NewXPos { get; set; }

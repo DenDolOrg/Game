@@ -1,36 +1,47 @@
 ﻿function SetupMove(model, color) {
-    var $boxes = $(".blackSquares");
     var stepHub = $.connection.stepHub;
-    var $figures =  $(".figure_" + color);
+    var boxes = $(".blackSquares");  
+    var figures =  $(".figure_" + color);
     var isRegularMovement = true;      
     var validBoxes = [];
-    var killModels;
+    var killModels; 
+
     stepHub.client.reciveJoinSignal = function (joinModel) {
         model.OpponentName = joinModel.myName;
         if (model.isMyTurn) {
             $("#TurnStatusParag").html("Now it's your turn!");
-            $figures.draggable('enable');
+            figures.draggable('enable');
         }
         else {
             $("#TurnStatusParag").html("Waiting for opponent's turn...");
         }
     }
-    stepHub.client.changePosition = function (step) {
 
-        killModels = ChangePos(step, $figures, $boxes, color)
+    stepHub.client.changeField = function (step) {
+        figures.draggable('enable');
+
+        if (step.figureDelId != null) {
+            var figToDelate = $(".figure_" + color + "[data-fig-id=" + step.figureDelId + "]");
+            figures = figures.filter(function (index) {
+                return $(this).data("fig-id") != figToDelate.data("fig-id");
+            });
+            figToDelate.parent().empty();
+
+        }
+        killModels = ChangePos(step, figures, boxes, color);
+
         if (killModels != null && killModels.length != 0) {
             isRegularMovement = false;
-            PrepareToEat($figures, killModels);
+            PrepareToEat(figures, killModels);
         }
         else {
             isRegularMovement = true;
-            $figures.draggable('enable');
         }
-        
+
     }
 
     $.connection.hub.start().done(function () {
-        $figures.draggable({
+        figures.draggable({
             containment: $("#checkersTable"),
             stop: function () {
                 if (isRegularMovement) {
@@ -58,34 +69,34 @@
 
         });
 
-        $boxes.droppable({
+        boxes.droppable({
             drop: function (event, ui) {
                 if (isRegularMovement) {
-                    RegularDrop(ui, $(this), color, $figures, model, stepHub);
+                    RegularDrop(ui, $(this), color, figures, model, stepHub, null);
                 }
                 else {
-                    EatDrop(ui, $(this), color, $figures, model, stepHub, killModels);
+                    EatDrop(ui, $(this), color, figures, model, stepHub, killModels, isRegularMovement);
                 }
             }
-        })
+        });
 
         if (!model.isMyTurn) {
             $("#TurnStatusParag").html("Waiting for opponent's turn...");
-            $figures.draggable('disable');
+            figures.draggable('disable');
         }
         else {
-            killModels = getPotencialKillers($figures, $boxes, color);
+            killModels = getPotencialKillers(figures, boxes, color);
 
             if (killModels != null && killModels.length != 0) {
                 isRegularMovement = false;
-                PrepareToEat($figures, killModels);
+                PrepareToEat(figures, killModels);
             }
             $("#TurnStatusParag").html("Now it's your turn!");
         }
 
         if (model.OpponentName == null) {
             $("#TurnStatusParag").html("Waiting for second player...");
-            $figures.draggable('disable');
+            figures.draggable('disable');
         };
 
         if (model.OpponentName != null) {
@@ -97,7 +108,6 @@
         }
 
     });
-
 
 };
 
@@ -111,40 +121,50 @@ function PrepareToEat(figures, killModels) {
     });
 }
 
-function RegularDrop(ui, box, color, figures, model, stepHub) {
+function RegularDrop(ui, box, color, figures, model, stepHub, figureIdToDelete) {
     var col = box.css("background-color");
     if (col == "rgb(0, 128, 0)") {
         var x = box.data("xcoord"),
-            y = box.data("ycoord");
+            y = box.data("ycoord"),
+            delta = 0;
         if (color == "Black") {
-            x = 11 - x;
-            y = 11 - y;
+            delta = 11;
         }
-        $.post("/Game/ChangeFigurePos", { model: { GameId: model.GameId, FigureId: ui.draggable.data("fig-id"), NewYPos: y, NewXPos: x } },
-                MakeAppend(box, ui, figures, stepHub, model),
-                "json");
+        var stepModel = {
+            newY: y,
+            newX: x,
+            figureId: ui.draggable.data("fig-id"),
+            gameId: model.GameId,
+            receiverName: model.OpponentName,
+            figureDelId: figureIdToDelete
+        };
+        SendDataToServer(stepModel, box, ui, stepHub, delta);
+        
+        figures.draggable('disable');
     }
 }
 
 function EatDrop(ui, box, color, figures, model, stepHub, killModels) {
-    RegularDrop(ui, box, color, figures, model, stepHub);
-    if ($(box).is(":has('img')")) {
-        var currentModel = killModels.filter(o => {
+    var col = box.css("background-color");
+    if (col == "rgb(0, 128, 0)") {
+        var currentKillModel = killModels.filter(o => {
             var $killer = o.killer;
             return $killer.data("fig-id") == ui.draggable.data("fig-id")
         });
 
-        var victimes = currentModel[0].victimes;
-        var fields = currentModel[0].freeSpaces;
+        var victimes = currentKillModel[0].victimes;
+        var fields = currentKillModel[0].freeSpaces;
         var victim;
         fields.forEach(function (elem, index, array) {
             if ((elem.data("xcoord") == box.data("xcoord")) &&
-                (elem.data("ycoord") == box.data("ycoord"))){
+                (elem.data("ycoord") == box.data("ycoord"))) {
                 victim = victimes[index];
             }
         });
-        victim.empty();
+        var figureId = victim.children().data("fig-id");
 
+        RegularDrop(ui, box, color, figures, model, stepHub, figureId)
+        victim.empty();
     }
 }
 
@@ -186,21 +206,36 @@ function StartEatDrag(validBoxes, currentFigure) {
     });
 }
 
-function MakeAppend(box, ui, figures, stepHub, model) {
+function MakeAppend(box, ui, stepHub, stepModel) {
     box.append(ui.draggable);
-    var stepModel = {
-        newY: box.data("ycoord"),
-        newX: box.data("xcoord"),
-        figureId: ui.draggable.data("fig-id"),
-        gameId: model.GameId,
-        receiverName: model.OpponentName,
-    }
     ui.draggable.css("z-index", "10");
     ui.draggable.css({ left: 0, top: 0 });
     $("#TurnStatusParag").html("Waiting for opponent's turn...");
-    figures.draggable('disable');
-    $(".canEat").removeClass("canEat");
+    $(".canEat").removeClass("canEat");  
     stepHub.server.updateField(stepModel);
+}
+
+function RemoveFigure(figureId, stepHub, model) {
+    var deleteModel = {
+        receiverName: model.OpponentName,
+        figureId: figureId
+    }
+    stepHub.server.deletetFigure(deleteModel);
+}
+
+function SendDataToServer(stepModel, box, ui, stepHub, delta) {
+        $.post("/Game/ChangeField", {
+            model: {
+                GameId: stepModel.gameId,
+                ReceiverName: stepModel.receiverName,
+                FigureId: stepModel.figureId,
+                FigureIdToDelete: stepModel.figureDelId,
+                NewXPos: Math.abs(stepModel.newX - delta),
+                NewYPos: Math.abs(stepModel.newY - delta)
+            }
+        },
+            MakeAppend(box, ui, stepHub, stepModel),
+        "json");
 }
 
 function ChangePos(step, figures, boxes, color) {
@@ -231,10 +266,5 @@ function ChangePos(step, figures, boxes, color) {
         });
 
         $("#TurnStatusParag").html("Now it's your turn!");
-        return killModels;
-
-    
+        return killModels;   
 }
-
-    
-

@@ -23,5 +23,14 @@ namespace MyGame.DAL.Interfaces
         /// <returns><see cref="Figure"/></returns>
         Task<Figure> FindByIdAsync(int figureId);
 
+        /// <summary>
+        /// Deletes one figure from DB.
+        /// </summary>
+        /// <param name="figureId">Figure's id.</param>
+        /// <returns><see cref="Figure"/></returns>
+        Task<bool> DeleteSingleFigureAsync(int figureId);
+
+
+
     }
 }

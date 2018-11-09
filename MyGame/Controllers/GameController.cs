@@ -201,7 +201,7 @@ namespace MyGame.Controllers
             OperationDetails details = await GameService.DeteteGame(new GameDTO {Id = id });
 
             if (!details.Succedeed)
-                throw new HttpException(403, "Error while deleting");
+                throw new HttpException(403, details.ErrorMessage);
 
         }
         #endregion
@@ -213,16 +213,13 @@ namespace MyGame.Controllers
         /// <param name="gameId">Id of game to enter.</param>
         public async Task<ActionResult> EnterGame(int gameId)
         {
-            var user = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
+            var user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
             var game = new GameDTO { Id = gameId };
-
-            if(user == null || game == null)
-                throw new HttpException(404, "Unexpected error");
 
             var joinResult = await GameService.JoinGame(user, game);
 
             if (!joinResult.Succedeed)
-                return RedirectToAction("GameList", new { gameType = "available" });
+                throw new HttpException(400, joinResult.ErrorMessage);
 
             var figures = await GameService.GetFiguresOnTable(game);
             if (figures == null)
@@ -248,10 +245,11 @@ namespace MyGame.Controllers
         }
         #endregion
 
+        #region CHANGE_FIG_POS
         [HttpPost]
-        public async Task ChangeFigurePos(StepModel model)
+        public async Task ChangeField(StepModel model)
         {
-            var changePosResult = await GameService.ChangeFigurePos(new FigureDTO
+            var changePosDetails = await GameService.ChangeFigurePos(new FigureDTO
             {
                 Id = int.Parse(model.FigureId),
                 XCoord = int.Parse(model.NewXPos),
@@ -259,18 +257,26 @@ namespace MyGame.Controllers
             });
             var opponent = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
 
-            if(opponent == null)
-                throw new HttpException(404, "Unexpected error.");
+            if (opponent == null)
+                throw new HttpException(404, "Error while searching user in database");
 
-            var changeTurnQuery = await GameService.ChangeTurnPriority(new GameDTO
+            var changeTurnQueryDetails = await GameService.ChangeTurnPriority(new GameDTO
             {
                 Id = int.Parse(model.GameId),
                 LastTurnPlayerId = opponent.Id
             });
-            if (!changePosResult.Succedeed || !changeTurnQuery.Succedeed)
-                throw new HttpException(404, "Unexpected error.");
 
+            if(model.FigureIdToDelete != null)
+            {
+                var figId = int.Parse(model.FigureIdToDelete);
+                var deleteFigureDetails = await GameService.DeleteFigure(new FigureDTO { Id = figId });
+                if(!deleteFigureDetails.Succedeed)
+                    throw new HttpException(404, deleteFigureDetails.ErrorMessage);
+            }
 
+            if (!changePosDetails.Succedeed || !changeTurnQueryDetails.Succedeed)
+                throw new HttpException(404, changePosDetails.ErrorMessage + " " + changeTurnQueryDetails.ErrorMessage);
         }
+        #endregion
     }
 }

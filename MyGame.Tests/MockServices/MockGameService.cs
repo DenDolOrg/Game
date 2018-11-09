@@ -120,6 +120,7 @@ namespace MyGame.Tests.Services
                     if(!ControllerDataToUse.GameDTO.Opponents.Select(o => o.Id).Contains(u.Id))
                         ControllerDataToUse.GameDTO.Opponents.Add(u.Clone());
                     g.Opponents = ControllerDataToUse.GameDTO.Opponents;
+                    u.Id = ControllerDataToUse.UserDTO.Id;
                     });
             return this;
         }
@@ -146,6 +147,19 @@ namespace MyGame.Tests.Services
             Setup(m => m.ChangeTurnPriority(
             It.Is<GameDTO>(g => g.Id == ControllerDataToUse.GameDTO.Id)))
             .ReturnsAsync(new OperationDetails(true));
+
+            return this;
+        }
+
+        public MockGameService MockDeleteFigure()
+        {
+            Setup(m => m.DeleteFigure(
+                It.IsAny<FigureDTO>()))
+                .ReturnsAsync(new OperationDetails(false));
+
+            Setup(m => m.DeleteFigure(
+               It.Is<FigureDTO>(f => f.Id == ControllerDataToUse.FigureDTO.Id)))
+               .ReturnsAsync(new OperationDetails(true));
 
             return this;
         }

@@ -83,5 +83,12 @@ namespace MyGame.BLL.Interfaces
         /// <param name="gameDTO">Game info.</param>
         Task<OperationDetails> JoinGame(UserDTO userDTO, GameDTO gameDTO);
 
+        /// <summary>
+        /// Deletes figure with some id from DB.
+        /// </summary>
+        /// <param name="figureDTO">Figure information class, which contains figure's id.</param>
+        /// <returns>Detelion result</returns>
+        Task<OperationDetails> DeleteFigure(FigureDTO figureDTO);
+
     }
 }

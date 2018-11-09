@@ -92,15 +92,14 @@ namespace MyGame.DAL.Repositories
         #endregion
 
         #region ADD_OPPONENT
-        public async Task<Game> AddOpponentToGame(int gameId, int userId)
+        public async Task<Game> AddOpponentToGame(int gameId, ApplicationUser user)
         {
             Game game;
+            
             try
             {
-                var user = Database.Users.Find(userId);
                 game = await Database.Games.FindAsync(gameId);
-
-                if (user == null || game == null)
+                if (game == null)
                     return null;
 
                 if (game.Opponents.Count != 2)
