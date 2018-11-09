@@ -1,16 +1,10 @@
-﻿
-
-function SetupMove(model, color) {
-    var $Boxes,
-        stepHub,
-        $figures
-
+﻿function SetupMove(model, color) {
+    var $boxes = $(".blackSquares");
+    var stepHub = $.connection.stepHub;
+    var $figures =  $(".figure_" + color);
+    var isRegularMovement = true;      
     var validBoxes = [];
-
-    stepHub = $.connection.stepHub,
-    $figures = $(".figure_" + color),
-    $Boxes = $(".blackSquares");
-
+    var killModels;
     stepHub.client.reciveJoinSignal = function (joinModel) {
         model.OpponentName = joinModel.myName;
         if (model.isMyTurn) {
@@ -22,27 +16,56 @@ function SetupMove(model, color) {
         }
     }
     stepHub.client.changePosition = function (step) {
-        ChangePos(step, $figures);      
+
+        killModels = ChangePos(step, $figures, $boxes, color)
+        if (killModels != null && killModels.length != 0) {
+            isRegularMovement = false;
+            PrepareToEat($figures, killModels);
+        }
+        else {
+            isRegularMovement = true;
+            $figures.draggable('enable');
+        }
+        
     }
 
     $.connection.hub.start().done(function () {
-        var $validBoxe_left;
-        var $validBoxe_right;
-
         $figures.draggable({
             containment: $("#checkersTable"),
             stop: function () {
-                validBoxes = StopDrag(validBoxes, $(this));
+                if (isRegularMovement) {
+                    validBoxes = StopRegularDrag(validBoxes, $(this));
+                }
+                else {
+                    validBoxes = StopEatDrag(validBoxes, $(this));
+                }
             },
             start: function () {
-                StartDrag(validBoxes, $(this));
+                if (isRegularMovement) {
+                    StartRegularDrag(validBoxes, $(this));
+                }
+                else {
+                    var current = $(this);
+                    var currentModel = killModels.filter(o => {
+                        var $killer = o.killer;
+                        return $killer.data("fig-id") == current.data("fig-id")
+                    });
+                    validBoxes = currentModel[0].freeSpaces;
+                    StartEatDrag(validBoxes, $(this))
+                }
+                
             }
 
         });
 
-        $Boxes.droppable({
+        $boxes.droppable({
             drop: function (event, ui) {
-                Drop(ui, $(this), color, $figures, model, stepHub);
+                if (isRegularMovement) {
+                    RegularDrop(ui, $(this), color, $figures, model, stepHub);
+                }
+                else {
+                    EatDrop(ui, $(this), color, $figures, model, stepHub, killModels);
+                }
             }
         })
 
@@ -51,6 +74,12 @@ function SetupMove(model, color) {
             $figures.draggable('disable');
         }
         else {
+            killModels = getPotencialKillers($figures, $boxes, color);
+
+            if (killModels != null && killModels.length != 0) {
+                isRegularMovement = false;
+                PrepareToEat($figures, killModels);
+            }
             $("#TurnStatusParag").html("Now it's your turn!");
         }
 
@@ -58,8 +87,6 @@ function SetupMove(model, color) {
             $("#TurnStatusParag").html("Waiting for second player...");
             $figures.draggable('disable');
         };
-
-
 
         if (model.OpponentName != null) {
             var joinModel = {
@@ -70,9 +97,21 @@ function SetupMove(model, color) {
         }
 
     });
+
+
 };
 
-function Drop(ui, box, color, figures, model, stepHub) {
+function PrepareToEat(figures, killModels) {
+    figures.draggable('disable');
+    killModels.forEach(function (model) {
+        var parent = model.killer.parent();
+        parent.addClass("canEat");
+        model.killer.draggable('enable');
+
+    });
+}
+
+function RegularDrop(ui, box, color, figures, model, stepHub) {
     var col = box.css("background-color");
     if (col == "rgb(0, 128, 0)") {
         var x = box.data("xcoord"),
@@ -82,12 +121,34 @@ function Drop(ui, box, color, figures, model, stepHub) {
             y = 11 - y;
         }
         $.post("/Game/ChangeFigurePos", { model: { GameId: model.GameId, FigureId: ui.draggable.data("fig-id"), NewYPos: y, NewXPos: x } },
-            MakeAppend(box, ui, figures, stepHub, model),
-            "json");
+                MakeAppend(box, ui, figures, stepHub, model),
+                "json");
     }
 }
 
-function StopDrag(validBoxes, current) {
+function EatDrop(ui, box, color, figures, model, stepHub, killModels) {
+    RegularDrop(ui, box, color, figures, model, stepHub);
+    if ($(box).is(":has('img')")) {
+        var currentModel = killModels.filter(o => {
+            var $killer = o.killer;
+            return $killer.data("fig-id") == ui.draggable.data("fig-id")
+        });
+
+        var victimes = currentModel[0].victimes;
+        var fields = currentModel[0].freeSpaces;
+        var victim;
+        fields.forEach(function (elem, index, array) {
+            if ((elem.data("xcoord") == box.data("xcoord")) &&
+                (elem.data("ycoord") == box.data("ycoord"))){
+                victim = victimes[index];
+            }
+        });
+        victim.empty();
+
+    }
+}
+
+function StopRegularDrag(validBoxes, current) {
     validBoxes.forEach(function (elem) {
         elem.css("background-color", "#3B363A");
     });
@@ -97,7 +158,13 @@ function StopDrag(validBoxes, current) {
     return validBoxes;
 }
 
-function StartDrag(validBoxes, currentFigure) {
+function StopEatDrag(validBoxes, current) {
+    validBoxes = StopRegularDrag(validBoxes, current);
+
+    return validBoxes;
+}
+
+function StartRegularDrag(validBoxes, currentFigure) {
     currentFigure.css("z-index", "15");
     var validY = currentFigure.parent().data("ycoord") - 1;
     var validX_r = currentFigure.parent().data("xcoord") + 1;
@@ -107,6 +174,13 @@ function StartDrag(validBoxes, currentFigure) {
     validBoxes.push($left);
     validBoxes.push($right);
 
+    validBoxes.forEach(function (elem) {
+        elem.css("background-color", "green");
+    });
+}
+
+function StartEatDrag(validBoxes, currentFigure) {
+    currentFigure.css("z-index", "15");
     validBoxes.forEach(function (elem) {
         elem.css("background-color", "green");
     });
@@ -125,34 +199,42 @@ function MakeAppend(box, ui, figures, stepHub, model) {
     ui.draggable.css({ left: 0, top: 0 });
     $("#TurnStatusParag").html("Waiting for opponent's turn...");
     figures.draggable('disable');
+    $(".canEat").removeClass("canEat");
     stepHub.server.updateField(stepModel);
 }
 
-function ChangePos(step, figures) {
+function ChangePos(step, figures, boxes, color) {
     var newSquareX = 11 - step.newX;
     var newSquareY = 11 - step.newY;
-    var $newParent = $(".blackSquares[data-xcoord='" + newSquareX + "'][data-ycoord='" + newSquareY + "']");
-    var $currentFigure = $("img[data-fig-id='" + step.figureId + "']");
-    var $oldParent = $currentFigure.parent();
+    var newParent = $(".blackSquares[data-xcoord='" + newSquareX + "'][data-ycoord='" + newSquareY + "']");
+    var currentFigure = $("img[data-fig-id='" + step.figureId + "']");
+    var oldParent = currentFigure.parent();
 
-    var xOld = $oldParent.offset().left;
-    var xNew = $newParent.offset().left;
+    var xOld = oldParent.offset().left;
+    var xNew = newParent.offset().left;
 
-    var yOld = $oldParent.offset().top;
-    var yNew = $newParent.offset().top;
+    var yOld = oldParent.offset().top;
+    var yNew = newParent.offset().top;
 
-    var $figureClone = $currentFigure.clone();
-    $currentFigure.hide();
-    $newParent.append($currentFigure);
-    $oldParent.append($figureClone);
-    $figureClone.animate({
+    var figureClone = currentFigure.clone();
+    currentFigure.hide();
+    newParent.append(currentFigure);
+    killModels = getPotencialKillers(figures, boxes, color);
+    oldParent.append(figureClone);
+    var killModels;
+    figureClone.animate({
         left: xNew - xOld,
         top: yNew - yOld
     }, "slow", function () {
-        $oldParent.empty();
-        $currentFigure.show();
-        //getPotencialKillers($figures, $(".blackSquares"), $newParent, color);
-    });
-    figures.draggable('enable');
-    $("#TurnStatusParag").html("Now it's your turn!");
+        oldParent.empty();
+        currentFigure.show();  
+        });
+
+        $("#TurnStatusParag").html("Now it's your turn!");
+        return killModels;
+
+    
 }
+
+    
+

@@ -1,4 +1,4 @@
-﻿function getPotencialKillers(figures, boxes, newParent, color) {
+﻿function getPotencialKillers(figures, boxes, color) {
 
     var opponentColor = "White";
     var killModels = [];
@@ -25,6 +25,7 @@
         var anglesWithOpponentFigures = angles.has(".figure_" + opponentColor);
 
         var realFreeSpaces = [];
+        var victimes = [];
 
         anglesWithOpponentFigures.each(function () {
             var angleFig = $(this);
@@ -42,69 +43,21 @@
                 var real = potencialFreeSpace.not(":has(img)");
                 if (real.length != 0) {
                     realFreeSpaces.push(real);
+                    victimes.push(angleFig);
                 }
             }
         });
 
         if (realFreeSpaces.length != 0) {
-            killModels.push(new KillModel(currentFig, realFreeSpaces));
+            killModels.push(new KillModel(currentFig, realFreeSpaces, victimes));
         }
     });
 
-    if (killModels.length == 0) {
-        figures.draggable('enable');
-    }
-    else {
-        figures.draggable('disable');
-        killModels.forEach(function (model) {
-            model.killer.draggable('enable');
-            model.killer.parent().css("background-color", "#FFA900");
-        });
-    }
+    return killModels;
 }
 
-function KillModel(killer, victims) {
+function KillModel(killer, freeSpaces, victimes) {
     this.killer = killer;
-    this.victims = victims;
-}
-
-function EatMove(model) {
-
-    figures.draggable({
-        containment: $("#checkersTable"),
-        stop: function () {
-            var current = $(this);
-            model.forEach(function (m) {
-                m.killer.css("background-color", "FFA900");
-            });
-            current.css("z-index", "10");
-            current.css({ left: 0, top: 0 });
-        },
-        start: function () {
-            var currentFigure = $(this);
-            currentFigure.css("z-index", "15");
-            boxes.forEach(function (box) {
-                box.css("background-color", "green");
-            });
-
-        }
-    });
-
-    model.victims.droppable({
-        drop: function (event, ui) {
-            var box = $(this);
-            var col = box.css("background-color");
-            if (col == "rgb(0, 128, 0)") {
-                var x = box.data("xcoord"),
-                    y = box.data("ycoord");
-                if (color == "Black") {
-                    x = 11 - x;
-                    y = 11 - y;
-                }
-                $.post("/Game/ChangeFigurePos", { model: { GameId: model.GameId, FigureId: ui.draggable.data("fig-id"), NewYPos: y, NewXPos: x } },
-                    MakeAppend(box, ui, $figures, stepHub, model),
-                    "json");
-            }
-        }
-    })
+    this.freeSpaces = freeSpaces;
+    this.victimes = victimes;
 }
