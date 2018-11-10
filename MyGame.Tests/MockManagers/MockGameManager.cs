@@ -19,7 +19,7 @@ namespace MyGame.Tests.MockManagers
 
             Setup(m => m.CreateAsync(
                 It.IsAny<Game>()))
-                .ReturnsAsync(true).Callback((Game t) => t.Id = 2);
+                .ReturnsAsync(true).Callback((Game t) => { t.Id = 2; t.Table = ServiceDataToUse.Table; });
             return this;
         }
 
@@ -80,6 +80,41 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
+        public MockGameManager MockAddOpponentToGame()
+        {
+            Setup(m => m.AddOpponentToGame(
+                It.IsAny<int>(),
+                It.IsAny<ApplicationUser>()))
+                .ReturnsAsync((Game)null);
+
+            Setup(m => m.AddOpponentToGame(
+                It.Is<int>(gId => gId == ServiceDataToUse.Game.Id),
+                It.Is<ApplicationUser>(u => (u.Id == ServiceDataToUse.User.Id) &&
+                                  (ServiceDataToUse.Game.Opponents.Count != 2))))
+                .ReturnsAsync(ServiceDataToUse.Game).Callback<int, ApplicationUser>((gId, u) =>
+                {
+                    if(!ServiceDataToUse.Game.Opponents.Select(o => o.Id).Contains(u.Id))
+                        ServiceDataToUse.Game.Opponents.Add(ServiceDataToUse.User.Clone());
+                });
+
+            return this;
+        }
+
+        public MockGameManager MockTurnChange()
+        {
+            Setup(m => m.TurnChange(
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            Setup(m => m.TurnChange(
+                It.Is<int>(g => g == ServiceDataToUse.Game.Id),
+                It.IsAny<int>()))
+                .ReturnsAsync(true);
+
+            return this;
+
+        }
         #region HELPERS
 
         private IQueryable<Game> GetDbSetGames(List<Game> tables)

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using MyGame.Models;
 using MyGame.Infrastructure;
 using MyGame.BLL.Infrastructure;
+using MyGame.Real_time;
+using MyGame.DAL.Entities;
 
 namespace MyGame.Controllers
 {
@@ -75,7 +77,7 @@ namespace MyGame.Controllers
         [Authorize]
         public ViewResult GameList(string gameType)
         {
-            TableActionModel tableAction = new TableActionModel();
+            GameActionModel tableAction = new GameActionModel();
             if (gameType == "all")
                 tableAction.ActionName = "/Game/GetAllGames";
 
@@ -117,7 +119,6 @@ namespace MyGame.Controllers
         /// Returns all table.
         /// </summary>
         /// <returns>Json object for table list.</returns>
-
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<JsonResult> GetAllGames()
@@ -148,19 +149,42 @@ namespace MyGame.Controllers
         }
         #endregion
 
-        #region CREATE_TABLE
+        #region CREATE_TABLE_POST
         /// <summary>
         /// Creates new table for user.
         /// </summary
-        public async Task<ActionResult> CreateNewGame()
+        [HttpPost]
+        public async Task<ActionResult> CreateNewGame(NewGameModel model)
         {
-            UserDTO user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
+            var user = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
+            if(user == null)
+                throw new HttpException(503, "Unexpected error.");
 
-            OperationDetails details = await GameService.CreateNewGame(user);
-            if(details.Succedeed)
-                return RedirectToAction("GameList", "Game", new { gameType = "myGames" });
+            var newGameDTO = new GameDTO
+            {
+                Opponents = new List<UserDTO> { user },
+                BlackPlayerId = model.FirstColor == "Black" ? user.Id : 0,
+                WhitePlayerId = model.FirstColor == "White" ? user.Id : 0,
+            };
 
-            return null;
+            var createdGameDTO = await GameService.CreateNewGame(newGameDTO);
+            if(createdGameDTO == null)
+                throw new HttpException(503, "Unexpected error.");
+
+            return RedirectToAction("EnterGame", new { gameId = createdGameDTO.Id});
+            
+        }
+        #endregion
+
+        #region CREATE_TABLE_GET
+        /// <summary>
+        /// Shows form for creating new game.
+        /// </summary>
+        /// <returns>Form view.</returns>
+        [HttpGet]
+        public ActionResult CreateNewGame()
+        {
+            return View("CreateGameForm");
         }
         #endregion
 
@@ -177,8 +201,81 @@ namespace MyGame.Controllers
             OperationDetails details = await GameService.DeteteGame(new GameDTO {Id = id });
 
             if (!details.Succedeed)
-                throw new HttpException(403, "Error while deleting");
+                throw new HttpException(403, details.ErrorMessage);
 
+        }
+        #endregion
+
+        #region ENTER_GAME
+        /// <summary>
+        /// Enter game with some id.
+        /// </summary>
+        /// <param name="gameId">Id of game to enter.</param>
+        public async Task<ActionResult> EnterGame(int gameId)
+        {
+            var user = new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name };
+            var game = new GameDTO { Id = gameId };
+
+            var joinResult = await GameService.JoinGame(user, game);
+
+            if (!joinResult.Succedeed)
+                throw new HttpException(400, joinResult.ErrorMessage);
+
+            var figures = await GameService.GetFiguresOnTable(game);
+            if (figures == null)
+                throw new HttpException(404, "Unexpected error");
+
+            var gameModel = new GameModel
+            {
+                ThisPlayerId = user.Id,
+                GameId = game.Id,
+                BlackId = game.BlackPlayerId,
+                WhiteId = game.WhitePlayerId,
+                Figures = await GameService.GetFiguresOnTable(game),
+                isMyTurn = (game.LastTurnPlayerId != user.Id),
+                MyName = user.UserName
+
+            };
+            var opponentName = game.Opponents.FirstOrDefault(o => o.UserName != user.UserName);
+            if (opponentName != null)
+                gameModel.OpponentName = opponentName.UserName;
+
+            return View("SingleTable", gameModel);
+
+        }
+        #endregion
+
+        #region CHANGE_FIG_POS
+        [HttpPost]
+        public async Task ChangeField(StepModel model)
+        {
+            var changePosDetails = await GameService.ChangeFigurePos(new FigureDTO
+            {
+                Id = int.Parse(model.FigureId),
+                XCoord = int.Parse(model.NewXPos),
+                YCoord = int.Parse(model.NewYPos)
+            });
+            var opponent = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
+
+            if (opponent == null)
+                throw new HttpException(404, "Error while searching user in database");
+
+            var changeTurnQueryDetails = await GameService.ChangeTurnPriority(new GameDTO
+            {
+                Id = int.Parse(model.GameId),
+                LastTurnPlayerId = opponent.Id
+            });
+
+            if(model.FigureIdToDelete != null)
+            {
+                var figId = int.Parse(model.FigureIdToDelete);
+                var deleteFigureDetails = await GameService.DeleteFigure(new FigureDTO { Id = figId });
+                if(!deleteFigureDetails.Succedeed)
+                    throw new HttpException(404, deleteFigureDetails.ErrorMessage);
+            }
+
+            if (!changePosDetails.Succedeed || !changeTurnQueryDetails.Succedeed)
+                throw new HttpException(404, changePosDetails.ErrorMessage + " " + changeTurnQueryDetails.ErrorMessage);
         }
         #endregion
     }

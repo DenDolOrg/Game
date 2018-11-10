@@ -30,10 +30,20 @@ namespace MyGame.Tests
         public void RoutesGameListTest()
         {
             TestRouteMatch("~/Game/GameList/Some", "Game", "GameList", new { gameType = "Some" });
-            TestRouteMatch("~/Game/GameList", "Game", "GameList");
+            TestRouteMatch("~/Game/GameList", "Game", "GameList", new { gameType = "myGames" });
 
             TestRouteFail("~/Game/GameList/Test3/123");
         }
+
+        [TestMethod()]
+        public void RoutesGameTableTest()
+        {
+            TestRouteMatch("~/Game/EnterGame/2", "Game", "EnterGame", new { gameId = "2" });
+            TestRouteMatch("~/Game/EnterGame", "Game", "EnterGame", new { gameId = "0" });
+
+            TestRouteFail("~/Game/EnterGame/Test3/123");
+        }
+
 
         #region HELPERS
         private HttpContextBase CreateHttpContext(string targetUrl = null, string httpMethod = "GET")
@@ -75,10 +85,11 @@ namespace MyGame.Tests
         private bool TestIncomingRouteResult(RouteData routeResult,
                                             string controller, string action, object propertySet = null)
         {
-            Func<object, object, bool> valCompare = (v1, v2) => {
+            bool valCompare(object v1, object v2)
+            {
                 return StringComparer.InvariantCultureIgnoreCase
                 .Compare(v1, v2) == 0;
-            };
+            }
             bool result = valCompare(routeResult.Values["controller"], controller)
             && valCompare(routeResult.Values["action"], action);
             if (propertySet != null)

@@ -14,6 +14,24 @@ namespace MyGame.Tests.Models
         public static Table Table { get; set; }
         public static Figure Figure { get; set; }
 
+        public static ApplicationUser Clone(this ApplicationUser user)
+        {
+            var clone = new ApplicationUser
+            {
+                Id = User.Id,
+                Email = User.Email,
+                PlayerProfile = new PlayerProfile
+                {
+                    Id = User.PlayerProfile.Id,
+                    Name = User.PlayerProfile.Name,
+                    Surname = User.PlayerProfile.Surname
+                },
+                PasswordHash = User.PasswordHash
+            };
+
+            return clone;
+        }
+
         public static void SetData()
         {
             SetUser();
@@ -32,7 +50,7 @@ namespace MyGame.Tests.Models
 
             game.Opponents.Add(User);
             Game = game;
-            Figure.Game = Game;
+            Figure.Table = Table;
         }
         private static void SetUser()
         {
@@ -56,7 +74,8 @@ namespace MyGame.Tests.Models
         {
             Table table = new Table
             {
-                Id = 1
+                Id = 1,
+                CreationTime = DateTime.Now
             };
 
             Table = table;

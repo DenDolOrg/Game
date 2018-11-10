@@ -90,9 +90,59 @@ namespace MyGame.DAL.Repositories
             return games;
         }
         #endregion
+
+        #region ADD_OPPONENT
+        public async Task<Game> AddOpponentToGame(int gameId, ApplicationUser user)
+        {
+            Game game;
+            
+            try
+            {
+                game = await Database.Games.FindAsync(gameId);
+                if (game == null)
+                    return null;
+
+                if (game.Opponents.Count != 2)
+                    game.Opponents.Add(user);
+                else
+                {
+                    if (!game.Opponents.Select(o => o.Id).Contains(user.Id))
+                        return null;
+                }
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return null;
+            }
+            return game;
+        }
+        #endregion
+
+        #region TURN_CHANGE
+        public async Task<bool> TurnChange(int gameId, int userId)
+        {
+            var game = await Database.Games.FindAsync(gameId);
+            if (game == null)
+                return false;
+
+            game.LastTurnPlayerId = userId;
+            try
+            {
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+        #endregion
         public void Dispose()
         {
             Database.Dispose();
         }
+
+
     }
 }

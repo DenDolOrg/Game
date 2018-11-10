@@ -17,7 +17,7 @@ namespace MyGame.Tests.Services
 {
     internal class MockUserService : Mock<IUserService>
     {
-        internal MockUserService MockAuthenticate()
+        public MockUserService MockAuthenticate()
         {
             Setup(m => m.Authenticate(
                 It.Is<UserDTO>(u => u.Email == ControllerDataToUse.UserDTO.Email && u.Password == ControllerDataToUse.UserDTO.Password )))
@@ -25,7 +25,7 @@ namespace MyGame.Tests.Services
             return this;
         }
 
-        internal MockUserService MockCreate()
+        public MockUserService MockCreate()
         {
             Setup(m => m.Create(
                 It.IsAny<UserDTO>()
@@ -37,7 +37,7 @@ namespace MyGame.Tests.Services
             return this;
         }
 
-        internal MockUserService MockDelete()
+        public MockUserService MockDelete()
         {
             Setup(m => m.Delete(
                 It.IsAny<UserDTO>()
@@ -49,13 +49,13 @@ namespace MyGame.Tests.Services
             return this;
         }
 
-        internal MockUserService GetAllUsers()
+        public MockUserService MockGetAllUsers()
         {
             Setup(m => m.GetAllUsers()).ReturnsAsync(new List<UserDTO> { ControllerDataToUse.UserDTO });
             return this;
         }
 
-        internal MockUserService GetUser()
+        public MockUserService MockGetUser()
         {
             Setup(m => m.GetUser(
                 It.IsAny<UserDTO>()
@@ -63,7 +63,7 @@ namespace MyGame.Tests.Services
 
             Setup(m => m.GetUser(
                 It.Is<UserDTO>(u => u.UserName == ControllerDataToUse.UserDTO.UserName)))
-                                     .ReturnsAsync(ControllerDataToUse.UserDTO);
+                .ReturnsAsync(ControllerDataToUse.UserDTO);
             return this;
         }
 

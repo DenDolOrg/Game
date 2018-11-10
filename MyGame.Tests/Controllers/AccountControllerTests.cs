@@ -8,6 +8,7 @@ using System.Web.Helpers;
 using MyGame.Tests.MockManagers;
 using MyGame.Tests.Models;
 using System.Collections.Generic;
+using System.Web;
 
 namespace MyGame.Controllers.Tests
 {
@@ -152,12 +153,10 @@ namespace MyGame.Controllers.Tests
 
             //Act
             AccountController accountController = new AccountController(mockUserService.Object, mockTableService.Object);
-            bool goodResult = await accountController.Delete(user_good.Id);
-            bool badResult = await accountController.Delete(user_bad.Id);
+            await accountController.Delete(user_good.Id);
 
             //Assert
-            Assert.IsTrue(goodResult, "Failed when it was good user Id");
-            Assert.IsFalse(badResult, "Passed when it was bad user Id");
+            await Assert.ThrowsExceptionAsync<HttpException>( async() => await accountController.Delete(user_bad.Id), "Can delete user with invalid id.");
         }
         #endregion
 
@@ -182,7 +181,7 @@ namespace MyGame.Controllers.Tests
         {
             //Arrange
             var mockUserService = new MockUserService()
-                .GetAllUsers();
+                .MockGetAllUsers();
 
             //Act
             AccountController accountController = new AccountController(mockUserService.Object);

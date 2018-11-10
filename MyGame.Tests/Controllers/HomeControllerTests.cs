@@ -39,7 +39,7 @@ namespace MyGame.Controllers.Tests
             string fullName = ControllerDataToUse.UserDTO.Name + " " + ControllerDataToUse.UserDTO.Surname;
 
             var mockUserService = new MockUserService()
-                .GetUser();
+                .MockGetUser();
 
 
             //Act_1

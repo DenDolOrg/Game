@@ -9,14 +9,12 @@
 
     $http.get(actionAddress).then(function (data) {
         $scope.gameList = data;
-        $scope.opponent_1 = data.data[0].Opponents;
-        $scope.opponent_2 = data.data[0].Opponents;
     }, function () {
             alert("Unexpected error occurred.");
         });
        
 
-    $scope.DeteleTable = function (gameModel) {
+    $scope.DeteleGame = function (gameModel) {
         if (confirm("Are you sure you want to detete this table?"))
         {
             $http.delete("/Game/Delete/" + gameModel.Id).then(function SuccessDeleteGame() {
@@ -26,7 +24,5 @@
                 alert("Unexpected error occurred.");
             });
         }
-    };
-    
-    
+    }; 
 });

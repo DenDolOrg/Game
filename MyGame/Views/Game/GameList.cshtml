@@ -1,4 +1,4 @@
-﻿@model MyGame.Models.TableActionModel
+﻿@model MyGame.Models.GameActionModel
 
 @{
     ViewBag.Title = "Table";
@@ -9,7 +9,7 @@
     <script type="text/javascript">
         var actionAddress = @Html.Raw(Json.Encode(Model.ActionName));
     </script>
-    <script src="~/Scripts/GameController.js"></script>
+
 }
 
 <h1>List of tables:</h1>
@@ -38,10 +38,10 @@
                 </td>
                 <td>
                     <div class="btn-group">
-                        <a href="#" ng-click="DeteleTable(gameModel)" class="btn btn-secondary btn-warning btn-sm">Join</a>
+                        <a href="~/Game/EnterGame/{{gameModel.Id}}" class="btn btn-secondary btn-warning btn-sm">Join</a>
                         @if (HttpContext.Current.User.IsInRole("admin"))
                         {
-                            <a href="#" ng-click="DeteleTable(gameModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
+                            <a href="#" ng-click="DeteleGame(gameModel)" class="btn btn-secondary btn-danger btn-sm">Delete</a>
                         }
                     </div>
 
@@ -50,3 +50,5 @@
         </tbody>
     </table>
 </div>
+
+<script src="~/Scripts/GameController.js"></script>

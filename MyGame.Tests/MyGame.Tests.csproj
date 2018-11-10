@@ -125,7 +125,7 @@
     <Compile Include="App_Start\RouteConfigTests.cs" />
     <Compile Include="Controllers\AccountControllerTests.cs" />
     <Compile Include="Controllers\HomeControllerTests.cs" />
-    <Compile Include="Controllers\TableControllerTests.cs" />
+    <Compile Include="Controllers\GameControllerTests.cs" />
     <Compile Include="MockHelpers\MockDbAsyncResolver.cs" />
     <Compile Include="MockHelpers\MockDbSet.cs" />
     <Compile Include="MockHelpers\MockHttpContext.cs" />

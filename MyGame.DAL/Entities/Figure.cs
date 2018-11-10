@@ -19,8 +19,8 @@ namespace MyGame.DAL.Entities
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("Game")]
-        public int GameId { get; set; }
+        [ForeignKey("Table")]
+        public int TableId { get; set; }
 
         /// <summary>
         /// Figure color.
@@ -40,6 +40,6 @@ namespace MyGame.DAL.Entities
         /// <summary>
         /// Table of current fugure.
         /// </summary>
-        public virtual Game Game { get; set; }
+        public virtual Table Table { get; set; }
     }
 }

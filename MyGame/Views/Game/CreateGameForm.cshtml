@@ -1,0 +1,17 @@
+﻿@model MyGame.Models.NewGameModel
+
+@{
+    ViewBag.Title = "CreateGameForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("CreateNewGame", "Game", FormMethod.Post))
+{
+    <div>
+        @Html.RadioButtonFor(m => m.FirstColor, "Black") Black
+        @Html.RadioButtonFor(m => m.FirstColor, "White") White
+    </div>
+
+
+    <input type="submit" value="Create" id="new_game_submmit_btn" />
+}

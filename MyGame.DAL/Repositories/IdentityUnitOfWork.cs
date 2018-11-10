@@ -34,39 +34,17 @@ namespace MyGame.DAL.Repositories
             FigureManager = new FigureManager(db);
         }
 
-        /// <summary>
-        /// User manager.
-        /// </summary>
-        /// <seealso cref="ApplicationUserManager"/>
         public ApplicationUserManager UserManager { get; }
 
-        /// <summary>
-        /// Role manager.
-        /// </summary>
-        /// /// <seealso cref="ApplicationRoleManager"/>
         public ApplicationRoleManager RoleManager { get; }
 
-        /// <summary>
-        /// Player manager.
-        /// </summary>
-        /// <seealso cref="ApplicationRoleManager"/>
         public IPlayerManager PlayerManager { get; }
 
-        /// <summary>
-        /// Table manager.
-        /// </summary>
         public IGameManager GameManager { get; }
 
-        /// <summary>
-        /// Figure manager.
-        /// </summary>
         public IFigureManager FigureManager { get; }
 
-        /// <summary>
-        /// Table manager.
-        /// </summary>
         public ITableManager TableManager { get; }
-
 
         public async Task SaveChangesAsync()
         {

@@ -39,7 +39,6 @@ namespace MyGame.App_Start
         /// <param name="app">Default appication builder instance of <see cref="IAppBuilder"/></param>
         public void Configuration(IAppBuilder app)
         {
-
             app.CreatePerOwinContext(CreareUserService);
             app.CreatePerOwinContext(CreareGameService);
             app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -57,6 +56,7 @@ namespace MyGame.App_Start
                 }
             });
             CreateDefaultRoles(CreareUserService()).Wait();
+            app.MapSignalR();
         }
 
         #region CREATORS

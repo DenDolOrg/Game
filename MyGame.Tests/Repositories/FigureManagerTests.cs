@@ -27,7 +27,8 @@ namespace MyGame.DAL.Repositories.Tests
             //Arrange
             MockApplicationContext context = new MockApplicationContext()
                 .MockGames()
-                .MockFigures();       
+                .MockTables()
+                .MockFigures();
             //Act
             FigureManager manager = new FigureManager(context.Object);
             var result_good = await manager.CreateAsync(ServiceDataToUse.Table.Id);
@@ -73,5 +74,37 @@ namespace MyGame.DAL.Repositories.Tests
             Assert.AreEqual(result_good.Count(), 1, "Failed while taking figures for valid table.");
         }
         #endregion
+
+        [TestMethod()]
+        public async Task FindByIdAsyncTest()
+        {
+            //Arrange
+            MockApplicationContext context = new MockApplicationContext()
+                .MockFigures();
+            //Act
+            FigureManager manager = new FigureManager(context.Object);
+            var result_good = await manager.FindByIdAsync(ServiceDataToUse.Figure.Id);
+            var result_bad = await manager.FindByIdAsync(123);
+
+            //Assert
+            Assert.IsNotNull(result_good, "Failed while getting figure with valid id.");
+            Assert.IsNull(result_bad, "Can get figure with invalid id.");
+        }
+
+        [TestMethod()]
+        public async Task DeleteSingleFigureAsyncTest()
+        {
+            //Arrange
+            MockApplicationContext context = new MockApplicationContext()
+                .MockFigures();
+            //Act
+            FigureManager manager = new FigureManager(context.Object);
+            var result_good = await manager.DeleteSingleFigureAsync(ServiceDataToUse.Figure.Id);
+            var result_bad = await manager.DeleteSingleFigureAsync(123);
+
+            //Assert
+            Assert.IsTrue(result_good, "Failed while deleting figure with valid id.");
+            Assert.IsFalse(result_bad, "Can delete figure with invalid id.");
+        }
     }
 }

@@ -23,14 +23,14 @@ namespace MyGame.DAL.Repositories
         }
 
         #region CREATE
-        public async Task<bool> CreateAsync(int gameId)
+        public async Task<bool> CreateAsync(int tableId)
         {
-            Game game = await Database.Games.FindAsync(gameId);         
-            if (game == null)
+            Table table = await Database.Tables.FindAsync(tableId);         
+            if (table == null)
                 return false;
             try
             {
-                Database.Figures.AddRange(SetFigures(game));
+                Database.Figures.AddRange(SetFigures(table));
                 await Database.SaveChangesAsync();
             }
             catch
@@ -43,9 +43,9 @@ namespace MyGame.DAL.Repositories
         #endregion
 
         #region DELETE
-        public async Task<bool> DeleteAsync(int gameId)
+        public async Task<bool> DeleteAsync(int tableId)
         {
-            IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Game.Id == gameId);
+            IEnumerable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
             if (tableFigures == null)
                 return false;
 
@@ -65,18 +65,19 @@ namespace MyGame.DAL.Repositories
         #endregion
 
         #region FIGURES_ON_TABLE
-        public IQueryable<Figure> GetFiguresForTable(int gameId)
+        public IQueryable<Figure> GetFiguresForTable(int tableId)
         {
-            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Game.Id == gameId);
+            IQueryable<Figure> tableFigures = Database.Figures.Where(f => f.Table.Id == tableId);
 
             return tableFigures;
         }
         #endregion
+
         #region HELPERS
         /// <summary>
         /// Set figures start position.
         /// </summary>
-        private ICollection<Figure> SetFigures(Game game)
+        private ICollection<Figure> SetFigures(Table table)
         {
             List<Figure> figures = new List<Figure>();
             Colors color = Colors.Black;
@@ -96,7 +97,7 @@ namespace MyGame.DAL.Repositories
                     figures.Add(new Figure
                     {
                         Color = color,
-                        Game = game,
+                        Table = table,
                         X = xCoord,
                         Y = yCoord + y0
                     });
@@ -108,12 +109,37 @@ namespace MyGame.DAL.Repositories
         }
         #endregion
 
+        #region FIND_BY_ID
+        public async Task<Figure> FindByIdAsync(int figureId)
+        {
+            return await Database.Figures.FindAsync(figureId);
+        }
+        #endregion
 
+        #region DELETE_SINGLE_FIGURE
+        public async Task<bool> DeleteSingleFigureAsync(int figureId)
+        {
+            var figure = await Database.Figures.FindAsync(figureId);
+            if (figure == null)
+                return false;
+            try
+            {
+                Database.Figures.Remove(figure);
+                await Database.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
 
+            return true;
+        }
+        #endregion
 
         public void Dispose()
         {
             Database.Dispose();
         }
+
     }
 }

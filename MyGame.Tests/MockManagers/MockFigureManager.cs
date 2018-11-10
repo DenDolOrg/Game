@@ -49,9 +49,36 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
+        public MockFigureManager MockFindByIdAsync()
+        {
+            Setup(m => m.FindByIdAsync(
+                It.IsAny<int>()))
+                .ReturnsAsync((Figure)null);
+
+            Setup(m => m.FindByIdAsync(
+                It.Is<int>(id => id == ServiceDataToUse.Figure.Id)))
+                .ReturnsAsync(ServiceDataToUse.Figure);
+            return this;
+        }
+
+        public MockFigureManager MockDeleteSingleFigureAsync()
+        {
+            Setup(m => m.DeleteSingleFigureAsync(
+                It.IsAny<int>()))
+                .ReturnsAsync(false);
+
+            Setup(m => m.DeleteSingleFigureAsync(
+                It.Is<int>(id => id == ServiceDataToUse.Figure.Id)))
+                .ReturnsAsync(true);
+
+            return this;
+        }
+
         private IQueryable<Figure> GetDbSetFigures(List<Figure> figures)
         {
             return MockDbSet.GetDataSet(figures).Object;
         }
+
+
     }
 }

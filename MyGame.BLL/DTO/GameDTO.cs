@@ -22,7 +22,22 @@ namespace MyGame.BLL.DTO
         public string CreationTime { get; set; }
 
         /// <summary>
-        /// Table figures data.
+        /// Id of player who plays with white figures.
+        /// </summary>
+        public int WhitePlayerId { get; set; }
+
+        /// <summary>
+        /// Id of player who plays with black figures.
+        /// </summary>
+        public int BlackPlayerId { get; set; }
+
+        /// <summary>
+        /// Id of player who has made last turn.
+        /// </summary>
+        public int LastTurnPlayerId { get; set; }
+
+        /// <summary>
+        /// Opponents data.
         /// </summary>
         public ICollection<UserDTO> Opponents { get; set; }
 
