@@ -27,6 +27,11 @@ namespace MyGame.BLL.DTO
         public int YCoord { get; set; }
 
         /// <summary>
+        /// Super figure status
+        /// </summary>
+        public bool IsSuperFigure { get; set; }
+
+        /// <summary>
         /// Figure color.
         /// </summary>
         public string Color { get; set; }

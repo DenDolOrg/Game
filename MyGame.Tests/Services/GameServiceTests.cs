@@ -337,12 +337,12 @@ namespace MyGame.BLL.Services.Tests
         }
 
         [TestMethod()]
-        public async Task DeleteFigureTest()
+        public async Task DeleteFiguresTest()
         {
             //Arrange
 
             figureManager = new MockFigureManager()
-                .MockDeleteSingleFigureAsync();
+                .MockDeleteSomeFiguresAsync();
 
             Work.SetManagers(null, null, null, figureManager);
 
@@ -352,8 +352,8 @@ namespace MyGame.BLL.Services.Tests
             //Act
             var service = new GameService(Work.Object);
 
-            var result_good = await service.DeleteFigure(figure_good);
-            var result_bad = await service.DeleteFigure(figure_bad);
+            var result_good = await service.DeleteFigures(new List<FigureDTO> { figure_good });
+            var result_bad = await service.DeleteFigures(new List<FigureDTO> { figure_bad });
 
             //Assert
             Assert.IsTrue(result_good.Succedeed, "Error while delting figure with valid id");

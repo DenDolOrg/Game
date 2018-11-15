@@ -21,8 +21,20 @@ namespace MyGame
                          "~/Scripts/Bibles/angular.min.js"
                         ));
 
+            bundles.Add(new ScriptBundle("~/bundles/BiblesForGame").Include(
+                        "~/Scripts/Bibles/jquery-ui-1.12.1.min.js",
+                        "~/Scripts/Bibles/jquery.signalR-2.3.0.min.js",
+                        "~/Scripts/Bibles/jquery.ui.touch-punch.js"
+                        ));
+
+            bundles.Add(new ScriptBundle("~/bundles/FunctionsForGame").Include(
+                        "~/Scripts/FillTableFithFigures.js",
+                        "~/Scripts/makeMove.js",
+                        "~/Scripts/eatFigure.js"
+                        ));
+
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/Scripts/Bibles/jquery.validate*"));
+                    "~/Scripts/Bibles/jquery.validate*"));
 
             bundles.Add(new StyleBundle("~/bundles/RegLog").Include(
                       "~/Content/RegistrationAndLogin.css"));

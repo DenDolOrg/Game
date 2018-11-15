@@ -153,12 +153,12 @@ namespace MyGame.Tests.Services
 
         public MockGameService MockDeleteFigure()
         {
-            Setup(m => m.DeleteFigure(
-                It.IsAny<FigureDTO>()))
+            Setup(m => m.DeleteFigures(
+                It.IsAny<ICollection<FigureDTO>>()))
                 .ReturnsAsync(new OperationDetails(false));
 
-            Setup(m => m.DeleteFigure(
-               It.Is<FigureDTO>(f => f.Id == ControllerDataToUse.FigureDTO.Id)))
+            Setup(m => m.DeleteFigures(
+               It.Is<ICollection<FigureDTO>>(f => f.First().Id == ControllerDataToUse.FigureDTO.Id)))
                .ReturnsAsync(new OperationDetails(true));
 
             return this;

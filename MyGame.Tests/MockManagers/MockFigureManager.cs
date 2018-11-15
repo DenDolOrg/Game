@@ -61,14 +61,14 @@ namespace MyGame.Tests.MockManagers
             return this;
         }
 
-        public MockFigureManager MockDeleteSingleFigureAsync()
+        public MockFigureManager MockDeleteSomeFiguresAsync()
         {
-            Setup(m => m.DeleteSingleFigureAsync(
-                It.IsAny<int>()))
+            Setup(m => m.DeleteSomeFiguresAsync(
+                It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(false);
 
-            Setup(m => m.DeleteSingleFigureAsync(
-                It.Is<int>(id => id == ServiceDataToUse.Figure.Id)))
+            Setup(m => m.DeleteSomeFiguresAsync(
+                It.Is<IEnumerable<int>>(id => id.First() == ServiceDataToUse.Figure.Id)))
                 .ReturnsAsync(true);
 
             return this;

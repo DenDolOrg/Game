@@ -28,7 +28,7 @@ namespace MyGame.DAL.Interfaces
         /// </summary>
         /// <param name="figureId">Figure's id.</param>
         /// <returns><see cref="Figure"/></returns>
-        Task<bool> DeleteSingleFigureAsync(int figureId);
+        Task<bool> DeleteSomeFiguresAsync(IEnumerable<int> figureIds);
 
 
 

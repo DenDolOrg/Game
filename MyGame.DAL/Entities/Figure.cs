@@ -38,8 +38,18 @@ namespace MyGame.DAL.Entities
         public int Y { get; set; }
 
         /// <summary>
+        /// Super figure status.
+        /// </summary>
+        public bool IsSuperFigure { get; set; }
+
+        /// <summary>
         /// Table of current fugure.
         /// </summary>
         public virtual Table Table { get; set; }
+
+        public Figure()
+        {
+            IsSuperFigure = false;
+        }
     }
 }

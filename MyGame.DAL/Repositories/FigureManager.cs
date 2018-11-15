@@ -117,14 +117,20 @@ namespace MyGame.DAL.Repositories
         #endregion
 
         #region DELETE_SINGLE_FIGURE
-        public async Task<bool> DeleteSingleFigureAsync(int figureId)
+        public async Task<bool> DeleteSomeFiguresAsync(IEnumerable<int> figureIds)
         {
-            var figure = await Database.Figures.FindAsync(figureId);
-            if (figure == null)
-                return false;
+            var figuresToDelete = new List<Figure>();
+            foreach (var id in figureIds)
+            {
+                var figure = await Database.Figures.FindAsync(id);
+                if (figure == null)
+                    return false;
+                figuresToDelete.Add(figure);
+            }
+           
             try
             {
-                Database.Figures.Remove(figure);
+                Database.Figures.RemoveRange(figuresToDelete);
                 await Database.SaveChangesAsync();
             }
             catch

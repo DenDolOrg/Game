@@ -36,13 +36,14 @@ namespace MyGame.Real_time
         public string FigureId { get; set; }
 
         [JsonProperty("figureDelId")]
-        public string FigureIdToDelete { get; set; }
+        public string FigureIdsToDelete { get; set; }
 
-        [JsonProperty("newX")]
-        public string NewXPos { get; set; }
+        [JsonProperty("coordsToMove")]
+        public string CoordsToMove { get; set; }
 
-        [JsonProperty("newY")]
-        public string NewYPos { get; set; }
+        [JsonProperty("superFigStatus")]
+        public string NewSuperFigureStatus { get; set; }
+
     }
 
     public class JoinSignalModel

@@ -13,6 +13,8 @@ using MyGame.Infrastructure;
 using MyGame.BLL.Infrastructure;
 using MyGame.Real_time;
 using MyGame.DAL.Entities;
+using System.Web.Script.Serialization;
+using System.Net;
 
 namespace MyGame.Controllers
 {
@@ -247,13 +249,18 @@ namespace MyGame.Controllers
 
         #region CHANGE_FIG_POS
         [HttpPost]
-        public async Task ChangeField(StepModel model)
+        public async Task ChangeField(StepModel data)
         {
+            StepModel model = data;
+            var coordPairs = model.CoordsToMove.Split(';').ToList().Last().Split(',');
+            var newX = coordPairs[0];
+            var newY = coordPairs[1];
             var changePosDetails = await GameService.ChangeFigurePos(new FigureDTO
             {
                 Id = int.Parse(model.FigureId),
-                XCoord = int.Parse(model.NewXPos),
-                YCoord = int.Parse(model.NewYPos)
+                XCoord = int.Parse(newX),
+                YCoord = int.Parse(newY),
+                IsSuperFigure = (model.NewSuperFigureStatus == "0") ? false : true
             });
             var opponent = await UserService.GetUser(new UserDTO { UserName = HttpContextManager.Current.User.Identity.Name });
 
@@ -266,10 +273,14 @@ namespace MyGame.Controllers
                 LastTurnPlayerId = opponent.Id
             });
 
-            if(model.FigureIdToDelete != null)
+            if(model.FigureIdsToDelete != null)
             {
-                var figId = int.Parse(model.FigureIdToDelete);
-                var deleteFigureDetails = await GameService.DeleteFigure(new FigureDTO { Id = figId });
+                var idStrList = model.FigureIdsToDelete.Split(',').ToList();
+                var listOfFigureDTOs = new List<FigureDTO>();
+                foreach(var i in idStrList)
+                    listOfFigureDTOs.Add(new FigureDTO { Id = int.Parse(i) });
+
+                var deleteFigureDetails = await GameService.DeleteFigures(listOfFigureDTOs);
                 if(!deleteFigureDetails.Succedeed)
                     throw new HttpException(404, deleteFigureDetails.ErrorMessage);
             }

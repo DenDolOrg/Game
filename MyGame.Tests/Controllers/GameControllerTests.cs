@@ -229,45 +229,40 @@ namespace MyGame.Controllers.Tests
             var step_good_1 = new StepModel
             {
                 FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
-                NewXPos = "2",
-                NewYPos = "3",
+                CoordsToMove = "2,3",
                 GameId = ControllerDataToUse.GameDTO.Id.ToString(),
-                FigureIdToDelete = null
+                FigureIdsToDelete = null
             };
 
             var step_good_2 = new StepModel
             {
                 FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
-                NewXPos = "2",
-                NewYPos = "3",
+                CoordsToMove = "2,3",
                 GameId = ControllerDataToUse.GameDTO.Id.ToString(),
-                FigureIdToDelete = ControllerDataToUse.FigureDTO.Id.ToString()
+                FigureIdsToDelete = ControllerDataToUse.FigureDTO.Id.ToString()
             };
 
             var step_bad_1 = new StepModel
             {
                 FigureId = "123",
-                NewXPos = "2",
-                NewYPos = "3",
+                CoordsToMove = "2,3",
                 GameId = ControllerDataToUse.GameDTO.Id.ToString(),
-                FigureIdToDelete = null
+                FigureIdsToDelete = null
             };
 
             var step_bad_2 = new StepModel
             {
                 FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
-                NewXPos = "2",
-                NewYPos = "3",
+                CoordsToMove = "2,3",
                 GameId = "123",
-                FigureIdToDelete = null
+                FigureIdsToDelete = null
             };
             var step_bad_3 = new StepModel
             {
                 FigureId = ControllerDataToUse.FigureDTO.Id.ToString(),
-                NewXPos = "2",
-                NewYPos = "3",
+                CoordsToMove = "2,3",
                 GameId = ControllerDataToUse.GameDTO.Id.ToString(),
-                FigureIdToDelete = "123"
+                FigureIdsToDelete = "123"
             };
 
             mockGameService = new MockGameService()

@@ -84,11 +84,11 @@ namespace MyGame.BLL.Interfaces
         Task<OperationDetails> JoinGame(UserDTO userDTO, GameDTO gameDTO);
 
         /// <summary>
-        /// Deletes figure with some id from DB.
+        /// Deletes figures from DB by id.
         /// </summary>
-        /// <param name="figureDTO">Figure information class, which contains figure's id.</param>
+        /// <param name="figureDTO">Figure information class, which contains figure ids.</param>
         /// <returns>Detelion result</returns>
-        Task<OperationDetails> DeleteFigure(FigureDTO figureDTO);
+        Task<OperationDetails> DeleteFigures(ICollection<FigureDTO> figureDTOs);
 
     }
 }

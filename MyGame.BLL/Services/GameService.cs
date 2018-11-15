@@ -210,6 +210,7 @@ namespace MyGame.BLL.Services
 
             figure.X = figureData.XCoord;
             figure.Y = figureData.YCoord;
+            figure.IsSuperFigure = figureData.IsSuperFigure;
 
             try
             {
@@ -289,10 +290,10 @@ namespace MyGame.BLL.Services
         #endregion
 
         #region DELETE_FIGURE
-        public async Task<OperationDetails> DeleteFigure(FigureDTO figureDTO)
+        public async Task<OperationDetails> DeleteFigures(ICollection<FigureDTO> figureDTOs)
         {
             OperationDetails successOD = new OperationDetails(true);
-            if (!(await Database.FigureManager.DeleteSingleFigureAsync(figureDTO.Id)))
+            if (!(await Database.FigureManager.DeleteSomeFiguresAsync(figureDTOs.Select(f => f.Id))))
             {
                 return new OperationDetails(false, "Failed while deleting figure.");
             }
@@ -337,6 +338,7 @@ namespace MyGame.BLL.Services
                     Id = f.Id,
                     XCoord = f.X,
                     YCoord = f.Y,
+                    IsSuperFigure = f.IsSuperFigure,
                     Color = f.Color.ToString()
                 });
             }
