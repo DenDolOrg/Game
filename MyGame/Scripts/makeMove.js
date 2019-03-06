@@ -8,6 +8,10 @@
     var coordsToMove = "";
     var killModels; 
     var superFigureStatus = 0;
+    stepHub.client.reciveEndOfGame = function () {
+        alert("You win.");
+    }
+
     stepHub.client.reciveJoinSignal = function (joinModel) {
         model.OpponentName = joinModel.myName;
         if (model.isMyTurn) {
@@ -36,15 +40,20 @@
             
         }
         killModels = ChangePos(step, color);
-        if (killModels != null && killModels.length != 0) {
-            isRegularMovement = false;
-            figures.draggable('disable');
-            PrepareToEat(killModels);
+        if (figures.length != 0) {
+
+            if (killModels != null && killModels.length != 0) {
+                isRegularMovement = false;
+                figures.draggable('disable');
+                PrepareToEat(killModels);
+            }
+            else {
+                isRegularMovement = true;
+            }
         }
         else {
-            isRegularMovement = true;
+            GameLose(stepHub, model.OpponentName);
         }
-
     }
 
     $.connection.hub.start().done(function () {
@@ -65,13 +74,13 @@
                     superFigureStatus = 0;
                 }
                 if (isRegularMovement) {
-                    
                     currentFigure.css("z-index", "15");
-                    var validY = currentFigure.parent().data("ycoord") - 1;
-                    var validX_r = currentFigure.parent().data("xcoord") + 1;
-                    var validX_l = validX_r - 2;
-                    $(".blackSquares:not(:has(img))[data-ycoord ='" + validY + "'][data-xcoord ='" + validX_l + "']").addClass("validBox");
-                    $(".blackSquares:not(:has(img))[data-ycoord ='" + validY + "'][data-xcoord ='" + validX_r + "']").addClass("validBox");
+                    if (superFigureStatus == 1) {
+                        SetBoxesForSuperFigureDrag(currentFigure);
+                    }
+                    else {
+                        SetBoxesForRegularDrag(currentFigure);
+                    }
                     StartDrag();
                 }
                 else {
@@ -134,7 +143,7 @@
                 receiverName: model.OpponentName,
                 myName: model.MyName
             };
-            stepHub.server.joinSignal(joinModel)
+            stepHub.server.joinSignal(joinModel);
         }
     });
 };
@@ -169,6 +178,7 @@ function RegularDrop(droppedFigure, box, color, figures, model, stepHub, figureI
         }
         if (y == 1) {
             superFigureStatus = 1;
+            droppedFigure.addClass("superFig");
             if (color == "Black") {
                 $(droppedFigure).attr("src", "../../Images/damkaB.png");
             }
@@ -199,6 +209,7 @@ function EatDrop(droppedFigure, box, color, figures, model, stepHub, killModels,
         var boxY = box.data("ycoord");
         if (boxY == 1) {
             superFigureStatus = 1;
+            droppedFigure.addClass("superFig");
             if (color == "Black") {
                 $(droppedFigure).attr("src", "../../Images/damkaB.png");
             }
@@ -212,14 +223,16 @@ function EatDrop(droppedFigure, box, color, figures, model, stepHub, killModels,
         });
 
         var victimes = currentKillModel[0].victimes;
-        var fields = currentKillModel[0].freeSpaces;
-        var victim;
-        fields.each(function (index) {
-            if (($(this).data("xcoord") == boxX) &&
-                ($(this).data("ycoord") == boxY)) {
-                victim = $(victimes[index]);
+        var victim = victimes[0];
+        var minDist = 100;
+        victimes.each(function (index) {
+            var dist = Math.sqrt(Math.pow((boxX - $(this).data("xcoord")), 2) + Math.pow((boxY - $(this).data("ycoord")), 2));
+            if (dist < minDist) {
+                minDist = dist;
+                victim = $(this);
             }
         });
+        victim.children().addClass("toDelete");
         var coords = boxX + "," + boxY;
         data = new SendDataModel(null, victim.children().data("fig-id"), coords, superFigureStatus);
 
@@ -228,8 +241,7 @@ function EatDrop(droppedFigure, box, color, figures, model, stepHub, killModels,
             opponentColor = "Black";
         }
 
-        victim.empty();
-        var innerModel = GetKillerModel(droppedFigure, boxX, boxY, opponentColor)
+        var innerModel = GetKillerModel(droppedFigure, boxX, boxY, color)
         if (innerModel != null) {
             data.innerModel = innerModel;
             MakeAppend(box, droppedFigure);
@@ -238,6 +250,7 @@ function EatDrop(droppedFigure, box, color, figures, model, stepHub, killModels,
             
         }
         else {
+            $(".toDelete").remove();
             figureIdsToDelete += data.idsToDel;
             movesToDo += data.coordsToMove;
             RegularDrop(droppedFigure, box, color, figures, model, stepHub, figureIdsToDelete, movesToDo, superFigureStatus);
@@ -369,6 +382,54 @@ function AnimateMovement(movementIndex, coordModels, currentFigure, color) {
     $("#TurnStatusParag").html("Now it's your turn!");
 
     return killModels;   
+}
+
+function SetBoxesForRegularDrag(currentFigure) {
+    var validY = currentFigure.parent().data("ycoord") - 1;
+    var validX_r = currentFigure.parent().data("xcoord") + 1;
+    var validX_l = validX_r - 2;
+    $(".blackSquares:not(:has(img))[data-ycoord ='" + validY + "'][data-xcoord ='" + validX_l + "']").addClass("validBox");
+    $(".blackSquares:not(:has(img))[data-ycoord ='" + validY + "'][data-xcoord ='" + validX_r + "']").addClass("validBox");
+}
+
+function SetBoxesForSuperFigureDrag(currentFigure) {
+    var current_x = currentFigure.parent().data("xcoord");
+    var current_y = currentFigure.parent().data("ycoord");
+
+    SetSuperFigGragDiagonal(current_x, current_y, -1, 1);
+    SetSuperFigGragDiagonal(current_x, current_y, -1, -1);
+    SetSuperFigGragDiagonal(current_x, current_y, 1, -1);
+    SetSuperFigGragDiagonal(current_x, current_y, 1, 1);
+}
+
+function SetSuperFigGragDiagonal(current_x, current_y, delta_x, delta_y) {
+    var i = 1;
+    while (true) {
+        var field_x = current_x + i * delta_x;
+        var field_y = current_y + i * delta_y;
+        if (field_x > 0 && field_x < 11 && field_y > 0 && field_y < 11) {
+            var tempFree = $(".blackSquares:not(:has(img))[data-ycoord ='" + field_y + "'][data-xcoord ='" + field_x + "']");
+            if (tempFree.is(":not(:has(img))")) {
+                tempFree.addClass("validBox");
+            }
+            else {
+                break;
+            }
+        }
+        else {
+            break;
+        }
+        i++;
+    }
+}
+
+function GameLose(stepHub, name) {
+    var endGameModel = {
+        receiverName: name
+    }
+    stepHub.server.endGame(endGameModel);
+
+    alert("You lose.");
 }
 
 function SendDataModel(innerModel, idsToDel, coordsToMove, superFigureStatus) {

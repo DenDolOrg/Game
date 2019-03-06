@@ -19,6 +19,12 @@
             }
         }
         var elem = $(".tableSquare[data-xcoord='" + value.XCoord + "'][data-ycoord='" + value.YCoord + "']");
-        elem.html("<img class='figure_" + value.Color + "' src='" + ImgSrc + "' data-fig-id='" + value.Id + "'>");
+        if (value.IsSuperFigure == true) {
+            elem.html("<img class='figure_" + value.Color + " superFig' src='" + ImgSrc + "' data-fig-id='" + value.Id + "'>");
+        }
+        else {
+            elem.html("<img class='figure_" + value.Color + "' src='" + ImgSrc + "' data-fig-id='" + value.Id + "'>");
+
+        }
     });
 }

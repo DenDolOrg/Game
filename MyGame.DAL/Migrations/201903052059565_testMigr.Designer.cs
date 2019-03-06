@@ -6,14 +6,14 @@ namespace MyGame.DAL.Migrations
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    [GeneratedCode("EntityFramework.Migrations", "6.1.0-30225")]
-    public sealed partial class lastTurn : IMigrationMetadata
+    [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
+    public sealed partial class testMigr : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(lastTurn));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(testMigr));
         
         string IMigrationMetadata.Id
         {
-            get { return "201811051133462_lastTurn"; }
+            get { return "201903052059565_testMigr"; }
         }
         
         string IMigrationMetadata.Source

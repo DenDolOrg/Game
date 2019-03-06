@@ -22,6 +22,11 @@ namespace MyGame.Real_time
         {
             Clients.User(joinModel.ReceiverName).reciveJoinSignal(joinModel);
         }
+
+        public void EndGame(EndGameModel endGameModel)
+        {
+            Clients.User(endGameModel.ReceiverName).reciveEndOfGame();
+        }
     }
 
     public class StepModel
@@ -53,6 +58,13 @@ namespace MyGame.Real_time
 
         [JsonProperty("myName")]
         public string MyName { get; set; }
+    }
+
+    public class EndGameModel
+    {
+        [JsonProperty("receiverName")]
+        public string ReceiverName { get; set; }
+
     }
 
 }
